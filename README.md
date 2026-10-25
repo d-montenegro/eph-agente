@@ -153,6 +153,29 @@ El desarrollo está guiado por evaluaciones: se arranca con una línea base mín
 
 Todo lo que define el comportamiento del agente (descripciones, vistas, prompts y golden set) va versionado, para que cada corrida de evaluación quede asociada a una versión. La base se reconstruye siempre con el mismo proceso, y las descripciones no se editan a mano en ella.
 
+### Golden set por áreas
+
+El golden set se arma por áreas temáticas de la EPH, una por vez: en cada área se entienden las variables, se construyen su vista y sus metadatos, se escriben las preguntas y se itera antes de pasar a la siguiente. Así la capa semántica y el golden set crecen juntos.
+
+1. **Pasada transversal inicial:** 5 a 10 preguntas simples repartidas entre áreas, para fijar temprano las decisiones globales (nombres de columnas, unión de personas y hogares, ponderadores).
+2. **Un área por vez**, en el orden de prioridad de la tabla. Las características demográficas se resuelven junto con la primera área, porque aparecen como filtro en casi todas las preguntas.
+3. **En cada área:** entender las variables con el diseño de registros y los datos; armar la vista y los metadatos de esas columnas; escribir entre 5 y 15 preguntas con su valor esperado, validado contra el INDEC cuando hay un dato publicado; iterar con los pasos de la sección siguiente.
+4. **Cruces entre áreas:** con dos o más áreas cubiertas, se suman preguntas que las combinan, como el ingreso medio según nivel educativo. Suelen ser las que más fallan.
+5. **Regresión y reserva:** cada iteración corre el golden set completo, no solo el del área nueva, y cada área aporta preguntas al conjunto de reserva.
+
+| Prioridad | Área | Base |
+| --- | --- | --- |
+| 1 | Condición de actividad: ocupados, desocupados, inactivos | Personas |
+| 1 | Ocupación principal: categoría, sector, formalidad, ocupación (CNO), rama | Personas |
+| 1 | Ingresos individuales y del hogar | Personas y hogares |
+| 2 | Características demográficas: sexo, edad, parentesco | Personas |
+| 2 | Educación | Personas |
+| 3 | Vivienda y características habitacionales | Hogares |
+| 3 | Estrategias y organización del hogar | Hogares |
+| 3 | Migración | Personas |
+
+Las áreas de prioridad 1 son el núcleo del objetivo (mercado laboral e ingresos). La primera área lleva más tiempo que las siguientes, porque en ella también se construyen el agente base y la evaluación automática.
+
 ### Iteración
 
 1. Correr la evaluación y analizar los fallos.
@@ -216,14 +239,14 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 ### Fase 3: evaluación
 
-- [ ] Golden set inicial con cobertura por categoría, incluidas las trampas
+- [ ] Golden set inicial: pasada transversal y primera área (condición de actividad), incluidas las trampas
 - [ ] Conjunto de reserva
 - [ ] Ejecución automática del golden set con repeticiones y registro de corridas
 - [ ] Primera medición: la línea base
 
 ### Fase 4: iteración
 
-- [ ] Ciclo de mejora con bitácora de decisiones, hasta alcanzar el nivel de acierto buscado
+- [ ] Ciclo de mejora con bitácora de decisiones, área por área en orden de prioridad, hasta alcanzar el nivel de acierto buscado
 - [ ] Ampliar el golden set con cada tipo de fallo encontrado
 
 ### Fase 5: elección del modelo
