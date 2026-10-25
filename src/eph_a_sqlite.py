@@ -22,7 +22,6 @@ Uso (desde la raíz del repositorio, con el entorno virtual activado):
 Tablas resultantes:
     individual  -> una fila por persona encuestada (usu_individual_*.txt)
     hogar       -> una fila por hogar encuestado   (usu_hogar_*.txt)
-    cargas      -> período cargado, origen del zip y fecha de carga
 
 Fuentes:
     Bases de datos: https://www.indec.gob.ar/indec/web/Institucional-Indec-BasesDeDatos
@@ -33,7 +32,6 @@ Fuentes:
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import io
 import sqlite3
 import sys
@@ -144,13 +142,14 @@ def tipo_sql(serie: pd.Series) -> str:
     return "TEXT"
 
 
-def construir_base(db: Path, tablas: dict[str, pd.DataFrame], origen: str) -> None:
+def construir_base(db: Path, tablas: dict[str, pd.DataFrame]) -> None:
     con = sqlite3.connect(db)
     try:
         with con:  # transacción: o queda la base completa o no cambia nada
             # Se eliminan vistas y tablas previas para reconstruir desde cero.
             for (vista,) in con.execute("SELECT name FROM sqlite_master WHERE type='view'").fetchall():
                 con.execute(f'DROP VIEW "{vista}"')
+            # "cargas" es una tabla de versiones anteriores del script.
             for tabla in (*TABLAS, "cargas"):
                 con.execute(f'DROP TABLE IF EXISTS "{tabla}"')
 
@@ -164,16 +163,6 @@ def construir_base(db: Path, tablas: dict[str, pd.DataFrame], origen: str) -> No
                     for fila in df.itertuples(index=False, name=None)
                 )
                 con.executemany(f'INSERT INTO "{nombre}" ({cols}) VALUES ({marcas})', filas)
-
-            con.execute(
-                "CREATE TABLE cargas (anio INTEGER, trimestre INTEGER, tabla TEXT, "
-                "filas INTEGER, origen TEXT, cargado_en TEXT)"
-            )
-            ahora = dt.datetime.now().isoformat(timespec="seconds")
-            con.executemany(
-                "INSERT INTO cargas VALUES (?,?,?,?,?,?)",
-                [(ANIO, TRIMESTRE, n, len(df), origen, ahora) for n, df in tablas.items()],
-            )
 
             for tabla in TABLAS:
                 con.execute(f'CREATE INDEX ix_{tabla}_hogar ON "{tabla}" (CODUSU, NRO_HOGAR)')
@@ -196,13 +185,12 @@ def main() -> int:
     args = p.parse_args()
 
     ruta = args.zip or buscar_zip(CARPETA_DATOS)
-    origen = ruta.name
     print(f"> Leyendo {ruta}")
     tablas = extraer_tablas(ruta)
     validar_periodo(tablas)
 
     print(f"> Construyendo {args.db}")
-    construir_base(args.db, tablas, origen)
+    construir_base(args.db, tablas)
     for nombre, df in tablas.items():
         print(f"  {nombre}: {len(df):,} filas, {df.shape[1]} columnas")
     print(f"\nListo: {args.db.resolve()}")
