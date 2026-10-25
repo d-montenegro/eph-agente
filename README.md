@@ -2,7 +2,7 @@
 
 Oct 23, 2026 · @Damian
 
-Este documento presenta un agente que responde preguntas en lenguaje natural sobre los microdatos de la Encuesta Permanente de Hogares (EPH) del INDEC: arma el SQL, lo ejecuta sobre una base de datos relacional y devuelve la respuesta con el SQL y los supuestos que usó. El alcance inicial es un único trimestre, el primero de 2026 (1T 2026), que es el último publicado al momento de implementar esto; sumar otros trimestres y la integración con Claude por MCP quedan como mejoras futuras.
+Este documento presenta un agente que responde preguntas en lenguaje natural sobre los microdatos de la Encuesta Permanente de Hogares (EPH) del INDEC: arma el SQL, lo ejecuta sobre una base de datos relacional y devuelve la respuesta con el SQL y los supuestos que usó. El alcance inicial es un único trimestre, el primero de 2026 (1T 2026), que es el último publicado al momento de implementar esto; sumar otros trimestres y la integración por MCP con asistentes basados en LLM quedan como mejoras futuras.
 
 Cumple tres funciones: compartir la propuesta, guiar el desarrollo (el plan de trabajo del final se va tildando) y documentar cómo funciona el producto terminado. Se actualiza a medida que avanza el proyecto; el detalle de cada decisión queda en la bitácora del repositorio.
 
@@ -255,20 +255,20 @@ Para cada trimestre nuevo:
 
 Con esto definido, el procedimiento pasa a ser parte del despliegue: cada publicación del INDEC dispara el análisis, la carga y la evaluación antes de publicar una nueva imagen.
 
-### Integración con Claude por MCP
+### Integración por MCP con asistentes LLM
 
-Exponer el agente como un servidor MCP (Model Context Protocol) permite usarlo desde la app de Claude: por ejemplo, pedir un gráfico de la desocupación por aglomerado y que Claude obtenga los datos y arme la visualización.
+Exponer el agente como un servidor MCP (Model Context Protocol) permite usarlo desde cualquier asistente basado en un LLM que soporte ese protocolo (Claude, ChatGPT, Gemini u otros): por ejemplo, pedir un gráfico de la desocupación por aglomerado y que el asistente obtenga los datos y arme la visualización.
 
 |  | Exponer el agente completo | Exponer las herramientas |
 | --- | --- | --- |
-| Qué ve Claude | Una herramienta: `consultar_eph(pregunta)` | `listar_tablas`, `describir_tabla`, `ejecutar_sql` y las métricas curadas |
-| Quién arma el SQL | El agente propio, con su modelo | Claude |
-| Ventaja | Se usa exactamente lo evaluado con el golden set | Más simple; Claude accede directo a los datos |
-| Desventaja | Dos modelos en cadena: más costo y latencia | Hay que evaluar a Claude en el rol de agente |
+| Qué ve el asistente | Una herramienta: `consultar_eph(pregunta)` | `listar_tablas`, `describir_tabla`, `ejecutar_sql` y las métricas curadas |
+| Quién arma el SQL | El agente propio, con su modelo | El asistente |
+| Ventaja | Se usa exactamente lo evaluado con el golden set | Más simple; el asistente accede directo a los datos |
+| Desventaja | Dos modelos en cadena: más costo y latencia | Hay que evaluar el modelo del asistente en el rol de agente |
 
-- Las herramientas devuelven datos (filas, SQL y supuestos), no imágenes ni texto: la visualización la arma Claude.
-- La capa semántica, las herramientas y el golden set se reutilizan en ambas opciones; el golden set sirve también para evaluar a Claude como agente.
-- Para uso personal alcanza un servidor MCP local en la app de escritorio; para usarlo desde cualquier dispositivo o compartirlo, hace falta un servidor remoto por HTTPS, que se suma al despliegue.
+- Las herramientas devuelven datos (filas, SQL y supuestos), no imágenes ni texto: la visualización la arma el asistente.
+- La capa semántica, las herramientas y el golden set se reutilizan en ambas opciones; el golden set sirve también para evaluar el modelo del asistente como agente.
+- Para uso personal alcanza un servidor MCP local conectado a un asistente de escritorio; para usarlo desde cualquier dispositivo o compartirlo, hace falta un servidor remoto por HTTPS, que se suma al despliegue.
 - Los gráficos de evolución dependen de la mejora anterior: con un solo trimestre no hay series.
 
 ### Evaluación de la respuesta en texto
