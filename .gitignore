@@ -1,0 +1,19 @@
+# Entorno virtual de Python
+.ve/
+.venv/
+__pycache__/
+*.pyc
+
+# Datos regenerables con eph_a_sqlite.py
+eph_zips/
+*.sqlite
+*.sqlite-journal
+
+# Proyecto local de DB Browser for SQLite
+*.sqbpro
+
+# Credenciales y configuración local
+.env
+
+# Sistema
+.DS_Store
