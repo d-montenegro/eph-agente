@@ -178,14 +178,23 @@ Las áreas de prioridad 1 son el núcleo del objetivo (mercado laboral e ingreso
 
 ### Iteración
 
-1. Correr la evaluación y analizar los fallos.
-2. Clasificar cada fallo (variable equivocada, ponderador, universo, ambigüedad) y formular una hipótesis.
-3. Hacer **un solo** cambio: descripción, vista, métrica o prompt.
-4. Probar a mano la pregunta que fallaba, con el perfil `dev`.
-5. Correr el golden set completo y comparar con la corrida anterior: ¿se corrigió? ¿hubo regresiones?
-6. Si mejora, commit y entrada en la bitácora; si no, revertir.
-7. Agregar preguntas nuevas que cubran el tipo de fallo encontrado.
-8. Cada tanto, una corrida con el perfil `eval` y contra el conjunto de reserva.
+```mermaid
+flowchart TB
+    E[Correr la evaluación<br/>y analizar los fallos] --> C[Clasificar el fallo<br/>y formular una hipótesis]
+    C --> U[Hacer un solo cambio<br/>descripción, vista, métrica o prompt]
+    U --> P[Probar a mano la pregunta<br/>con el perfil dev]
+    P --> G[Correr el golden set completo<br/>y comparar con la corrida anterior]
+    G --> D{¿Mejora sin<br/>regresiones?}
+    D -- sí --> K[Commit y bitácora<br/>registrar el efecto]
+    K --> A[Agregar preguntas<br/>de ese tipo de fallo]
+    A --> E
+    D -- no --> R[Revertir el cambio<br/>y repensar]
+    R -- otra hipótesis --> C
+    N[Cada tanto: corrida con el<br/>perfil eval y la reserva]
+    style N stroke-dasharray: 5 5
+```
+
+Si el cambio no mejora o genera regresiones, se revierte y se vuelve a la hipótesis; si mejora, queda registrado y el golden set suma preguntas del tipo de fallo encontrado. Cada tanto se corre con el perfil `eval` y contra el conjunto de reserva.
 
 ### Bitácora de decisiones
 
