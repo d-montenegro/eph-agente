@@ -7,17 +7,17 @@ el último publicado al momento de implementar esto. Incorporar otros trimestres
 mejora futura: cada uno requiere antes un análisis de cambios en el diseño de registros.
 
 Los datos se leen del zip original del INDEC guardado en la carpeta datos_indec/ del
-repositorio (ver datos_indec/README.md para saber de dónde se descarga).
+repositorio (ver datos_indec/README.md para saber de dónde se descarga). La base se
+genera en la raíz del repositorio (eph.sqlite). Ver src/README.md para instalar y correr.
 
 La base se reconstruye siempre con el mismo proceso: cada corrida borra las tablas y
 las vuelve a crear desde el zip. Las tablas quedan tal como las publica el INDEC
 (mismas columnas y códigos); la capa semántica (vistas legibles y metadatos) se
 construye después, sobre ellas.
 
-Uso:
-    pip install pandas
-    python eph_a_sqlite.py                        # usa el zip de datos_indec/ y construye eph.sqlite
-    python eph_a_sqlite.py --zip otro/archivo.zip # usa un zip de otra ubicación
+Uso (desde la raíz del repositorio, con el entorno virtual activado):
+    python src/eph_a_sqlite.py                        # usa el zip de datos_indec/ y construye eph.sqlite
+    python src/eph_a_sqlite.py --zip otro/archivo.zip # usa un zip de otra ubicación
 
 Tablas resultantes:
     individual  -> una fila por persona encuestada (usu_individual_*.txt)
@@ -45,7 +45,9 @@ import pandas as pd
 # Período del alcance inicial.
 ANIO, TRIMESTRE = 2026, 1
 
-CARPETA_DATOS = Path(__file__).resolve().parent / "datos_indec"
+RAIZ_REPO = Path(__file__).resolve().parent.parent
+CARPETA_DATOS = RAIZ_REPO / "datos_indec"
+BASE_DEFAULT = RAIZ_REPO / "eph.sqlite"
 TABLAS = ("individual", "hogar")
 
 
@@ -189,7 +191,7 @@ def main() -> int:
     p = argparse.ArgumentParser(
         description=f"Construye la base del agente EPH con el {ANIO}T{TRIMESTRE} del INDEC."
     )
-    p.add_argument("--db", type=Path, default=Path("eph.sqlite"), help="archivo de la base (default: eph.sqlite)")
+    p.add_argument("--db", type=Path, default=BASE_DEFAULT, help="archivo de la base (default: eph.sqlite en la raíz del repo)")
     p.add_argument("--zip", type=Path, help="zip de microdatos (default: el que esté en datos_indec/)")
     args = p.parse_args()
 

@@ -10,7 +10,7 @@ Encuesta Permanente de Hogares (EPH) continua, **1er trimestre de 2026** (1T 202
 
 | Archivo | Qué es |
 | --- | --- |
-| Zip de microdatos del 1T 2026 (formato txt) | Bases usuarias Individual y Hogar. Es lo que carga `eph_a_sqlite.py`. |
+| Zip de microdatos del 1T 2026 (formato txt) | Bases usuarias Individual y Hogar. Es lo que carga `src/eph_a_sqlite.py`. |
 | `EPH_registro_1T2026.pdf` | Diseño de registros y estructura para las bases preliminares Hogar y Personas: describe cada variable y sus códigos. |
 
 ## De dónde se descargan
