@@ -6,15 +6,18 @@ Alcance inicial: un único trimestre de la EPH continua, el primero de 2026 (1T 
 el último publicado al momento de implementar esto. Incorporar otros trimestres es una
 mejora futura: cada uno requiere antes un análisis de cambios en el diseño de registros.
 
+Los datos se leen del zip original del INDEC guardado en la carpeta datos_indec/ del
+repositorio (ver datos_indec/README.md para saber de dónde se descarga).
+
 La base se reconstruye siempre con el mismo proceso: cada corrida borra las tablas y
-las vuelve a crear desde el zip del INDEC. Las tablas quedan tal como las publica el
-INDEC (mismas columnas y códigos); la capa semántica (vistas legibles y metadatos)
-se construye después, sobre ellas.
+las vuelve a crear desde el zip. Las tablas quedan tal como las publica el INDEC
+(mismas columnas y códigos); la capa semántica (vistas legibles y metadatos) se
+construye después, sobre ellas.
 
 Uso:
-    pip install pandas requests
-    python eph_a_sqlite.py                        # descarga el 1T 2026 y construye eph.sqlite
-    python eph_a_sqlite.py --zip archivo.zip      # usa un zip ya descargado a mano
+    pip install pandas
+    python eph_a_sqlite.py                        # usa el zip de datos_indec/ y construye eph.sqlite
+    python eph_a_sqlite.py --zip otro/archivo.zip # usa un zip de otra ubicación
 
 Tablas resultantes:
     individual  -> una fila por persona encuestada (usu_individual_*.txt)
@@ -38,55 +41,30 @@ import zipfile
 from pathlib import Path
 
 import pandas as pd
-import requests
 
 # Período del alcance inicial.
 ANIO, TRIMESTRE = 2026, 1
 
-BASE_URL = "https://www.indec.gob.ar/ftp/cuadros/menusuperior/eph/"
-HEADERS = {"User-Agent": "Mozilla/5.0 (eph_a_sqlite.py; uso personal)"}
+CARPETA_DATOS = Path(__file__).resolve().parent / "datos_indec"
 TABLAS = ("individual", "hogar")
 
 
 # ----------------------------------------------------------------------------
-# Descarga
+# Ubicación del zip
 # ----------------------------------------------------------------------------
 
-def urls_candidatas(anio: int, trim: int) -> list[str]:
-    """INDEC no fue consistente con los nombres de archivo; probamos variantes."""
-    ordinal = {1: "1er", 2: "2do", 3: "3er", 4: "4to"}[trim]
-    nombres = [
-        f"EPH_usu_{ordinal}_Trim_{anio}_txt.zip",
-        f"EPH_usu_{trim}_Trim_{anio}_txt.zip",
-        f"EPH_usu_{ordinal}Trim_{anio}_txt.zip",
-        f"EPH_usu_{ordinal}_trim_{anio}_txt.zip",
-        f"EPH_usu_{trim}_trim_{anio}_txt.zip",
-    ]
-    return [BASE_URL + n for n in dict.fromkeys(nombres)]
-
-
-def descargar(anio: int, trim: int, cache: Path) -> tuple[Path, str]:
-    """Devuelve (ruta_zip, origen). Reutiliza el zip si ya está descargado."""
-    cache.mkdir(parents=True, exist_ok=True)
-    destino = cache / f"eph_{anio}T{trim}.zip"
-    if destino.exists() and zipfile.is_zipfile(destino):
-        return destino, f"cache ({destino})"
-
-    with requests.Session() as sesion:
-        sesion.headers.update(HEADERS)
-        for url in urls_candidatas(anio, trim):
-            try:
-                r = sesion.get(url, timeout=60)
-            except requests.RequestException as e:
-                print(f"  ! error de red con {url}: {e}")
-                continue
-            if r.status_code == 200 and r.content[:2] == b"PK":
-                destino.write_bytes(r.content)
-                return destino, url
-
+def buscar_zip(carpeta: Path) -> Path:
+    """Devuelve el único zip de microdatos que hay en la carpeta de datos del INDEC."""
+    zips = sorted(p for p in carpeta.glob("*.zip") if zipfile.is_zipfile(p))
+    if len(zips) == 1:
+        return zips[0]
+    if not zips:
+        motivo = f"No hay ningún zip en {carpeta}."
+    else:
+        motivo = f"Hay más de un zip en {carpeta}: {', '.join(p.name for p in zips)}."
     sys.exit(
-        f"No encontré el zip de {anio}T{trim} en INDEC. Bajalo a mano desde la página de "
-        "Bases de datos y corré: python eph_a_sqlite.py --zip <archivo.zip>"
+        f"{motivo} Dejá ahí solo el zip de microdatos del {TRIMESTRE}T {ANIO} "
+        f"(ver {carpeta / 'README.md'}) o indicá uno con --zip."
     )
 
 
@@ -212,15 +190,11 @@ def main() -> int:
         description=f"Construye la base del agente EPH con el {ANIO}T{TRIMESTRE} del INDEC."
     )
     p.add_argument("--db", type=Path, default=Path("eph.sqlite"), help="archivo de la base (default: eph.sqlite)")
-    p.add_argument("--cache", type=Path, default=Path("eph_zips"), help="carpeta de los zip (default: eph_zips)")
-    p.add_argument("--zip", type=Path, help="usar un zip ya descargado en lugar de bajarlo")
+    p.add_argument("--zip", type=Path, help="zip de microdatos (default: el que esté en datos_indec/)")
     args = p.parse_args()
 
-    if args.zip:
-        ruta, origen = args.zip, str(args.zip)
-    else:
-        print(f"> Descargando {ANIO}T{TRIMESTRE}...")
-        ruta, origen = descargar(ANIO, TRIMESTRE, args.cache)
+    ruta = args.zip or buscar_zip(CARPETA_DATOS)
+    origen = ruta.name
     print(f"> Leyendo {ruta}")
     tablas = extraer_tablas(ruta)
     validar_periodo(tablas)
