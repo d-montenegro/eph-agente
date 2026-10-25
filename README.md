@@ -4,7 +4,7 @@ Oct 23, 2026 · @Damian
 
 Este documento presenta un agente que responde preguntas en lenguaje natural sobre los microdatos de la Encuesta Permanente de Hogares (EPH) del INDEC: arma el SQL, lo ejecuta sobre una base de datos relacional y devuelve la respuesta con el SQL y los supuestos que usó. El alcance inicial es un único trimestre, el primero de 2026 (1T 2026), que es el último publicado al momento de implementar esto; sumar otros trimestres y la integración por MCP con asistentes basados en LLM quedan como mejoras futuras.
 
-Cumple tres funciones: compartir la propuesta, guiar el desarrollo (el plan de trabajo del final se va tildando) y documentar cómo funciona el producto terminado. Se actualiza a medida que avanza el proyecto; el detalle de cada decisión queda en la bitácora del repositorio.
+El documento cumple tres funciones: compartir la propuesta, guiar el desarrollo (el plan de trabajo del final se va tildando) y documentar cómo funciona el producto terminado. Se actualiza a medida que avanza el proyecto; el detalle de cada decisión queda en la bitácora del repositorio.
 
 ## Objetivo
 
@@ -23,22 +23,17 @@ El criterio de éxito es medible: un porcentaje de acierto sobre un golden set d
 
 Usamos la **EPH continua**: trimestral, 31 aglomerados urbanos, microdatos publicados desde el 2T 2016 en dos tablas (individuos y hogares). El alcance inicial usa un único trimestre, el primero de 2026 (1T 2026), que es el último publicado al momento de implementar esto.
 
-| Base | Cobertura | Frecuencia | Uso |
-| --- | --- | --- | --- |
-| EPH continua | 31 aglomerados urbanos | Trimestral | **Elegida**: comparación entre aglomerados; series trimestrales en una mejora futura |
-| EPH total urbano | Aglomerados + localidades de 2.000 habitantes o más | Anual (3er trimestre) | Descartada por ahora; candidata a una segunda fuente |
-
 Los microdatos se descargan de la [página de bases de datos del INDEC](https://www.indec.gob.ar/indec/web/Institucional-Indec-BasesDeDatos) y se cargan en una **base de datos relacional**. Las tablas de individuos y hogares quedan tal como las publica el INDEC, y sobre ellas se construye la capa semántica.
 
 ## Capa semántica
 
-Las tablas del INDEC usan nombres de columnas y valores codificados: por ejemplo, el sexo está en `CH04`, con 1 = varón y 2 = mujer. Sin contexto, un modelo no puede interpretarlos. Por eso, sobre las tablas se crean **vistas** con nombres y valores legibles, acompañadas de **metadatos** que describen cada columna; el agente trabaja solo con esa capa.
+Las tablas del INDEC usan nombres de columnas y valores codificados: por ejemplo, el sexo está en la columna `CH04`, con 1 = varón y 2 = mujer. Sin contexto, un modelo no puede interpretarlos. Por eso, sobre las tablas se crean **vistas** con nombres y valores legibles, acompañadas de **metadatos** que describen cada columna; el agente trabaja solo con esas vistas y los metadatos, no con las tablas crudas.
 
-Esos metadatos forman el diccionario de datos: para cada columna, qué significa, qué valores toma, a quién aplica y con qué ponderador se estima. El agente lo consulta para decidir qué columnas usar y cómo. El diccionario se arma con el [Diseño de registros y estructura para las bases preliminares Hogar y Personas](https://www.indec.gob.ar/ftp/cuadros/menusuperior/eph/EPH_registro_1T2026.pdf) del 1T 2026 (publicado en agosto de 2026).
+Los metadatos forman el diccionario de datos: para cada columna, qué significa, qué valores toma, a quién aplica y con qué ponderador se estima. El agente lo consulta para decidir qué columnas usar y cómo. El diccionario se arma con el [Diseño de registros y estructura para las bases preliminares Hogar y Personas](https://www.indec.gob.ar/ftp/cuadros/menusuperior/eph/EPH_registro_1T2026.pdf) del 1T 2026 (publicado en agosto de 2026).
 
 ### Tres niveles
 
-1. **Vistas legibles** (`personas`, `hogares`) sobre las tablas crudas, que quedan intactas. Nombres claros (`sexo = 'Mujer'`), valores especiales convertidos en `NULL`, universo aplicado en los datos (el ingreso laboral es `NULL` fuera de los ocupados) y columnas derivadas (`es_desocupado`, `grupo_edad`). Esto hace imposibles varios errores, incluso en SQL libre.
+1. **Vistas legibles** (`personas`, `hogares`) sobre las tablas crudas, que quedan intactas. Nombres claros (`sexo = 'Mujer'`), valores especiales convertidos en `NULL`, universo aplicado en los datos (el ingreso laboral es `NULL` fuera de los ocupados) y columnas derivadas (`es_desocupado`, `grupo_edad`). Esto limita potenciales errores del modelo al implementar las consultas a la base de datos.
 2. **Metadatos de columnas** guardados en la base, armados a partir del diseño de registro del INDEC y versionados junto con el resto del proyecto.
 3. **Métricas curadas y parametrizables** (`tasa_desocupacion(filtros, agrupar_por)`), solo donde la evaluación muestre fallos recurrentes.
 
@@ -48,7 +43,7 @@ La ficha describe solo las columnas de las vistas, que es lo único que ve el mo
 
 | Campo | Para qué sirve |
 | --- | --- |
-| Nombre y vista | En qué vista está la columna y si hace falta unir personas con hogares |
+| Nombre y vista | Nombre de la columna y a qué vista pertenece |
 | Descripción | Qué mide, en lenguaje claro |
 | Tipo | Categórica, numérica o identificador: define qué agregaciones tienen sentido |
 | Valores posibles | Las etiquetas que puede tomar (por ejemplo, “Mujer” o “Desocupado”), para filtrar sin inventar valores |
@@ -56,7 +51,7 @@ La ficha describe solo las columnas de las vistas, que es lo único que ve el mo
 | Universo | A quién aplica la columna; fuera de ese universo la vista deja NULL |
 | Ponderador | Qué columna de ponderación usar para esa medida |
 | Sinónimos | “desempleo”, “sueldo”: ayudan a encontrar la columna |
-| Notas | Advertencias metodológicas; al sumar trimestres, desde y hasta cuándo existe la columna |
+| Notas | Cualquier información relevante no presente en los anteriores campos |
 
 Los clasificadores largos (CNO, CAES) van en tablas aparte. La parte estadística (valores distintos, rangos, nulos) se genera con un profiling automático que además valida el diccionario.
 
@@ -66,9 +61,8 @@ Un único agente con tool use, sin framework de orquestación: un loop simple (p
 
 ```mermaid
 flowchart TB
-    P[Pregunta en lenguaje natural] --> A["Agente LLM con tool use<br/>independiente del proveedor<br/>prompt con índice compacto de columnas"]
+    P[Pregunta en lenguaje natural] --> A["Agente LLM con tool use<br/>independiente del proveedor<br/>prompt con vistas e índice de columnas"]
     A --> R[Respuesta: valor, SQL, supuestos]
-    A --> T1[listar_tablas<br/>qué vistas hay disponibles]
     A --> T2[describir_tabla<br/>ficha completa de columnas]
     A --> T3[ejecutar_sql<br/>solo lectura, con límites]
     subgraph BD[Base de datos relacional · solo lectura]
@@ -77,20 +71,20 @@ flowchart TB
         C[Métricas curadas<br/>solo si la evaluación lo pide]
         RAW[(Tablas crudas del INDEC, intactas:<br/>individuos y hogares)]
     end
-    T1 --> BD
     T2 --> BD
     T3 --> BD
     V --> RAW
     style C stroke-dasharray: 5 5
 ```
 
-El agente solo accede a la base a través de tres herramientas y solo ve las vistas; las tablas crudas quedan debajo, sin cambios. La caja punteada se agrega solo si la evaluación la justifica.
+El agente solo accede a la base a través de dos herramientas y solo ve las vistas; las tablas crudas quedan debajo, sin cambios. La caja punteada se agrega solo si la evaluación la justifica.
 
 | Herramienta | Qué hace |
 | --- | --- |
-| `listar_tablas()` | Lista las vistas disponibles con su descripción |
 | `describir_tabla(nombre)` | Devuelve la ficha completa de cada columna de la vista: descripción, valores posibles, significado de NULL, universo y ponderador |
 | `ejecutar_sql(query)` | Ejecuta la consulta y devuelve el resultado o el error, para que el modelo corrija |
+
+Los nombres de las dos vistas, para qué sirve cada una y el índice compacto de sus columnas van en el prompt del agente, así que no hace falta una herramienta para listarlas: el modelo arranca sabiendo qué hay y se ahorra una llamada por pregunta.
 
 **Ejecución segura:** acceso de solo lectura a la base, validación previa de que la consulta sea un único `SELECT`, límite de filas y timeout.
 
@@ -211,7 +205,7 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 ### Fase 2: agente base
 
-- [ ] Loop con las tres herramientas y ejecución segura
+- [ ] Loop con las dos herramientas y ejecución segura
 - [ ] Índice compacto de columnas generado desde los metadatos
 - [ ] Salida estructurada `{valor, sql, supuestos, respuesta}`
 - [ ] Perfiles `local` y `dev`
@@ -261,7 +255,7 @@ Exponer el agente como un servidor MCP (Model Context Protocol) permite usarlo d
 
 |  | Exponer el agente completo | Exponer las herramientas |
 | --- | --- | --- |
-| Qué ve el asistente | Una herramienta: `consultar_eph(pregunta)` | `listar_tablas`, `describir_tabla`, `ejecutar_sql` y las métricas curadas |
+| Qué ve el asistente | Una herramienta: `consultar_eph(pregunta)` | `describir_tabla`, `ejecutar_sql` y las métricas curadas; como el asistente no recibe el prompt del agente, las descripciones de las herramientas tienen que indicar qué vistas hay |
 | Quién arma el SQL | El agente propio, con su modelo | El asistente |
 | Ventaja | Se usa exactamente lo evaluado con el golden set | Más simple; el asistente accede directo a los datos |
 | Desventaja | Dos modelos en cadena: más costo y latencia | Hay que evaluar el modelo del asistente en el rol de agente |
