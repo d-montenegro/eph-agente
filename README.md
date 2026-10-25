@@ -35,7 +35,9 @@ Los metadatos forman el diccionario de datos: para cada columna, qué significa,
 
 1. **Vistas legibles** (`personas`, `hogares`) sobre las tablas crudas, que quedan intactas. Nombres claros (`sexo = 'Mujer'`), valores especiales convertidos en `NULL`, universo aplicado en los datos (el ingreso laboral es `NULL` fuera de los ocupados) y columnas derivadas (`es_desocupado`, `grupo_edad`). Esto limita potenciales errores del modelo al implementar las consultas a la base de datos.
 2. **Metadatos de columnas** guardados en la base, armados a partir del diseño de registro del INDEC y versionados junto con el resto del proyecto.
-3. **Métricas curadas y parametrizables** (`tasa_desocupacion(filtros, agrupar_por)`), solo donde la evaluación muestre fallos recurrentes.
+3. **Métricas curadas y parametrizables**, implementadas como herramientas del agente (por ejemplo, `tasa_desocupacion(filtros, agrupar_por)`), solo donde la evaluación muestre fallos recurrentes. A diferencia de los otros dos niveles, no viven en la base: son funciones que arman el SQL con la definición oficial.
+
+Cada métrica curada es una **herramienta** del agente: una función que recibe filtros y agrupaciones y arma el SQL de forma determinística, con la definición oficial, el ponderador y el universo correctos. El modelo la conoce por la definición de la herramienta, que se envía en cada llamada igual que la de `ejecutar_sql`; solo elige la métrica y completa los parámetros, sin escribir el SQL del indicador. El prompt incluye una regla de prioridad: si la pregunta corresponde a una métrica disponible, se usa esa métrica, y el SQL libre queda para lo que las métricas no cubren.
 
 ### Ficha de cada columna
 
@@ -65,30 +67,32 @@ flowchart TB
     A --> R[Respuesta: valor, SQL, supuestos]
     A --> T2[describir_tabla<br/>ficha completa de columnas]
     A --> T3[ejecutar_sql<br/>solo lectura, con límites]
+    A -.-> MC[Métricas curadas<br/>solo si la evaluación lo pide]
     subgraph BD[Base de datos relacional · solo lectura]
         V[Vistas legibles<br/>personas, hogares]
         M[Metadatos de columnas<br/>desde el diseño de registro]
-        C[Métricas curadas<br/>solo si la evaluación lo pide]
         RAW[(Tablas crudas del INDEC, intactas:<br/>individuos y hogares)]
     end
     T2 --> BD
     T3 --> BD
+    MC -.-> BD
     V --> RAW
-    style C stroke-dasharray: 5 5
+    style MC stroke-dasharray: 5 5
 ```
 
-El agente solo accede a la base a través de dos herramientas y solo ve las vistas; las tablas crudas quedan debajo, sin cambios. La caja punteada se agrega solo si la evaluación la justifica.
+El agente solo accede a la base a través de dos herramientas y solo ve las vistas; las tablas crudas quedan debajo, sin cambios. La caja punteada (métricas curadas) se agrega solo si la evaluación la justifica.
 
 | Herramienta | Qué hace |
 | --- | --- |
 | `describir_tabla(nombre)` | Devuelve la ficha completa de cada columna de la vista: descripción, valores posibles, significado de NULL, universo y ponderador |
 | `ejecutar_sql(query)` | Ejecuta la consulta y devuelve el resultado o el error, para que el modelo corrija |
+| Métricas curadas (opcionales) | Una herramienta por indicador, por ejemplo `tasa_desocupacion(filtros, agrupar_por)`: calcula el indicador con su definición oficial. Se agregan solo si la evaluación lo justifica |
 
 Los nombres de las dos vistas, para qué sirve cada una y el índice compacto de sus columnas van en el prompt del agente, así que no hace falta una herramienta para listarlas: el modelo arranca sabiendo qué hay y se ahorra una llamada por pregunta.
 
 **Ejecución segura:** acceso de solo lectura a la base, validación previa de que la consulta sea un único `SELECT`, límite de filas y timeout.
 
-**Salida:** el agente devuelve el valor, el SQL, los supuestos y una respuesta en texto que explicita esos supuestos y advierte cuando la muestra es chica.
+**Salida:** el agente devuelve el valor, el SQL, los supuestos (incluida la métrica curada usada, si corresponde) y una respuesta en texto que explicita esos supuestos y advierte cuando la muestra es chica.
 
 ## Estrategia de modelos
 
