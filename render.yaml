@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: eph-agente
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: EPH_DATABASE_BACKEND
+        value: sqlite
+      - key: EPH_DATABASE_URL
+        value: sqlite:///eph.sqlite
+      - key: EPH_MODE
+        value: hosted
+      - key: EPH_PROVIDERS_FILE
+        value: config/providers.hosted.example.yml
+      - key: EPH_ALLOWED_LLM_HOSTS
+        sync: false
+      - key: EPH_LLM_API_KEY
+        sync: false

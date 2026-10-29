@@ -253,6 +253,79 @@ async def run_suite(
     }
 
 
+def run_reference_smoke(
+    cases: list[dict[str, Any]],
+    adapter: Any,
+    repetitions: int = 1,
+) -> dict[str, Any]:
+    """Ejecuta el ``sql_esperado`` como referencia determinística para CI.
+
+    No usa un modelo: valida que los datos y la capa semántica sigan produciendo
+    los valores del golden set. Sirve como smoke test de regresión en CI.
+    """
+    results: list[dict[str, Any]] = []
+    for case in cases:
+        sql = case.get("sql_esperado")
+        if not sql or case["tipo"] in {"rechazo", "sin_datos"}:
+            results.append({"id": case["id"], "skipped": True, "passed": True, "pass_rate": 1.0})
+            continue
+        attempts: list[dict[str, Any]] = []
+        for _ in range(max(1, repetitions)):
+            try:
+                result = adapter.execute(sql)
+                payload = {
+                    "result": _result_dict(result),
+                    "sql": result.sql,
+                    "answer": "referencia",
+                    "warnings": [],
+                }
+                comparison = compare_result(payload, case)
+                violations = inspect_sql(result.sql, case.get("reglas_sql"))
+                attempts.append(
+                    {
+                        "ok": bool(comparison["ok"]) and not violations,
+                        "comparison": comparison,
+                        "sql_violations": violations,
+                    }
+                )
+            except Exception as exc:  # noqa: BLE001 - se registra el fallo
+                attempts.append({"ok": False, "error": f"{exc.__class__.__name__}: {exc}"})
+        passed = sum(1 for attempt in attempts if attempt["ok"])
+        results.append(
+            {
+                "id": case["id"],
+                "skipped": False,
+                "attempts": attempts,
+                "passed": passed == len(attempts),
+                "pass_rate": passed / len(attempts),
+            }
+        )
+
+    scored = [item for item in results if not item["skipped"]]
+    total = len(scored)
+    passed_cases = sum(1 for item in scored if item["passed"])
+    return {
+        "cases": results,
+        "summary": {
+            "total": total,
+            "passed": passed_cases,
+            "pass_rate": passed_cases / total if total else 0.0,
+            "repetitions": repetitions,
+            "skipped": len(results) - total,
+        },
+    }
+
+
+def _result_dict(result: Any) -> dict[str, Any]:
+    is_scalar = len(result.columns) == 1 and len(result.rows) == 1
+    return {
+        "kind": "scalar" if is_scalar else "table",
+        "value": result.rows[0][0] if is_scalar else None,
+        "columns": result.columns,
+        "rows": result.rows,
+    }
+
+
 def compare_runs(previous: dict[str, Any], current: dict[str, Any]) -> dict[str, Any]:
     before = {case["id"]: case for case in previous.get("cases", [])}
     after = {case["id"]: case for case in current.get("cases", [])}
@@ -326,28 +399,41 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--repetitions", type=int, default=DEFAULT_REPETITIONS)
     parser.add_argument("--profile", default="local")
     parser.add_argument("--out", type=Path, default=Path("eval/runs"))
+    parser.add_argument(
+        "--reference",
+        action="store_true",
+        help="ejecuta el sql_esperado sin modelo (smoke determinístico para CI)",
+    )
     args = parser.parse_args(argv)
 
-    from eph_agent.agent import AgentService
     from eph_agent.config import DatabaseSettings
     from eph_agent.database import create_database_adapter
-    from eph_agent.providers import ProviderRegistry
 
-    registry = ProviderRegistry.from_env()
-    profile = registry.get(args.profile)
-    provider = registry.create(profile.name)
     adapter = create_database_adapter(DatabaseSettings.from_env())
-    service = AgentService(adapter, provider, model=provider.model, profile=profile.name)
     try:
-        result = asyncio.run(run_suite(load_cases(args.golden), service.ask, args.repetitions))
+        if args.reference:
+            result = run_reference_smoke(load_cases(args.golden), adapter, args.repetitions)
+            profile_name, model_name = "reference", "sql_esperado"
+        else:
+            from eph_agent.agent import AgentService
+            from eph_agent.providers import ProviderRegistry
+
+            registry = ProviderRegistry.from_env()
+            profile = registry.get(args.profile)
+            provider = registry.create(profile.name)
+            service = AgentService(adapter, provider, model=provider.model, profile=profile.name)
+            result = asyncio.run(run_suite(load_cases(args.golden), service.ask, args.repetitions))
+            profile_name, model_name = profile.name, provider.model
     finally:
         adapter.close()
 
-    path = save_run(result, args.out, profile=profile.name, model=provider.model)
+    path = save_run(result, args.out, profile=profile_name, model=model_name)
     summary = result["summary"]
+    skipped = summary.get("skipped", 0)
     print(
         f"Aprobados {summary['passed']}/{summary['total']} "
-        f"({summary['pass_rate']:.0%}) · corrida guardada en {path}"
+        f"({summary['pass_rate']:.0%}) · {skipped} sin SQL de referencia · "
+        f"corrida guardada en {path}"
     )
     return 0 if summary["pass_rate"] >= 0.9 else 1
 

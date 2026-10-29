@@ -122,6 +122,7 @@ casos:
       SELECT sexo,
              SUM(CASE WHEN estado_actividad = 'Desocupado' THEN pondera ELSE 0 END) * 1.0
              / SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END)
+             AS tasa_desocupacion
       FROM personas GROUP BY sexo
     reglas_sql:
       vistas: [personas]

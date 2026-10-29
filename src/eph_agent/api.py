@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import asdict, replace
-from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 
 from eph_agent.agent import AgentError, AgentService
 from eph_agent.answer import AgentAnswer
@@ -18,6 +18,7 @@ from eph_agent.database import (
     QueryTimeoutError,
     create_database_adapter,
 )
+from eph_agent.paths import repo_root
 from eph_agent.providers import (
     Message,
     ProviderError,
@@ -45,7 +46,7 @@ from eph_agent.sql_guard import SQLGuardError
 from eph_agent.tools import describir_tabla, ejecutar_sql
 
 app = FastAPI(title="Agente EPH", version="0.1.0")
-PROJECT_DOC = Path(__file__).resolve().parents[2] / "docs" / "proyecto.md"
+PROJECT_DOC = repo_root() / "docs" / "proyecto.md"
 
 
 def get_settings() -> DatabaseSettings:
@@ -77,16 +78,22 @@ def get_registry() -> ProviderRegistry:
 def health(
     settings: DatabaseSettings = Depends(get_settings),
     adapter: DatabaseAdapter = Depends(get_adapter),
+    registry: ProviderRegistry = Depends(get_registry),
 ) -> HealthResponse:
     try:
         views = [view["view"] for view in adapter.views()]
     except DatabaseError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
+    try:
+        profile = getattr(app.state, "selected_profile", None) or registry.default_profile().name
+    except ProviderRegistryError:
+        profile = None
     return HealthResponse(
         status="ok",
         backend=settings.backend.value,
         dialect=settings.sql_dialect,
         views=views,
+        profile=profile,
     )
 
 
@@ -230,3 +237,8 @@ async def ask_agent(
         raise HTTPException(status_code=502, detail=str(error)) from error
     except ProviderError as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
+
+
+WEB_DIST = repo_root() / "web" / "dist"
+if WEB_DIST.is_dir():
+    app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")

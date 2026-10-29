@@ -55,3 +55,20 @@ La bitácora sirve para dos cosas:
   tipos, valores, períodos y conteos contra la base real del 1T 2026.
 - **Estado:** queda, sujeto a revisión metodológica humana.
 - **Commit:** ver historial de la rama `codex/eph-web-configurable`.
+
+### 2026-10-29 · Línea base local con qwen2.5:7b (no concluyente)
+
+- **Fallo:** con Ollama local (`qwen2.5:7b`) la pregunta por la tasa de
+  desocupación total devolvió `0` con SQL sin ponderador:
+  `SUM(CASE WHEN es_desocupado = 1 THEN 1 ELSE 0 END) / SUM(...)`, que además
+  cae en división entera de SQLite.
+- **Hipótesis:** el modelo no aplicó la regla de ponderación ni el casteo a real.
+- **Cambio:** se reforzó el prompt con la fórmula ponderada explícita y la regla
+  de `* 1.0`.
+- **Efecto:** al repetir la misma pregunta, el modelo no ejecutó SQL ni devolvió
+  una respuesta final dentro de 4 turnos. El cambio empeoró el smoke local.
+- **Decisión:** se revierte el cambio. No se corre el golden completo porque el
+  perfil `local` no es el de medición de calidad; la línea base formal queda
+  pendiente de un perfil `dev` o `eval`.
+- **Estado:** revertido.
+- **Commit:** ver historial de la rama `codex/eph-web-configurable`.

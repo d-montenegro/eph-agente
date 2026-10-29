@@ -11,10 +11,11 @@ from urllib.parse import urlparse
 
 import yaml
 
+from eph_agent.paths import repo_root
 from eph_agent.providers.base import ProviderError
 from eph_agent.providers.openai_compatible import OpenAICompatibleProvider
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = repo_root()
 DEFAULT_PROVIDERS = REPO_ROOT / "config" / "providers.yml"
 EXAMPLE_PROVIDERS = REPO_ROOT / "config" / "providers.example.yml"
 VALID_MODES = {"local", "hosted"}

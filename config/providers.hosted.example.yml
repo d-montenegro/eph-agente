@@ -1,0 +1,20 @@
+# Ejemplo de perfiles para un despliegue hosted.
+# Copiar a config/providers.yml (o apuntar EPH_PROVIDERS_FILE acá) y reemplazar
+# base_url y model por el proveedor real. La clave se inyecta como secreto.
+
+mode: hosted
+
+# Solo se permiten hosts de esta lista; sin lista no hay destinos remotos.
+allowed_hosts:
+  - api.example.com
+
+profiles:
+  demo:
+    base_url: https://api.example.com/v1
+    model: example-model
+    api_mode: chat_completions
+    api_key_env: EPH_LLM_API_KEY
+    timeout_seconds: 60
+    max_retries: 2
+    enabled: true
+    hosted: true

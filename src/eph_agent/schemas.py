@@ -58,6 +58,7 @@ class HealthResponse(BaseModel):
     backend: str
     dialect: str
     views: list[str]
+    profile: str | None = None
 
 
 class ProviderProfilePublic(BaseModel):

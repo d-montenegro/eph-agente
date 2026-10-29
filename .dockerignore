@@ -1,0 +1,16 @@
+.git
+.venv
+.ve
+__pycache__
+*.pyc
+*.egg-info
+.pytest_cache
+.ruff_cache
+web/node_modules
+web/dist
+graphify-out
+tmp
+*.sqlite
+*.sqlite-journal
+.env
+.DS_Store

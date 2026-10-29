@@ -266,3 +266,23 @@ def test_compara_corridas_detecta_correcciones_y_regresiones() -> None:
     diff = compare_runs(previous, current)
 
     assert diff == {"corrected": ["a"], "regressed": ["b"], "noisy": ["c"]}
+
+
+def test_reference_smoke_ejecuta_los_sql_esperados(semantic_database) -> None:
+    from eph_agent.database.sqlite import SQLiteAdapter
+    from eph_agent.evaluation import run_reference_smoke
+
+    cases = load_cases(RAIZ / "eval" / "golden.yml")
+    adapter = SQLiteAdapter(semantic_database)
+    try:
+        result = run_reference_smoke(cases, adapter, repetitions=1)
+    finally:
+        adapter.close()
+
+    assert result["summary"] == {
+        "total": 13,
+        "passed": 13,
+        "pass_rate": 1.0,
+        "repetitions": 1,
+        "skipped": 3,
+    }

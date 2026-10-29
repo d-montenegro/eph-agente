@@ -476,18 +476,18 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] `docker build` reconstruye la base desde el ZIP y empaqueta una copia read-only.
-- [ ] `/api/health` verifica proceso, base y perfil sin exponer secretos.
-- [ ] El contenedor arranca localmente sin depender de rutas de la máquina del autor.
-- [ ] El demo hosted usa solo perfiles remotos permitidos.
-- [ ] CI bloquea el despliegue ante fallos de tests o regresión del smoke set.
-- [ ] La respuesta pública siempre informa que los datos cubren 1T 2026.
+- [x] `docker build` reconstruye la base desde el ZIP y empaqueta una copia read-only.
+- [x] `/api/health` verifica proceso, base y perfil sin exponer secretos.
+- [x] El contenedor arranca localmente sin depender de rutas de la máquina del autor.
+- [x] El demo hosted usa solo perfiles remotos permitidos.
+- [x] CI bloquea el despliegue ante fallos de tests o regresión del smoke set.
+- [x] La respuesta pública siempre informa que los datos cubren 1T 2026.
 
 ### Checks
 
-- [ ] Build de contenedor.
-- [ ] Revisión de seguridad de imagen y secretos.
-- [ ] Smoke test contra la URL desplegada.
+- [x] Build de contenedor.
+- [ ] Revisión de seguridad de imagen y secretos (pendiente).
+- [ ] Smoke test contra la URL desplegada (el contenedor local sí fue probado).
 
 ## Fase 8: Validación final y defensa
 
@@ -495,15 +495,15 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios finales
 
-- [ ] La base se reconstruye de forma reproducible desde los originales del INDEC.
-- [ ] Las variables expuestas tienen metadatos y universo documentados.
-- [ ] El SQL es auditable y no puede modificar ni escapar de la base permitida.
-- [ ] La misma pregunta puede correrse con perfiles distintos sin cambiar código.
-- [ ] El perfil local se valida contra un LLM realmente ejecutado en la computadora.
-- [ ] El perfil hosted funciona con secretos server-side.
-- [ ] La web ofrece las tres secciones acordadas y modo presentación.
-- [ ] El golden set mide resultados, SQL y estructura de salida.
-- [ ] La bitácora explica al menos una mejora guiada por un fallo medido.
+- [x] La base se reconstruye de forma reproducible desde los originales del INDEC.
+- [x] Las variables expuestas tienen metadatos y universo documentados.
+- [x] El SQL es auditable y no puede modificar ni escapar de la base permitida.
+- [x] La misma pregunta puede correrse con perfiles distintos sin cambiar código.
+- [x] El perfil local se valida contra un LLM realmente ejecutado en la computadora (qwen2.5:7b; calidad no concluyente).
+- [ ] El perfil hosted funciona con secretos server-side (requiere despliegue con proveedor real).
+- [x] La web ofrece las tres secciones acordadas y modo presentación.
+- [x] El golden set mide resultados, SQL y estructura de salida.
+- [ ] La bitácora explica al menos una mejora guiada por un fallo medido (hay fallo registrado, pero el cambio se revirtió).
 - [ ] La demo pública y el plan de contingencia local están probados antes de la defensa.
 
 ### Checks

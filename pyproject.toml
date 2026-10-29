@@ -29,6 +29,9 @@ dev = [
 where = ["src"]
 include = ["eph_agent*"]
 
+[tool.setuptools.package-data]
+"eph_agent.prompts" = ["*.md"]
+
 [tool.pytest.ini_options]
 addopts = "-q"
 pythonpath = ["src"]

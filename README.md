@@ -265,8 +265,8 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 ### Fase 6: despliegue
 
-- [ ] Contenedor con el agente y la base de solo lectura
-- [ ] Evaluación en CI como condición para desplegar
+- [x] Contenedor con el agente y la base de solo lectura
+- [x] Evaluación en CI como condición para desplegar
 - [x] Dejar explícito en las respuestas el período que cubren los datos (1T 2026)
 
 ## Mejoras futuras

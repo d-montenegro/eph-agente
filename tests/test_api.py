@@ -22,6 +22,7 @@ def test_health_informa_backend_y_vistas(client) -> None:
         "backend": "sqlite",
         "dialect": "sqlite",
         "views": ["hogares", "personas"],
+        "profile": "local",
     }
 
 

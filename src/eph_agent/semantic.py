@@ -11,7 +11,9 @@ from typing import Any
 
 import yaml
 
-PACKAGE_ROOT = Path(__file__).resolve().parents[2]
+from eph_agent.paths import repo_root
+
+PACKAGE_ROOT = repo_root()
 SEMANTIC_DIR = PACKAGE_ROOT / "semantic"
 VIEWS_SQL = SEMANTIC_DIR / "views.sql"
 SCHEMA_SQL = SEMANTIC_DIR / "schema.sql"
