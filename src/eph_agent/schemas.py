@@ -103,3 +103,7 @@ class ProviderSelectRequest(BaseModel):
 class AgentAskRequest(BaseModel):
     question: str = Field(min_length=1)
     profile: str | None = None
+
+
+class ProjectResponse(BaseModel):
+    markdown: str

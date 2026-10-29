@@ -23,6 +23,10 @@ eph_zips/
 # Artefactos locales de análisis y temporales
 tmp/
 
+# Frontend
+web/node_modules/
+web/dist/
+
 # Graphify: se versiona el grafo consultable y su reporte; el resto es caché local
 graphify-out/*
 !graphify-out/graph.json

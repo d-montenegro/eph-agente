@@ -400,18 +400,18 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] Las tres secciones son navegables por URL y por pestañas.
-- [ ] Proyecto permite editar, previsualizar, presentar, exportar, importar y restaurar.
-- [ ] Agente muestra por separado respuesta, resultado, SQL, supuestos y advertencias.
-- [ ] Configuración prueba la conexión antes de permitir seleccionar un perfil.
-- [ ] La web funciona en pantalla de notebook y proyector sin texto cortado.
-- [ ] Accesibilidad básica: teclado, foco visible, etiquetas y contraste.
-- [ ] No se almacenan API keys en `localStorage`.
+- [x] Las tres secciones son navegables por URL y por pestañas.
+- [x] Proyecto permite editar, previsualizar, presentar, exportar, importar y restaurar.
+- [x] Agente muestra por separado respuesta, resultado, SQL, supuestos y advertencias.
+- [x] Configuración prueba la conexión antes de permitir seleccionar un perfil.
+- [ ] La web funciona en pantalla de notebook y proyector sin texto cortado (CSS responsive listo; falta revisión visual).
+- [x] Accesibilidad básica: teclado, foco visible, etiquetas y contraste.
+- [x] No se almacenan API keys en `localStorage`.
 
 ### Checks
 
-- [ ] Lint, pruebas de componentes y smoke test de las tres rutas.
-- [ ] Revisión UX para la defensa oral.
+- [x] Lint, pruebas de componentes y smoke test de las tres rutas (typecheck + Vitest + build).
+- [ ] Revisión UX para la defensa oral (pendiente).
 
 ## Fase 6: Golden set y evaluación reproducible
 

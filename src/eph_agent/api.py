@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import asdict, replace
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException
 
@@ -29,6 +30,7 @@ from eph_agent.schemas import (
     DescribeTableRequest,
     ExecuteSQLRequest,
     HealthResponse,
+    ProjectResponse,
     ProviderHealthResponse,
     ProviderProfilePublic,
     ProviderSelectRequest,
@@ -43,6 +45,7 @@ from eph_agent.sql_guard import SQLGuardError
 from eph_agent.tools import describir_tabla, ejecutar_sql
 
 app = FastAPI(title="Agente EPH", version="0.1.0")
+PROJECT_DOC = Path(__file__).resolve().parents[2] / "docs" / "proyecto.md"
 
 
 def get_settings() -> DatabaseSettings:
@@ -85,6 +88,13 @@ def health(
         dialect=settings.sql_dialect,
         views=views,
     )
+
+
+@app.get("/api/project", response_model=ProjectResponse)
+def project() -> ProjectResponse:
+    if not PROJECT_DOC.exists():
+        raise HTTPException(status_code=404, detail="No existe docs/proyecto.md")
+    return ProjectResponse(markdown=PROJECT_DOC.read_text(encoding="utf-8"))
 
 
 @app.get("/api/schema", response_model=SchemaResponse)

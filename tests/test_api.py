@@ -75,3 +75,10 @@ def test_execute_sql_rechaza_consultas_peligrosas(client, query) -> None:
 
     assert response.status_code == 400
     assert "detail" in response.json()
+
+
+def test_project_devuelve_el_markdown_versionado(client) -> None:
+    response = client.get("/api/project")
+
+    assert response.status_code == 200
+    assert "# Agente de consultas en lenguaje natural sobre la EPH" in response.json()["markdown"]
