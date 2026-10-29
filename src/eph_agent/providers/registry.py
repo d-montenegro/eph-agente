@@ -49,6 +49,13 @@ class ProviderProfile:
         parsed = urlparse(base_url)
         if parsed.scheme not in {"http", "https"} or not parsed.hostname:
             raise ProviderRegistryError(f"El perfil {name!r} tiene una base_url inválida")
+        if parsed.username or parsed.password:
+            raise ProviderRegistryError(
+                f"El perfil {name!r} no debe incluir credenciales en la base_url"
+            )
+        hosted = bool(data.get("hosted", False))
+        if hosted and parsed.scheme != "https":
+            raise ProviderRegistryError(f"El perfil hosted {name!r} debe usar https")
         api_mode = str(data.get("api_mode") or "chat_completions")
         if api_mode not in VALID_API_MODES:
             supported = ", ".join(sorted(VALID_API_MODES))
@@ -70,7 +77,7 @@ class ProviderProfile:
             timeout_seconds=timeout,
             max_retries=retries,
             enabled=bool(data.get("enabled", True)),
-            hosted=bool(data.get("hosted", False)),
+            hosted=hosted,
         )
 
     def public(self, *, has_api_key: bool) -> dict[str, Any]:

@@ -213,3 +213,26 @@ def test_perfil_rechaza_api_mode_desconocido() -> None:
             "x",
             {"base_url": "http://host/v1", "model": "m", "api_mode": "responses"},
         )
+
+
+def test_perfil_rechaza_credenciales_en_la_url() -> None:
+    with pytest.raises(ProviderRegistryError, match="credenciales"):
+        ProviderProfile.from_dict(
+            "x",
+            {
+                "base_url": "https://usuario:clave@host/v1",
+                "model": "m",
+            },
+        )
+
+
+def test_perfil_hosted_exige_https() -> None:
+    with pytest.raises(ProviderRegistryError, match="https"):
+        ProviderProfile.from_dict(
+            "x",
+            {
+                "base_url": "http://host/v1",
+                "model": "m",
+                "hosted": True,
+            },
+        )

@@ -41,7 +41,8 @@ class PostgresAdapter:
                 "Falta el driver de PostgreSQL; instalá el extra 'postgres'"
             ) from error
         connection = psycopg.connect(self.dsn)
-        connection.execute("SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY")
+        # Garantiza BEGIN READ ONLY también en la primera consulta.
+        connection.read_only = True
         connection.execute(f"SET statement_timeout = {int(self.timeout_ms)}")
         self._connection = connection
         return connection

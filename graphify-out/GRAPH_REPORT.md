@@ -1,17 +1,17 @@
 # Graph Report - Trabajo Final Diplomatura  (2026-10-29)
 
 ## Corpus Check
-- 76 files · ~34,689 words
+- 76 files · ~34,907 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 1, .zip 1)
 
 ## Summary
-- 765 nodes · 1666 edges · 33 communities (26 shown, 7 thin omitted)
+- 768 nodes · 1674 edges · 37 communities (27 shown, 10 thin omitted)
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 177 edges (avg confidence: 0.91)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0688461b`
+- Built from commit: `92d56e28`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,7 @@
 - agent.py
 - test_api.py
 - providers/__init__.py
-- test_providers.py
+- AgentService
 - evaluation.py
 - permission
 - package.json
@@ -45,6 +45,9 @@
 - Evaluación
 - scripts
 - Despliegue
+- schema_index.py
+- LLMProvider
+- _json_arguments
 
 ## God Nodes (most connected - your core abstractions)
 1. `bash` - 40 edges
@@ -80,15 +83,15 @@
 - **Acceso semántico seguro a la EPH** — readme_readable_views, readme_metadata_dictionary, readme_describir_tabla, readme_ejecutar_sql, readme_safe_sql_execution [EXTRACTED 1.00]
 - **Ponderación y calidad de estimaciones EPH** — datos_indec_eph_registro_1t2026_general_weight, datos_indec_eph_registro_1t2026_income_weights, datos_indec_eph_consideraciones_metodologicas_2t20_propensity_score, datos_indec_eph_consideraciones_metodologicas_2t20_calibration, datos_indec_eph_consideraciones_metodologicas_2t20_quality_thresholds [INFERRED 0.85]
 
-## Communities (33 total, 7 thin omitted)
+## Communities (37 total, 10 thin omitted)
 
 ### Community 0 - "Evaluación y reproducibilidad"
 Cohesion: 0.09
-Nodes (21): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+13 more)
+Nodes (19): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+11 more)
 
 ### Community 1 - "Capa semántica EPH"
-Cohesion: 0.09
-Nodes (12): get_settings(), DatabaseBackend, DatabaseSettings, create_database_adapter(), repo_root(), test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string(), test_default_sqlite_path_is_relative_to_project() (+4 more)
+Cohesion: 0.12
+Nodes (10): get_settings(), DatabaseBackend, DatabaseSettings, test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string(), test_default_sqlite_path_is_relative_to_project(), test_defaults_to_local_sqlite(), test_rejects_incompatible_backend_and_url() (+2 more)
 
 ### Community 2 - "opencode.json"
 Cohesion: 0.22
@@ -104,11 +107,11 @@ Nodes (27): Ajuste por calibración demográfica, Panel de rotación 2-2-2, Ajus
 
 ### Community 5 - "pytest"
 Cohesion: 0.05
-Nodes (26): DatabaseError, QueryExecutionError, QueryResult, QueryTimeoutError, D1Adapter, PostgresAdapter, _authorizer(), SQLiteAdapter (+18 more)
+Nodes (28): DatabaseError, QueryExecutionError, QueryResult, QueryTimeoutError, D1Adapter, create_database_adapter(), PostgresAdapter, _authorizer() (+20 more)
 
 ### Community 6 - "semantic.py"
-Cohesion: 0.10
-Nodes (31): _check_column_values(), _check_dictionary_structure(), describe_table(), _from_json(), install_semantic_layer(), list_views(), load_dictionary(), main() (+23 more)
+Cohesion: 0.08
+Nodes (34): profile_view(), _check_column_values(), _check_dictionary_structure(), describe_table(), _from_json(), install_semantic_layer(), list_views(), load_dictionary() (+26 more)
 
 ### Community 12 - "bash"
 Cohesion: 0.05
@@ -116,27 +119,27 @@ Nodes (39): cat*, curl *, docker *, find*, git add*, git commit*, git diff*, git
 
 ### Community 14 - "api.py"
 Cohesion: 0.07
-Nodes (36): La solución, ask_agent(), describe_table(), execute_sql(), get_adapter(), health(), list_providers(), project() (+28 more)
+Nodes (37): La solución, ask_agent(), describe_table(), execute_sql(), get_adapter(), get_registry(), health(), list_providers() (+29 more)
 
 ### Community 15 - "agent.py"
-Cohesion: 0.07
-Nodes (31): AgentError, AgentService, _dedupe(), detect_period_conflict(), quality_warnings(), _to_payload(), AgentAnswer, AnswerValidationError (+23 more)
+Cohesion: 0.12
+Nodes (15): _dedupe(), detect_period_conflict(), quality_warnings(), _to_payload(), AgentAnswer, AnswerValidationError, _as_list(), normalize_structured() (+7 more)
 
 ### Community 16 - "test_api.py"
-Cohesion: 0.07
-Nodes (14): AlwaysToolsProvider, client(), FakeProvider, patch_provider(), fake_create(), test_agent_ask_acota_periodo(), test_agent_ask_devuelve_salida_auditable(), test_agent_ask_falla_si_no_termina() (+6 more)
+Cohesion: 0.05
+Nodes (35): _default_path(), AlwaysToolsProvider, client(), FakeProvider, patch_provider(), fake_create(), test_agent_ask_acota_periodo(), test_agent_ask_devuelve_salida_auditable() (+27 more)
 
 ### Community 17 - "providers/__init__.py"
-Cohesion: 0.09
-Nodes (15): _json_arguments(), LLMProvider, Message, ModelInfo, ModelNotFound, ModelTurn, ProviderAuthError, ProviderError (+7 more)
+Cohesion: 0.15
+Nodes (13): Message, ModelInfo, ModelNotFound, ModelTurn, ProviderAuthError, ProviderError, ProviderHealth, ProviderUnreachable (+5 more)
 
-### Community 18 - "test_providers.py"
-Cohesion: 0.14
-Nodes (19): get_registry(), _default_path(), models_handler(), provider(), test_complete_with_tools_parsea_argumentos(), test_error_de_conexion_es_seguro(), test_health_credencial_invalida(), test_health_modelo_inexistente() (+11 more)
+### Community 18 - "AgentService"
+Cohesion: 0.19
+Nodes (13): AgentError, AgentService, FakeProvider, final(), sql_call(), test_agota_los_turnos_sin_inventar(), test_rechaza_otro_periodo_antes_de_llamar_al_modelo(), test_reintenta_cuando_el_sql_falla() (+5 more)
 
 ### Community 19 - "evaluation.py"
 Cohesion: 0.08
-Nodes (37): _as_dict(), compare_result(), compare_runs(), _current_commit(), EvaluationError, extract_scalar(), inspect_sql(), load_cases() (+29 more)
+Nodes (36): _as_dict(), compare_result(), compare_runs(), _current_commit(), EvaluationError, extract_scalar(), inspect_sql(), load_cases() (+28 more)
 
 ### Community 20 - "permission"
 Cohesion: 0.20
@@ -186,25 +189,29 @@ Nodes (6): scripts, build, dev, preview, test, typecheck
 Cohesion: 0.22
 Nodes (8): CI, Despliegue, Docker, Local, Render (demo gratuita), Secretos, Variables, Vercel (frontend separado, opcional)
 
+### Community 33 - "schema_index.py"
+Cohesion: 0.48
+Nodes (3): build_schema_index(), _describe_column(), _render_value()
+
 ## Knowledge Gaps
 - **30 isolated node(s):** `eph-agente`, `@types/react`, `@types/react-dom`, `jsdom`, `typescript` (+25 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 299 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **10 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `AgentService` connect `agent.py` to `providers/__init__.py`, `evaluation.py`, `pytest`, `api.py`?**
+- **Why does `AgentService` connect `AgentService` to `LLMProvider`, `pytest`, `api.py`, `agent.py`, `providers/__init__.py`, `evaluation.py`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `AgentService` (e.g. with `AgentAnswer` and `ResultPayload`) actually correct?**
   _`AgentService` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `eph-agente`, `@types/react`, `@types/react-dom` to the rest of the system?**
   _30 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Evaluación y reproducibilidad` be split into smaller, more focused modules?**
-  _Cohesion score 0.09468599033816426 - nodes in this community are weakly interconnected._
-- **Why does `ProviderRegistry` connect `api.py` to `providers/__init__.py`, `test_providers.py`, `evaluation.py`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _Cohesion score 0.08928571428571429 - nodes in this community are weakly interconnected._
+- **Why does `ProviderRegistry` connect `api.py` to `Evaluación y reproducibilidad`, `providers/__init__.py`, `evaluation.py`, `test_api.py`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **Are the 12 inferred relationships involving `DatabaseSettings` (e.g. with `get_adapter()` and `get_settings()`) actually correct?**
   _`DatabaseSettings` has 12 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Capa semántica EPH` be split into smaller, more focused modules?**
-  _Cohesion score 0.08961593172119488 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12315270935960591 - nodes in this community are weakly interconnected._

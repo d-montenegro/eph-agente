@@ -100,3 +100,17 @@ La bitácora sirve para dos cosas:
   semántica pasa 19 pruebas, incluidas las de `P47T`, `grupo_edad` y ponderadores.
 - **Estado:** queda, sujeto a revisión humana final.
 - **Commit:** ver historial de la rama `codex/eph-web-configurable`.
+
+### 2026-10-29 · Endurecimiento de proveedores y adaptadores
+
+- **Fallo:** la revisión de seguridad encontró cuatro riesgos: una `base_url` con
+  usuario/clave se habría devuelto en `/api/providers`; un perfil `hosted` podía
+  usar `http`; PostgreSQL no garantizaba `READ ONLY` en la primera transacción; y
+  el authorizer de SQLite permitía `load_extension`.
+- **Hipótesis:** los perfiles y los adaptadores no validaban esas condiciones.
+- **Cambio:** se rechazan credenciales embebidas, se exige `https` para perfiles
+  hosted, PostgreSQL usa `connection.read_only = True`, y SQLite deniega
+  `load_extension`. Se agregaron pruebas de regresión.
+- **Efecto:** 122 pruebas en verde; el golden de referencia sigue 13/13.
+- **Estado:** queda.
+- **Commit:** ver historial de la rama `codex/eph-web-configurable`.

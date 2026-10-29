@@ -83,3 +83,20 @@ def test_expone_metadatos_y_vistas(adapter) -> None:
     assert [view["view"] for view in views] == ["hogares", "personas"]
     assert len(columns) == 26
     assert columns[0]["column"] == "codusu"
+
+
+def test_el_authorizer_bloquea_load_extension() -> None:
+    import sqlite3 as sqlite_module
+
+    from eph_agent.database.sqlite import _authorizer
+
+    assert (
+        _authorizer(
+            sqlite_module.SQLITE_FUNCTION,
+            "load_extension",
+            "load_extension",
+            None,
+            None,
+        )
+        == sqlite_module.SQLITE_DENY
+    )

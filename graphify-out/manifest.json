@@ -120,9 +120,9 @@
     "semantic_hash": "5582055a3eded35ddcd81ecc236ebeb5"
   },
   "docs/decisiones/README.md": {
-    "mtime": 1793312398.4368668,
-    "seen": 1793314841.4673831,
-    "ast_hash": "f5fe748a10f009fc914646c90c0eebf1",
+    "mtime": 1793315089.8747728,
+    "seen": 1793315092.568146,
+    "ast_hash": "6458b9b6c89cd0e64c22c456f5e9b78a",
     "semantic_hash": ""
   },
   "Agente de consultas en lenguaje natural sobre la EPH.pdf": {
@@ -162,15 +162,15 @@
     "semantic_hash": ""
   },
   "src/eph_agent/database/postgres.py": {
-    "mtime": 1793302967.643751,
-    "seen": 1793303657.852113,
-    "ast_hash": "ae198657c234be1f4819feec36d04fb4",
+    "mtime": 1793314873.9533346,
+    "seen": 1793315092.56688,
+    "ast_hash": "9c5a3b3bebbfd52d2f3d5cf07f1dee39",
     "semantic_hash": ""
   },
   "src/eph_agent/database/sqlite.py": {
-    "mtime": 1793305911.3790133,
-    "seen": 1793306209.2080529,
-    "ast_hash": "2d4bbc32321b60b00d16d0825eeb4087",
+    "mtime": 1793314903.2411356,
+    "seen": 1793315092.566881,
+    "ast_hash": "140e3698127c99432e7ce6e03e580252",
     "semantic_hash": ""
   },
   "src/eph_agent/profile.py": {
@@ -216,9 +216,9 @@
     "semantic_hash": ""
   },
   "tests/test_database.py": {
-    "mtime": 1793302958.2761772,
-    "seen": 1793303657.85214,
-    "ast_hash": "a262418df63ec5199ad24c8a45afb847",
+    "mtime": 1793314912.803035,
+    "seen": 1793315092.567293,
+    "ast_hash": "f93ec7af241e28316a1b566b063631a5",
     "semantic_hash": ""
   },
   "tests/test_semantic_layer.py": {
@@ -282,9 +282,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/providers/registry.py": {
-    "mtime": 1793309418.6304595,
-    "seen": 1793310022.694575,
-    "ast_hash": "867ee2571599865aad3fef630f1fc219",
+    "mtime": 1793315056.9696345,
+    "seen": 1793315092.5670772,
+    "ast_hash": "80ca2bae77b6f7516c22bcfd63c706b6",
     "semantic_hash": ""
   },
   "tests/test_agent.py": {
@@ -306,9 +306,9 @@
     "semantic_hash": ""
   },
   "tests/test_providers.py": {
-    "mtime": 1793304123.3124583,
-    "seen": 1793306209.20826,
-    "ast_hash": "df9add07cb0549346bea496681b157db",
+    "mtime": 1793314912.7985578,
+    "seen": 1793315092.567335,
+    "ast_hash": "236185a163a6b37f545a64ce288e41c1",
     "semantic_hash": ""
   },
   "config/providers.example.yml": {

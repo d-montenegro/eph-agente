@@ -29,6 +29,8 @@ def _authorizer(
     action: int, arg1: str | None, arg2: str | None, dbname: str | None, trigger: str | None
 ) -> int:
     """Permite solo lectura; el parser ya limita las tablas a las vistas."""
+    if action == sqlite3.SQLITE_FUNCTION and (arg2 or "").lower() == "load_extension":
+        return sqlite3.SQLITE_DENY
     if action in _ALLOWED_ACTIONS:
         return sqlite3.SQLITE_OK
     return sqlite3.SQLITE_DENY
