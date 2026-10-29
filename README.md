@@ -248,9 +248,9 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 ### Fase 3: evaluación
 
-- [ ] Golden set inicial: pasada transversal y primera área (condición de actividad), incluidas las trampas
-- [ ] Conjunto de reserva
-- [ ] Ejecución automática del golden set con repeticiones y registro de corridas
+- [x] Golden set inicial: pasada transversal y primera área (condición de actividad), incluidas las trampas
+- [x] Conjunto de reserva
+- [x] Ejecución automática del golden set con repeticiones y registro de corridas
 - [ ] Primera medición: la línea base
 
 ### Fase 4: iteración

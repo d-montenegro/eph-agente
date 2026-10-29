@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: setup db test lint check api opencode-config
+.PHONY: setup db test lint check api eval opencode-config
 
 setup:
 	uv sync --extra dev --extra postgres
@@ -20,6 +20,9 @@ check: lint test
 
 api:
 	PYTHONPATH=src $(PYTHON) -m uvicorn eph_agent.api:app --reload --port 8000
+
+eval:
+	PYTHONPATH=src $(PYTHON) -m eph_agent.evaluation --golden eval/golden.yml --repetitions 3 --profile local
 
 opencode-config:
 	opencode debug config

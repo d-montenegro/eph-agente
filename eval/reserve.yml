@@ -1,0 +1,69 @@
+version: 1
+periodo:
+  anio: 2026
+  trimestre: 1
+
+# Conjunto de reserva: no se usa durante la iteración de prompts ni descripciones.
+casos:
+  - id: res_001
+    pregunta: "¿Cuál fue la tasa de desocupación de los varones en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.074723
+    unidad: fraccion
+    tolerancia: 0.0005
+    categoria: tasas_laborales
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN estado_actividad = 'Desocupado' THEN pondera ELSE 0 END) * 1.0
+             / SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END)
+      FROM personas WHERE sexo = 'Varón'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Varón, Desocupado, Ocupado]
+
+  - id: res_002
+    pregunta: "¿Cuál es la población estimada de los Partidos del Gran Buenos Aires en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 13229175
+    unidad: absoluta
+    tolerancia: 10000
+    categoria: demografia
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(pondera) FROM personas
+      WHERE aglomerado = 'Partidos del Gran Buenos Aires'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Partidos del Gran Buenos Aires]
+
+  - id: res_003
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal en Gran Rosario en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1160729.53
+    unidad: absoluta
+    tolerancia: 2500
+    categoria: ingresos
+    dificultad: alta
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
+             / SUM(pondera_ingreso_ocupacion)
+      FROM personas
+      WHERE ingreso_ocupacion_principal IS NOT NULL AND aglomerado = 'Gran Rosario'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
+      texto: [Gran Rosario]
+
+  - id: res_004
+    pregunta: "¿Cuál fue la tasa de desocupación en el 3T 2026?"
+    tipo: rechazo
+    categoria: trampas
+    dificultad: baja
+    fuente: "Alcance del proyecto: solo 1T 2026"
+    sql_esperado: null
+    reglas_sql: {}

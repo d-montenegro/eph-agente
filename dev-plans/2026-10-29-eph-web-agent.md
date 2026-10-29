@@ -436,16 +436,16 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] Golden set inicial de condición de actividad, demografía e ingresos.
-- [ ] Incluye trampas: conteo sin ponderar, período inexistente, aglomerado inválido y universo incorrecto.
-- [ ] Cada corrida guarda commit, fecha, perfil, modelo, resultado, SQL y latencia.
-- [ ] Se ejecutan tres repeticiones para mediciones formales.
-- [ ] Un umbral de aprobación queda documentado antes de mirar los resultados finales.
+- [x] Golden set inicial de condición de actividad, demografía e ingresos.
+- [x] Incluye trampas: conteo sin ponderar, período inexistente, aglomerado inválido y universo incorrecto.
+- [x] Cada corrida guarda commit, fecha, perfil, modelo, resultado, SQL y latencia.
+- [x] Se ejecutan tres repeticiones para mediciones formales.
+- [x] Un umbral de aprobación queda documentado antes de mirar los resultados finales.
 
 ### Checks
 
-- [ ] Pruebas del evaluador.
-- [ ] Corrida completa local y comparación entre al menos dos perfiles.
+- [x] Pruebas del evaluador.
+- [ ] Corrida completa local y comparación entre al menos dos perfiles (requiere un proveedor configurado).
 
 ## Fase 7: Empaquetado y despliegue gratuito
 

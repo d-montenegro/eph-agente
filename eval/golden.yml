@@ -1,0 +1,297 @@
+version: 1
+periodo:
+  anio: 2026
+  trimestre: 1
+
+# Golden set visible. Los valores se calcularon sobre los microdatos del 1T 2026
+# y quedan pendientes de validación contra el informe técnico del INDEC.
+casos:
+  - id: lab_001
+    pregunta: "¿Cuál fue la tasa de desocupación total en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.078309
+    unidad: fraccion
+    tolerancia: 0.0005
+    categoria: tasas_laborales
+    dificultad: baja
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN estado_actividad = 'Desocupado' THEN pondera ELSE 0 END) * 1.0
+             / SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END)
+      FROM personas
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Desocupado, Ocupado]
+    supuestos:
+      - Se usa el ponderador general PONDERA.
+      - El denominador es la población activa (ocupados + desocupados).
+
+  - id: lab_002
+    pregunta: "¿Cuál fue la tasa de desocupación en Gran Córdoba en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.088062
+    unidad: fraccion
+    tolerancia: 0.0005
+    categoria: tasas_laborales
+    dificultad: baja
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN estado_actividad = 'Desocupado' THEN pondera ELSE 0 END) * 1.0
+             / SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END)
+      FROM personas WHERE aglomerado = 'Gran Córdoba'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Gran Córdoba, Desocupado, Ocupado]
+    supuestos:
+      - Se usa PONDERA.
+      - El denominador es la población activa del aglomerado.
+
+  - id: lab_003
+    pregunta: "¿Cuál fue la tasa de actividad total en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.487406
+    unidad: fraccion
+    tolerancia: 0.0005
+    categoria: tasas_laborales
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END) * 1.0
+             / SUM(pondera)
+      FROM personas WHERE estado_actividad IS NOT NULL
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Ocupado, Desocupado]
+    supuestos:
+      - Se usa PONDERA.
+      - El denominador es la población con entrevista individual realizada.
+
+  - id: lab_004
+    pregunta: "¿Cuál fue la tasa de empleo total en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.449238
+    unidad: fraccion
+    tolerancia: 0.0005
+    categoria: tasas_laborales
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN estado_actividad = 'Ocupado' THEN pondera ELSE 0 END) * 1.0 / SUM(pondera)
+      FROM personas WHERE estado_actividad IS NOT NULL
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Ocupado]
+    supuestos:
+      - Se usa PONDERA.
+      - El denominador es la población con entrevista individual realizada.
+
+  - id: lab_005
+    pregunta: "¿Cuántas personas desocupadas hay en el total de los 31 aglomerados en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1144582
+    unidad: absoluta
+    tolerancia: 1500
+    categoria: tasas_laborales
+    dificultad: baja
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: "SELECT SUM(pondera) FROM personas WHERE estado_actividad = 'Desocupado'"
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Desocupado]
+    supuestos:
+      - Se usa PONDERA para expandir la muestra.
+
+  - id: lab_006
+    pregunta: "¿Cuál fue la tasa de desocupación por sexo en el 1T 2026?"
+    tipo: tabla
+    unidad: fraccion
+    tolerancia: 0.001
+    columns: [sexo, tasa_desocupacion]
+    rows:
+      - [Mujer, 0.082700]
+      - [Varón, 0.074723]
+    categoria: tasas_laborales
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT sexo,
+             SUM(CASE WHEN estado_actividad = 'Desocupado' THEN pondera ELSE 0 END) * 1.0
+             / SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END)
+      FROM personas GROUP BY sexo
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Desocupado, Ocupado]
+    supuestos:
+      - Se usa PONDERA.
+      - El denominador es la población activa de cada sexo.
+
+  - id: dem_001
+    pregunta: "¿Cuál es la población estimada total de los 31 aglomerados en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 30095103
+    unidad: absoluta
+    tolerancia: 10000
+    categoria: demografia
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: "SELECT SUM(pondera) FROM personas"
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+    supuestos:
+      - Se usa PONDERA.
+      - Se incluyen todas las personas relevadas.
+
+  - id: dem_002
+    pregunta: "¿Qué porcentaje de la población son mujeres en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.512770
+    unidad: fraccion
+    tolerancia: 0.002
+    categoria: demografia
+    dificultad: baja
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN sexo = 'Mujer' THEN pondera ELSE 0 END) * 1.0 / SUM(pondera)
+      FROM personas
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+      texto: [Mujer]
+    supuestos:
+      - Se usa PONDERA.
+
+  - id: dem_003
+    pregunta: "¿Cuál es la edad promedio de la población en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 35.718319
+    unidad: absoluta
+    tolerancia: 0.2
+    categoria: demografia
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(edad * pondera) * 1.0 / SUM(pondera)
+      FROM personas WHERE edad IS NOT NULL
+    reglas_sql:
+      vistas: [personas]
+      columnas: [edad, pondera]
+    supuestos:
+      - Se usa PONDERA.
+      - Se excluyen las edades no informadas.
+
+  - id: ing_001
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1076056.10
+    unidad: absoluta
+    tolerancia: 2000
+    categoria: ingresos
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
+             / SUM(pondera_ingreso_ocupacion)
+      FROM personas WHERE ingreso_ocupacion_principal IS NOT NULL
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
+    supuestos:
+      - Se usa PONDIIO, no PONDERA.
+      - Se excluyen ingresos no informados.
+
+  - id: ing_002
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal de las mujeres en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 872863.13
+    unidad: absoluta
+    tolerancia: 2000
+    categoria: ingresos
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
+             / SUM(pondera_ingreso_ocupacion)
+      FROM personas
+      WHERE ingreso_ocupacion_principal IS NOT NULL AND sexo = 'Mujer'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
+      texto: [Mujer]
+    supuestos:
+      - Se usa PONDIIO, no PONDERA.
+
+  - id: ing_003
+    pregunta: "¿Cuál es el ingreso per cápita familiar medio en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 728007.57
+    unidad: absoluta
+    tolerancia: 2000
+    categoria: ingresos
+    dificultad: alta
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    sql_esperado: >-
+      SELECT SUM(ingreso_per_capita_familiar * pondera_ingreso_familiar) * 1.0
+             / SUM(pondera_ingreso_familiar)
+      FROM personas WHERE pondera_ingreso_familiar > 0
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_per_capita_familiar, pondera_ingreso_familiar]
+    supuestos:
+      - Se usa PONDIH, no PONDERA.
+      - Los hogares con ponderador 0 no aportan al promedio.
+
+  - id: trap_001
+    pregunta: "¿Cuántas personas viven en los 31 aglomerados según la EPH del 1T 2026?"
+    tipo: numero
+    valor_esperado: 30095103
+    unidad: absoluta
+    tolerancia: 10000
+    categoria: trampas
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026"
+    sql_esperado: "SELECT SUM(pondera) FROM personas"
+    reglas_sql:
+      vistas: [personas]
+      columnas: [pondera]
+    supuestos:
+      - La respuesta correcta es la población expandida, no COUNT(*).
+
+  - id: trap_002
+    pregunta: "¿Cuál fue la tasa de desocupación en el 2T 2024?"
+    tipo: rechazo
+    categoria: trampas
+    dificultad: baja
+    fuente: "Alcance del proyecto: solo 1T 2026"
+    sql_esperado: null
+    reglas_sql: {}
+    supuestos:
+      - Debe aclarar que los datos cubren solo el 1T 2026.
+
+  - id: trap_003
+    pregunta: "¿Cuál fue la tasa de desocupación en Villa Mercedes en el 1T 2026?"
+    tipo: sin_datos
+    categoria: trampas
+    dificultad: media
+    fuente: "Villa Mercedes no es un aglomerado de la EPH"
+    sql_esperado: null
+    reglas_sql: {}
+    supuestos:
+      - No debe inventar una tasa para un aglomerado inexistente.
+
+  - id: trap_004
+    pregunta: "¿Cuál es el ingreso promedio de la ocupación principal de los desocupados?"
+    tipo: sin_datos
+    categoria: trampas
+    dificultad: alta
+    fuente: "P21 no aplica a desocupados"
+    sql_esperado: null
+    reglas_sql: {}
+    supuestos:
+      - El ingreso de la ocupación principal no existe para desocupados.
