@@ -25,6 +25,12 @@ Usamos la **EPH continua**: trimestral, 31 aglomerados urbanos, microdatos publi
 
 Los microdatos se descargan de la [página de bases de datos del INDEC](https://www.indec.gob.ar/indec/web/Institucional-Indec-BasesDeDatos) y se cargan en una **base de datos relacional**. Las tablas de individuos y hogares quedan tal como las publica el INDEC, y sobre ellas se construye la capa semántica.
 
+### Primera iteración en Google Colab
+
+El notebook [`notebooks/eph_1t2026_sqlite.ipynb`](notebooks/eph_1t2026_sqlite.ipynb) descarga el ZIP oficial, verifica su huella SHA-256 y construye SQLite por lotes. Permite filtrar por aglomerado y seleccionar columnas sin cargar toda la base en memoria; cada ejecución genera además un manifiesto con la fuente, filtros, esquema y conteos. El modo predeterminado conserva todas las filas y columnas.
+
+[Abrir el notebook en Google Colab](https://colab.research.google.com/github/d-montenegro/eph-agente/blob/main/notebooks/eph_1t2026_sqlite.ipynb)
+
 ## Capa semántica
 
 Las tablas del INDEC usan nombres de columnas y valores codificados: por ejemplo, el sexo está en la columna `CH04`, con 1 = varón y 2 = mujer. Sin contexto, un modelo no puede interpretarlos. Por eso, sobre las tablas se crean **vistas** con nombres y valores legibles, acompañadas de **metadatos** que describen cada columna; el agente trabaja solo con esas vistas y los metadatos, no con las tablas crudas.
