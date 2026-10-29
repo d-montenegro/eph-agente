@@ -1,0 +1,134 @@
+{
+  "src/eph_a_sqlite.py": {
+    "mtime": 1793287678.5212264,
+    "seen": 1793288747.852353,
+    "ast_hash": "0455e452451c38afab474d67b7e7d422",
+    "semantic_hash": "0455e452451c38afab474d67b7e7d422"
+  },
+  "README.md": {
+    "mtime": 1793286290.153021,
+    "seen": 1793286455.825786,
+    "ast_hash": "31202e6085e2c0cf513937ffff8a9397",
+    "semantic_hash": "31202e6085e2c0cf513937ffff8a9397"
+  },
+  "datos_indec/README.md": {
+    "mtime": 1793286290.1620173,
+    "seen": 1793286455.8257868,
+    "ast_hash": "0462285e7bb2b9f830d1f12574050d2f",
+    "semantic_hash": "0462285e7bb2b9f830d1f12574050d2f"
+  },
+  "src/README.md": {
+    "mtime": 1793287783.407416,
+    "seen": 1793288747.852363,
+    "ast_hash": "423ec93dd973a54dcbc7bc3424aa9800",
+    "semantic_hash": "423ec93dd973a54dcbc7bc3424aa9800"
+  },
+  "src/requirements.txt": {
+    "mtime": 1793286290.1624467,
+    "seen": 1793286455.825789,
+    "ast_hash": "bc23df952ff0c7e0d197db4932244933",
+    "semantic_hash": "bc23df952ff0c7e0d197db4932244933"
+  },
+  "datos_indec/EPH_consideraciones_metodologicas_2t20.pdf": {
+    "mtime": 1793286290.154328,
+    "seen": 1793286455.82579,
+    "ast_hash": "810c8bc718ccd31dc71e7d0134c545d6",
+    "semantic_hash": "810c8bc718ccd31dc71e7d0134c545d6"
+  },
+  "datos_indec/EPH_nota_metodologica_1_trim_2019.pdf": {
+    "mtime": 1793286290.154787,
+    "seen": 1793286455.82579,
+    "ast_hash": "8fc5b4aa30fe55abc40fa16833f2f2ea",
+    "semantic_hash": "8fc5b4aa30fe55abc40fa16833f2f2ea"
+  },
+  "datos_indec/EPH_registro_1T2026.pdf": {
+    "mtime": 1793286290.1563635,
+    "seen": 1793286455.825791,
+    "ast_hash": "a4dee87a4133409840a9d9e268cf202b",
+    "semantic_hash": "a4dee87a4133409840a9d9e268cf202b"
+  },
+  "opencode.json": {
+    "mtime": 1793287256.9261482,
+    "seen": 1793288747.852341,
+    "ast_hash": "b78aef9b3732b036799913b63ac1e7df",
+    "semantic_hash": "b78aef9b3732b036799913b63ac1e7df"
+  },
+  "pyproject.toml": {
+    "mtime": 1793287257.112725,
+    "seen": 1793288747.852351,
+    "ast_hash": "d91fe3e7655aadd5aae5c1db39e6b9e4",
+    "semantic_hash": "d91fe3e7655aadd5aae5c1db39e6b9e4"
+  },
+  "src/eph_agent/__init__.py": {
+    "mtime": 1793287257.187981,
+    "seen": 1793288747.852354,
+    "ast_hash": "a5134f87f503563d0fa530c0f839d817",
+    "semantic_hash": "a5134f87f503563d0fa530c0f839d817"
+  },
+  "src/eph_agent/config.py": {
+    "mtime": 1793287678.5210943,
+    "seen": 1793288747.852355,
+    "ast_hash": "1843d3dfd6d1d039c7f86e666299972d",
+    "semantic_hash": "1843d3dfd6d1d039c7f86e666299972d"
+  },
+  "tests/test_config.py": {
+    "mtime": 1793287678.5211177,
+    "seen": 1793288747.8523562,
+    "ast_hash": "1b39609bdb1eefe2aa5bf1f0f2417a91",
+    "semantic_hash": "1b39609bdb1eefe2aa5bf1f0f2417a91"
+  },
+  "tests/test_eph_a_sqlite.py": {
+    "mtime": 1793287678.5211246,
+    "seen": 1793288747.8523571,
+    "ast_hash": "674dfcb65d983769ebcbecc074a93ce1",
+    "semantic_hash": "674dfcb65d983769ebcbecc074a93ce1"
+  },
+  ".opencode/agents/eph-data-reviewer.md": {
+    "mtime": 1793287257.0309722,
+    "seen": 1793288747.8523579,
+    "ast_hash": "7f3963e61ee2be2837d18107b51ea141",
+    "semantic_hash": "7f3963e61ee2be2837d18107b51ea141"
+  },
+  ".opencode/agents/eph-implementer.md": {
+    "mtime": 1793287257.0596652,
+    "seen": 1793288747.8523579,
+    "ast_hash": "98a48a7a2d2c07c028c5dc44008c6c11",
+    "semantic_hash": "98a48a7a2d2c07c028c5dc44008c6c11"
+  },
+  ".opencode/agents/sql-safety-reviewer.md": {
+    "mtime": 1793287257.087482,
+    "seen": 1793288747.8523588,
+    "ast_hash": "39d69844dfcb1e4415a1976594be203d",
+    "semantic_hash": "39d69844dfcb1e4415a1976594be203d"
+  },
+  "AGENTS.md": {
+    "mtime": 1793287256.89599,
+    "seen": 1793288747.85236,
+    "ast_hash": "27a44b615087fe13ef8830a046e1c9b2",
+    "semantic_hash": "27a44b615087fe13ef8830a046e1c9b2"
+  },
+  "dev-plans/2026-10-29-eph-web-agent.md": {
+    "mtime": 1793287257.454332,
+    "seen": 1793288747.852361,
+    "ast_hash": "6693a7ad1b9c56e39be2de8cd419d4d3",
+    "semantic_hash": "6693a7ad1b9c56e39be2de8cd419d4d3"
+  },
+  "docs/architecture/database-backends.md": {
+    "mtime": 1793287257.4281967,
+    "seen": 1793288747.852361,
+    "ast_hash": "5582055a3eded35ddcd81ecc236ebeb5",
+    "semantic_hash": "5582055a3eded35ddcd81ecc236ebeb5"
+  },
+  "docs/decisiones/README.md": {
+    "mtime": 1793287621.9345262,
+    "seen": 1793288747.852362,
+    "ast_hash": "8f7783b0272734fe3680f2feccf3bc0b",
+    "semantic_hash": "8f7783b0272734fe3680f2feccf3bc0b"
+  },
+  "Agente de consultas en lenguaje natural sobre la EPH.pdf": {
+    "mtime": 1793285769.504846,
+    "seen": 1793288747.852364,
+    "ast_hash": "fd834710abaf88906083abfb86643f3f",
+    "semantic_hash": "fd834710abaf88906083abfb86643f3f"
+  }
+}
