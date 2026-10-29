@@ -191,18 +191,18 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] Una instalación limpia puede generar `eph.sqlite` desde el ZIP versionado.
-- [ ] La reconstrucción produce exactamente dos tablas crudas y los índices esperados.
-- [ ] Los conteos 15.447/43.739 quedan fijados como prueba de integridad del 1T 2026.
-- [ ] El repositorio documenta Python soportado y un único comando de preparación.
-- [ ] OpenCode carga la configuración del proyecto y descubre los agentes especializados.
-- [ ] SQLite, PostgreSQL y D1 tienen configuraciones validadas sin exponer secretos.
+- [x] Una instalación limpia puede generar `eph.sqlite` desde el ZIP versionado.
+- [x] La reconstrucción produce exactamente dos tablas crudas y los índices esperados.
+- [x] Los conteos 15.447/43.739 quedan fijados como prueba de integridad del 1T 2026.
+- [x] El repositorio documenta Python soportado y un único comando de preparación.
+- [x] OpenCode carga la configuración del proyecto y descubre los agentes especializados.
+- [x] SQLite, PostgreSQL y D1 tienen configuraciones validadas sin exponer secretos.
 - [ ] El proyecto se registra en el Hub del orquestador para delegaciones remotas; mientras tanto puede delegarse con el CLI local.
 
 ### Checks
 
-- [ ] Lint/format de Python.
-- [ ] Pruebas unitarias del cargador.
+- [x] Lint/format de Python.
+- [x] Pruebas unitarias del cargador.
 
 ## Fase 1: Capa semántica y profiling
 
@@ -234,16 +234,16 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] El agente no necesita conocer códigos `CHxx` para las preguntas cubiertas.
-- [ ] Valores especiales y fuera de universo se convierten a `NULL` según documentación.
-- [ ] Personas y hogares se unen únicamente con identificadores documentados.
-- [ ] Cada columna expuesta declara descripción, tipo, valores, universo, significado de `NULL`, ponderador y sinónimos.
-- [ ] El profiling falla de forma explícita si datos y diccionario divergen.
+- [x] El agente no necesita conocer códigos `CHxx` para las preguntas cubiertas.
+- [x] Valores especiales y fuera de universo se convierten a `NULL` según documentación.
+- [x] Personas y hogares se unen únicamente con identificadores documentados.
+- [x] Cada columna expuesta declara descripción, tipo, valores, universo, significado de `NULL`, ponderador y sinónimos.
+- [x] El profiling falla de forma explícita si datos y diccionario divergen.
 
 ### Checks
 
-- [ ] Pruebas de datos y regresión SQL.
-- [ ] Revisión metodológica manual contra `EPH_registro_1T2026.pdf`.
+- [x] Pruebas de datos y regresión SQL.
+- [ ] Revisión metodológica manual contra `EPH_registro_1T2026.pdf` (pendiente de aprobación humana).
 
 ## Fase 2: Backend, contratos y ejecución SQL segura
 
@@ -282,18 +282,18 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] `SELECT` y CTEs de lectura sobre vistas permitidas funcionan.
-- [ ] Múltiples sentencias, DML, DDL, `ATTACH`, PRAGMA mutable y tablas crudas se rechazan.
-- [ ] Una consulta costosa se cancela al superar el timeout.
-- [ ] El API nunca devuelve una traza o ruta sensible al cliente.
-- [ ] La respuesta conserva el SQL realmente ejecutado y el tamaño muestral no ponderado.
-- [ ] SQLite y PostgreSQL producen resultados equivalentes para el mismo fixture.
-- [ ] D1 no se marca como soportado hasta pasar las mismas pruebas de contrato.
+- [x] `SELECT` y CTEs de lectura sobre vistas permitidas funcionan.
+- [x] Múltiples sentencias, DML, DDL, `ATTACH`, PRAGMA mutable y tablas crudas se rechazan.
+- [x] Una consulta costosa se cancela al superar el timeout.
+- [x] El API nunca devuelve una traza o ruta sensible al cliente.
+- [ ] La respuesta conserva el SQL realmente ejecutado y el tamaño muestral no ponderado (SQL sí; tamaño muestral queda para el loop del agente).
+- [ ] SQLite y PostgreSQL producen resultados equivalentes para el mismo fixture (PostgreSQL implementado, falta una instancia para la prueba cruzada).
+- [x] D1 no se marca como soportado hasta pasar las mismas pruebas de contrato.
 
 ### Checks
 
-- [ ] Revisión de seguridad.
-- [ ] Pruebas unitarias y de integración.
+- [ ] Revisión de seguridad (pendiente de revisión independiente).
+- [x] Pruebas unitarias y de integración.
 
 ## Fase 3: Perfiles LLM y diagnóstico de conectividad
 

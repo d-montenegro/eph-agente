@@ -1,15 +1,17 @@
 # Graph Report - Trabajo Final Diplomatura  (2026-10-29)
 
 ## Corpus Check
-- cluster-only mode — file stats not available
+- 36 files · ~18,829 words
+- Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 5 file(s) not represented in the graph (top: (none) 2, .example 1, .zip 1)
 
 ## Summary
-- 141 nodes · 206 edges · 14 communities (7 shown, 7 thin omitted)
-- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 22 edges (avg confidence: 0.9)
+- 372 nodes · 721 edges · 17 communities (10 shown, 7 thin omitted)
+- Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 82 edges (avg confidence: 0.91)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3ebcc82d`
+- Built from commit: `b753b30d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -18,24 +20,28 @@
 - Capa semántica EPH
 - Lectura y tipado
 - Carga y CLI
-- Calidad metodológica
-- Agente y herramientas
-- Construcción SQLite
+- Diseño de registros EPH 1T 2026
+- pytest
+- semantic.py
 - Validación del período
 - eph-agente
+- bash
 - Dependencia pandas 3.1.0
+- api.py
+- database/__init__.py
+- test_api.py
 
 ## God Nodes (most connected - your core abstractions)
-1. `DatabaseSettings` - 15 edges
-2. `Natural Language Query Agent on EPH` - 15 edges
-3. `bash` - 10 edges
-4. `construir_base()` - 9 edges
-5. `DatabaseBackend` - 8 edges
-6. `extraer_tablas()` - 7 edges
-7. `leer_txt()` - 7 edges
-8. `validar_periodo()` - 7 edges
-9. `convertir_tipos()` - 6 edges
-10. `main()` - 6 edges
+1. `bash` - 40 edges
+2. `DatabaseSettings` - 21 edges
+3. `SQLiteAdapter` - 20 edges
+4. `DatabaseError` - 18 edges
+5. `DatabaseAdapter` - 18 edges
+6. `PostgresAdapter` - 16 edges
+7. `Natural Language Query Agent on EPH` - 15 edges
+8. `validate_query()` - 14 edges
+9. `QueryResult` - 13 edges
+10. `validate_dictionary()` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Diccionario de metadatos de columnas` --references--> `Ponderadores de ingresos PONDII PONDIIO PONDIH`  [INFERRED]
@@ -59,55 +65,67 @@
 - **Acceso semántico seguro a la EPH** — readme_readable_views, readme_metadata_dictionary, readme_describir_tabla, readme_ejecutar_sql, readme_safe_sql_execution [EXTRACTED 1.00]
 - **Ponderación y calidad de estimaciones EPH** — datos_indec_eph_registro_1t2026_general_weight, datos_indec_eph_registro_1t2026_income_weights, datos_indec_eph_consideraciones_metodologicas_2t20_propensity_score, datos_indec_eph_consideraciones_metodologicas_2t20_calibration, datos_indec_eph_consideraciones_metodologicas_2t20_quality_thresholds [INFERRED 0.85]
 
-## Communities (14 total, 7 thin omitted)
+## Communities (17 total, 7 thin omitted)
 
 ### Community 0 - "Evaluación y reproducibilidad"
-Cohesion: 0.15
-Nodes (13): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+5 more)
+Cohesion: 0.09
+Nodes (21): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+13 more)
 
 ### Community 1 - "Capa semántica EPH"
-Cohesion: 0.12
-Nodes (9): DatabaseBackend, DatabaseSettings, test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string(), test_default_sqlite_path_is_relative_to_project(), test_defaults_to_local_sqlite(), test_rejects_incompatible_backend_and_url(), test_resolves_absolute_sqlite_path() (+1 more)
+Cohesion: 0.11
+Nodes (11): get_settings(), DatabaseBackend, DatabaseSettings, create_database_adapter(), test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string(), test_default_sqlite_path_is_relative_to_project(), test_defaults_to_local_sqlite() (+3 more)
 
 ### Community 2 - "Lectura y tipado"
-Cohesion: 0.10
-Nodes (22): agent, build, plan, git diff*, git log*, git status*, make check*, make test* (+14 more)
+Cohesion: 0.11
+Nodes (19): agent, build, plan, permission, instructions, permission, edit, external_directory (+11 more)
 
 ### Community 3 - "Carga y CLI"
 Cohesion: 0.12
 Nodes (16): Natural Language Query Agent on EPH, Architecture of Natural Language Query Agent on EPH, Decision Log for Natural Language Query Agent on EPH, Data for Natural Language Query Agent on EPH, Deployment of Natural Language Query Agent on EPH, Future Improvements for Natural Language Query Agent on EPH, Implementer for Natural Language Query Agent on EPH, Integrations for Natural Language Query Agent on EPH (+8 more)
 
-### Community 4 - "Calidad metodológica"
-Cohesion: 0.17
-Nodes (13): Condición de actividad ESTADO, Variables demográficas CH03-CH16, Campos de ingresos P21 P47T ITF IPCF, Ponderadores de ingresos PONDII PONDIIO PONDIH, Códigos especiales y no respuesta, Diseño de registros EPH 1T 2026, Identificadores CODUSU NRO_HOGAR COMPONENTE, Herramienta describir_tabla (+5 more)
+### Community 4 - "Diseño de registros EPH 1T 2026"
+Cohesion: 0.07
+Nodes (27): Ajuste por calibración demográfica, Panel de rotación 2-2-2, Ajuste por propensity score, Umbrales de calidad para publicar resultados, Relevamiento telefónico EPH 2T 2020, Coeficientes de ajuste 2016-2018, Revisión de cobertura geográfica EPH, Ajuste de proyecciones de población (+19 more)
 
-### Community 5 - "Agente y herramientas"
-Cohesion: 0.22
-Nodes (7): Coeficientes de ajuste 2016-2018, Revisión de cobertura geográfica EPH, Ajuste de proyecciones de población, Archivos originales del INDEC, Golden set de preguntas EPH, Perfiles local dev y eval, Despliegue reproducible en contenedor
+### Community 5 - "pytest"
+Cohesion: 0.09
+Nodes (19): _authorizer(), SQLiteAdapter, SQLGuardError, validate_query(), adapter(), test_acota_las_filas_devueltas(), test_base_inexistente_falla_con_mensaje_seguro(), test_cierra_consultas_que_superan_el_timeout() (+11 more)
 
-### Community 6 - "Construcción SQLite"
-Cohesion: 0.29
-Nodes (7): Ajuste por calibración demográfica, Panel de rotación 2-2-2, Ajuste por propensity score, Umbrales de calidad para publicar resultados, Relevamiento telefónico EPH 2T 2020, Ponderador general PONDERA, Agente de consultas en lenguaje natural sobre la EPH
+### Community 6 - "semantic.py"
+Cohesion: 0.10
+Nodes (26): _check_column_values(), _check_dictionary_structure(), describe_table(), _from_json(), install_semantic_layer(), list_views(), load_dictionary(), main() (+18 more)
+
+### Community 12 - "bash"
+Cohesion: 0.05
+Nodes (39): cat*, curl *, docker *, find*, git add*, git commit*, git diff*, git log* (+31 more)
+
+### Community 14 - "api.py"
+Cohesion: 0.11
+Nodes (16): describe_table(), execute_sql(), get_adapter(), health(), schema(), DatabaseAdapter, ColumnMetadata, DescribeTableRequest (+8 more)
+
+### Community 15 - "database/__init__.py"
+Cohesion: 0.12
+Nodes (6): DatabaseError, QueryExecutionError, QueryResult, QueryTimeoutError, D1Adapter, PostgresAdapter
 
 ## Knowledge Gaps
 - **25 isolated node(s):** `eph-agente`, `Perfiles local dev y eval`, `Despliegue reproducible en contenedor`, `Condición de actividad ESTADO`, `Variables demográficas CH03-CH16` (+20 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 67 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 164 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Diseño de registros EPH 1T 2026` connect `Calidad metodológica` to `Agente y herramientas`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Are the 7 inferred relationships involving `DatabaseSettings` (e.g. with `test_accepts_cloudflare_d1_identifier()` and `test_accepts_postgresql_connection_string()`) actually correct?**
-  _`DatabaseSettings` has 7 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `DatabaseSettings` connect `Capa semántica EPH` to `api.py`, `database/__init__.py`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Are the 11 inferred relationships involving `DatabaseSettings` (e.g. with `get_adapter()` and `get_settings()`) actually correct?**
+  _`DatabaseSettings` has 11 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `eph-agente`, `Perfiles local dev y eval`, `Despliegue reproducible en contenedor` to the rest of the system?**
   _25 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Evaluación y reproducibilidad` be split into smaller, more focused modules?**
-  _Cohesion score 0.14623655913978495 - nodes in this community are weakly interconnected._
-- **Why does `Archivos originales del INDEC` connect `Agente y herramientas` to `Calidad metodológica`, `Construcción SQLite`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `construir_base()` (e.g. with `test_construir_base_creates_tables_and_indexes()` and `test_reconstruye_el_1t2026_con_los_conteos_oficiales()`) actually correct?**
-  _`construir_base()` has 2 INFERRED edges - model-reasoned connections that need verification._
+  _Cohesion score 0.09042553191489362 - nodes in this community are weakly interconnected._
+- **Why does `SQLiteAdapter` connect `pytest` to `Capa semántica EPH`, `database/__init__.py`?**
+  _High betweenness centrality (0.034) - this node is a cross-community bridge._
+- **Are the 8 inferred relationships involving `SQLiteAdapter` (e.g. with `DatabaseError` and `QueryExecutionError`) actually correct?**
+  _`SQLiteAdapter` has 8 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Capa semántica EPH` be split into smaller, more focused modules?**
-  _Cohesion score 0.11724137931034483 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10606060606060606 - nodes in this community are weakly interconnected._

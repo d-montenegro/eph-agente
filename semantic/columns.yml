@@ -1,0 +1,448 @@
+# Diccionario de la capa semántica de la EPH (1T 2026).
+#
+# Fuente: Diseño de registros y estructura para las bases preliminares Hogar y
+# Personas, INDEC, 1T 2026.
+# https://www.indec.gob.ar/ftp/cuadros/menusuperior/eph/EPH_registro_1T2026.pdf
+#
+# Cada columna declara qué mide, sus valores legibles, el significado de NULL,
+# el universo, el ponderador que corresponde y sinónimos para buscarla.
+# Las columnas crudas del INDEC (CHxx, Pxx) no llegan al agente.
+
+version: 1
+period:
+  anio: 2026
+  trimestre: 1
+
+views:
+  personas:
+    source_table: individual
+    description: >-
+      Una fila por persona encuestada. Expone características demográficas,
+      condición de actividad e ingresos con nombres y valores legibles.
+    columns:
+      codusu:
+        source: CODUSU
+        description: Identificador del hogar al que pertenece la persona.
+        type: identificador
+        null_meaning: No debería ser NULL en la base del INDEC.
+        universe: Todas las personas.
+        synonyms: [hogar, vivienda, identificador]
+        notes: Se combina con NRO_HOGAR para unir personas y hogares.
+      nro_hogar:
+        source: NRO_HOGAR
+        description: Número de hogar dentro de la vivienda.
+        type: identificador
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [hogar]
+        notes: Junto con CODUSU identifica unívocamente el hogar.
+      componente:
+        source: COMPONENTE
+        description: Número de componente (persona) dentro del hogar.
+        type: identificador
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [persona, miembro]
+      anio:
+        source: ANO4
+        description: Año de la encuesta.
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [año, periodo]
+      trimestre:
+        source: TRIMESTRE
+        description: Trimestre de la encuesta (1 a 4).
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [trimestre, periodo]
+        notes: El alcance inicial es solo el 1T 2026.
+      aglomerado:
+        source: AGLOMERADO
+        description: Aglomerado urbano donde se relevó el hogar.
+        type: categorica
+        possible_values:
+          - Gran La Plata
+          - Bahía Blanca-Cerri
+          - Gran Rosario
+          - Gran Santa Fe
+          - Gran Paraná
+          - Posadas
+          - Gran Resistencia
+          - Comodoro Rivadavia-Rada Tilly
+          - Gran Mendoza
+          - Corrientes
+          - Gran Córdoba
+          - Concordia
+          - Formosa
+          - Neuquén-Plottier
+          - Santiago del Estero-La Banda
+          - Jujuy-Palpalá
+          - Río Gallegos
+          - Gran Catamarca
+          - Gran Salta
+          - La Rioja
+          - Gran San Luis
+          - Gran San Juan
+          - Gran Tucumán-Tafí Viejo
+          - Santa Rosa-Toay
+          - Ushuaia-Río Grande
+          - Ciudad Autónoma de Buenos Aires
+          - Partidos del Gran Buenos Aires
+          - Mar del Plata
+          - Río Cuarto
+          - San Nicolás-Villa Constitución
+          - Rawson-Trelew
+          - Viedma-Carmen de Patagones
+        null_meaning: No se documenta un NULL; el código de aglomerado siempre está presente.
+        universe: Todas las personas.
+        synonyms: [ciudad, aglomerado, región urbana]
+      region:
+        source: REGION
+        description: Región estadística del aglomerado.
+        type: categorica
+        possible_values:
+          - Gran Buenos Aires
+          - Noroeste
+          - Noreste
+          - Cuyo
+          - Pampeana
+          - Patagonia
+        null_meaning: No se documenta un NULL.
+        universe: Todas las personas.
+        synonyms: [región]
+      pondera:
+        source: PONDERA
+        description: Ponderador general de la persona para estimar totales y tasas.
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        weight: PONDERA
+        synonyms: [ponderador, peso, expansión]
+        notes: >-
+          Se usa para todas las variables salvo los ingresos, que tienen
+          ponderadores con corrección por no respuesta.
+      sexo:
+        source: CH04
+        description: Sexo de la persona.
+        type: categorica
+        possible_values: [Varón, Mujer]
+        null_meaning: No se documenta un NULL.
+        universe: Todas las personas.
+        synonyms: [género, varón, mujer]
+      edad:
+        source: CH06
+        description: Años cumplidos de la persona.
+        type: numerica
+        null_meaning: >-
+          NULL cuando la edad no se informó (CH06 = -1) o llegó como código
+          Ns/Nr (CH06 = 99).
+        universe: Todas las personas.
+        synonyms: [años, edad]
+        notes: >-
+          Las personas menores de 10 años pueden tener edad NULL; en ese caso
+          estado_actividad indica 'Menor de 10 años'.
+      grupo_edad:
+        source: null
+        description: Grupo de edad derivado de edad.
+        type: categorica
+        possible_values: ["0-9", "10-14", "15-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+        null_meaning: NULL cuando la edad no se informó.
+        universe: Todas las personas.
+        synonyms: [grupo etario, franja de edad]
+        notes: Derivada de CH06; no existe como columna cruda.
+      parentesco:
+        source: CH03
+        description: Relación de parentesco con el jefe o la jefa de hogar.
+        type: categorica
+        possible_values:
+          - Jefe/a
+          - Cónyuge/pareja
+          - Hijo/a/hijastro/a
+          - Yerno/nuera
+          - Nieto/a
+          - Madre/padre
+          - Suegro/a
+          - Hermano/a
+          - Otros familiares
+          - No familiares
+        null_meaning: No se documenta un NULL.
+        universe: Todas las personas.
+        synonyms: [parentesco, relación con el jefe de hogar]
+      estado_actividad:
+        source: ESTADO
+        description: Condición de actividad económica de la persona.
+        type: categorica
+        possible_values: [Ocupado, Desocupado, Inactivo, "Menor de 10 años"]
+        null_meaning: NULL cuando la entrevista individual no se realizó (ESTADO = 0).
+        universe: Todas las personas.
+        synonyms: [ocupación, desempleo, inactividad, condición de actividad]
+        notes: >-
+          La tasa de desocupación se calcula sobre ocupados + desocupados
+          (población activa), no sobre el total de personas.
+      es_ocupado:
+        source: ESTADO
+        description: Vale 1 si la persona está ocupada y 0 en caso contrario.
+        type: booleana
+        possible_values: [0, 1]
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [ocupado, empleado, trabajando]
+        notes: Derivada de ESTADO; no existe como columna cruda.
+      es_desocupado:
+        source: ESTADO
+        description: Vale 1 si la persona está desocupada y 0 en caso contrario.
+        type: booleana
+        possible_values: [0, 1]
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [desocupado, desempleado, buscando trabajo]
+        notes: Derivada de ESTADO.
+      es_inactivo:
+        source: ESTADO
+        description: Vale 1 si la persona está inactiva y 0 en caso contrario.
+        type: booleana
+        possible_values: [0, 1]
+        null_meaning: No debería ser NULL.
+        universe: Todas las personas.
+        synonyms: [inactivo, fuera de la fuerza laboral]
+        notes: Derivada de ESTADO.
+      categoria_ocupacion:
+        source: CAT_OCUP
+        description: Categoría ocupacional de la ocupación principal.
+        type: categorica
+        possible_values:
+          - Patrón
+          - Cuenta propia
+          - Obrero o empleado
+          - Trabajador familiar sin remuneración
+        null_meaning: >-
+          NULL fuera del universo (no ocupado ni desocupado con ocupación
+          anterior) o cuando la respuesta es Ns/Nr (CAT_OCUP = 9).
+        universe: Ocupados y desocupados con ocupación anterior.
+        synonyms: [categoría ocupacional, patrón, cuenta propia, asalariado]
+      empleo_formal:
+        source: EMPLEO
+        description: Carácter formal o informal del empleo.
+        type: categorica
+        possible_values: [Formal, Informal]
+        null_meaning: NULL fuera del universo o cuando la respuesta es Ns/Nr.
+        universe: Ocupados.
+        synonyms: [formalidad, empleo formal, empleo informal]
+        notes: La definición de formalidad del INDEC no equivale a tener recibo de sueldo.
+      sector:
+        source: SECTOR
+        description: Sector institucional del empleo.
+        type: categorica
+        possible_values: [Formal, Informal, Hogares]
+        null_meaning: NULL fuera del universo o cuando la respuesta es Ns/Nr.
+        universe: Ocupados.
+        synonyms: [sector, sector formal, sector informal]
+        notes: Hogares corresponde al servicio doméstico en hogares.
+      ingreso_ocupacion_principal:
+        source: P21
+        description: Monto de ingreso de la ocupación principal, en pesos.
+        type: numerica
+        null_meaning: >-
+          NULL fuera del universo (no ocupado) o cuando no hubo respuesta de
+          ingresos (P21 = -9).
+        universe: Ocupados.
+        weight: PONDIIO
+        synonyms: [sueldo, salario, ingreso laboral, ingreso de la ocupación principal]
+        notes: >-
+          Debe estimarse con pondera_ingreso_ocupacion, no con pondera.
+          No incluye otras ocupaciones ni ingresos no laborales.
+      pondera_ingreso_ocupacion:
+        source: PONDIIO
+        description: Ponderador del ingreso de la ocupación principal, con corrección por no respuesta.
+        type: numerica
+        null_meaning: NULL fuera del universo o cuando el ingreso no es válido.
+        universe: Ocupados con ingreso de ocupación principal informado.
+        weight: PONDIIO
+        synonyms: [ponderador de ingreso laboral]
+      ingreso_total_individual:
+        source: P47T
+        description: Ingreso total individual, laboral y no laboral, en pesos.
+        type: numerica
+        null_meaning: >-
+          NULL cuando la entrevista individual no se realizó (ESTADO = 0) o
+          cuando no hubo respuesta de ingresos (P47T = -9).
+        universe: Personas con entrevista individual realizada.
+        weight: PONDII
+        synonyms: [ingreso individual, ingreso total, ingreso personal]
+        notes: Debe estimarse con pondera_ingreso_total.
+      pondera_ingreso_total:
+        source: PONDII
+        description: Ponderador del ingreso total individual, con corrección por no respuesta.
+        type: numerica
+        null_meaning: NULL fuera del universo o cuando el ingreso no es válido.
+        universe: Personas con ingreso total individual informado.
+        weight: PONDII
+        synonyms: [ponderador de ingreso individual]
+      ingreso_total_familiar:
+        source: ITF
+        description: Ingreso total familiar, suma de los ingresos individuales del hogar.
+        type: numerica
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos o sin
+          ingresos informados.
+        universe: Todos los hogares (se repite en cada persona del hogar).
+        weight: PONDIH
+        synonyms: [ingreso familiar, ingreso del hogar]
+        notes: >-
+          Es una variable de hogar repetida en la tabla de personas. Debe
+          estimarse con pondera_ingreso_familiar.
+      ingreso_per_capita_familiar:
+        source: IPCF
+        description: Ingreso per cápita familiar (ingreso total familiar dividido los miembros).
+        type: numerica
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos o sin
+          ingresos informados.
+        universe: Todos los hogares (se repite en cada persona del hogar).
+        weight: PONDIH
+        synonyms: [ingreso per cápita, ingreso por persona]
+        notes: Es una variable de hogar repetida en la tabla de personas.
+      pondera_ingreso_familiar:
+        source: PONDIH
+        description: Ponderador de los ingresos del hogar, con corrección por no respuesta.
+        type: numerica
+        null_meaning: No se documenta un NULL; 0 indica un hogar sin respuesta de ingresos.
+        universe: Todos los hogares.
+        weight: PONDIH
+        synonyms: [ponderador de ingreso familiar]
+
+  hogares:
+    source_table: hogar
+    description: >-
+      Una fila por hogar encuestado. Expone identificadores, tamaño e ingresos
+      del hogar con nombres legibles.
+    columns:
+      codusu:
+        source: CODUSU
+        description: Identificador de la vivienda.
+        type: identificador
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        synonyms: [vivienda, identificador]
+      nro_hogar:
+        source: NRO_HOGAR
+        description: Número de hogar dentro de la vivienda.
+        type: identificador
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        synonyms: [hogar]
+        notes: Junto con CODUSU identifica unívocamente el hogar.
+      anio:
+        source: ANO4
+        description: Año de la encuesta.
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        synonyms: [año, periodo]
+      trimestre:
+        source: TRIMESTRE
+        description: Trimestre de la encuesta (1 a 4).
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        synonyms: [trimestre, periodo]
+      aglomerado:
+        source: AGLOMERADO
+        description: Aglomerado urbano donde se relevó el hogar.
+        type: categorica
+        possible_values:
+          - Gran La Plata
+          - Bahía Blanca-Cerri
+          - Gran Rosario
+          - Gran Santa Fe
+          - Gran Paraná
+          - Posadas
+          - Gran Resistencia
+          - Comodoro Rivadavia-Rada Tilly
+          - Gran Mendoza
+          - Corrientes
+          - Gran Córdoba
+          - Concordia
+          - Formosa
+          - Neuquén-Plottier
+          - Santiago del Estero-La Banda
+          - Jujuy-Palpalá
+          - Río Gallegos
+          - Gran Catamarca
+          - Gran Salta
+          - La Rioja
+          - Gran San Luis
+          - Gran San Juan
+          - Gran Tucumán-Tafí Viejo
+          - Santa Rosa-Toay
+          - Ushuaia-Río Grande
+          - Ciudad Autónoma de Buenos Aires
+          - Partidos del Gran Buenos Aires
+          - Mar del Plata
+          - Río Cuarto
+          - San Nicolás-Villa Constitución
+          - Rawson-Trelew
+          - Viedma-Carmen de Patagones
+        null_meaning: No se documenta un NULL.
+        universe: Todos los hogares.
+        synonyms: [ciudad, aglomerado, región urbana]
+      region:
+        source: REGION
+        description: Región estadística del aglomerado.
+        type: categorica
+        possible_values:
+          - Gran Buenos Aires
+          - Noroeste
+          - Noreste
+          - Cuyo
+          - Pampeana
+          - Patagonia
+        null_meaning: No se documenta un NULL.
+        universe: Todos los hogares.
+        synonyms: [región]
+      pondera:
+        source: PONDERA
+        description: Ponderador general del hogar.
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        weight: PONDERA
+        synonyms: [ponderador, peso, expansión]
+      cantidad_miembros:
+        source: IX_TOT
+        description: Cantidad total de miembros del hogar.
+        type: numerica
+        null_meaning: No debería ser NULL.
+        universe: Todos los hogares.
+        synonyms: [miembros, tamaño del hogar, personas]
+        notes: Es la cantidad de personas relevadas, no una estimación poblacional.
+      ingreso_total_familiar:
+        source: ITF
+        description: Ingreso total familiar, suma de los ingresos individuales del hogar.
+        type: numerica
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos o sin
+          ingresos informados.
+        universe: Todos los hogares.
+        weight: PONDIH
+        synonyms: [ingreso familiar, ingreso del hogar]
+      ingreso_per_capita_familiar:
+        source: IPCF
+        description: Ingreso per cápita familiar (ingreso total familiar dividido los miembros).
+        type: numerica
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos o sin
+          ingresos informados.
+        universe: Todos los hogares.
+        weight: PONDIH
+        synonyms: [ingreso per cápita, ingreso por persona]
+      pondera_ingreso_familiar:
+        source: PONDIH
+        description: Ponderador de los ingresos del hogar, con corrección por no respuesta.
+        type: numerica
+        null_meaning: No se documenta un NULL; 0 indica un hogar sin respuesta de ingresos.
+        universe: Todos los hogares.
+        weight: PONDIH
+        synonyms: [ponderador de ingreso familiar]

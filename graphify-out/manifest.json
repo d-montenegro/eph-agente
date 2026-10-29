@@ -6,58 +6,58 @@
     "semantic_hash": "0455e452451c38afab474d67b7e7d422"
   },
   "README.md": {
-    "mtime": 1793286290.153021,
-    "seen": 1793286455.825786,
+    "mtime": 1793287169.4510381,
+    "seen": 1793303657.852213,
     "ast_hash": "31202e6085e2c0cf513937ffff8a9397",
     "semantic_hash": "31202e6085e2c0cf513937ffff8a9397"
   },
   "datos_indec/README.md": {
-    "mtime": 1793286290.1620173,
-    "seen": 1793286455.8257868,
+    "mtime": 1793287169.46404,
+    "seen": 1793303657.852214,
     "ast_hash": "0462285e7bb2b9f830d1f12574050d2f",
     "semantic_hash": "0462285e7bb2b9f830d1f12574050d2f"
   },
   "src/README.md": {
-    "mtime": 1793287783.407416,
-    "seen": 1793288747.852363,
-    "ast_hash": "423ec93dd973a54dcbc7bc3424aa9800",
-    "semantic_hash": "423ec93dd973a54dcbc7bc3424aa9800"
+    "mtime": 1793303510.8551817,
+    "seen": 1793303657.8522391,
+    "ast_hash": "c279dbd2c4e650168f9aec077354fd5a",
+    "semantic_hash": ""
   },
   "src/requirements.txt": {
-    "mtime": 1793286290.1624467,
-    "seen": 1793286455.825789,
+    "mtime": 1793287169.4645991,
+    "seen": 1793303657.8522398,
     "ast_hash": "bc23df952ff0c7e0d197db4932244933",
     "semantic_hash": "bc23df952ff0c7e0d197db4932244933"
   },
   "datos_indec/EPH_consideraciones_metodologicas_2t20.pdf": {
-    "mtime": 1793286290.154328,
-    "seen": 1793286455.82579,
+    "mtime": 1793287169.45348,
+    "seen": 1793303657.852264,
     "ast_hash": "810c8bc718ccd31dc71e7d0134c545d6",
     "semantic_hash": "810c8bc718ccd31dc71e7d0134c545d6"
   },
   "datos_indec/EPH_nota_metodologica_1_trim_2019.pdf": {
-    "mtime": 1793286290.154787,
-    "seen": 1793286455.82579,
+    "mtime": 1793287169.454081,
+    "seen": 1793303657.852264,
     "ast_hash": "8fc5b4aa30fe55abc40fa16833f2f2ea",
     "semantic_hash": "8fc5b4aa30fe55abc40fa16833f2f2ea"
   },
   "datos_indec/EPH_registro_1T2026.pdf": {
-    "mtime": 1793286290.1563635,
-    "seen": 1793286455.825791,
+    "mtime": 1793287169.4602454,
+    "seen": 1793303657.852265,
     "ast_hash": "a4dee87a4133409840a9d9e268cf202b",
     "semantic_hash": "a4dee87a4133409840a9d9e268cf202b"
   },
   "opencode.json": {
-    "mtime": 1793287256.9261482,
-    "seen": 1793288747.852341,
-    "ast_hash": "b78aef9b3732b036799913b63ac1e7df",
-    "semantic_hash": "b78aef9b3732b036799913b63ac1e7df"
+    "mtime": 1793303132.0310714,
+    "seen": 1793303657.851997,
+    "ast_hash": "61a9e41064619618023c3e9605a8d1b2",
+    "semantic_hash": ""
   },
   "pyproject.toml": {
-    "mtime": 1793287257.112725,
-    "seen": 1793288747.852351,
-    "ast_hash": "d91fe3e7655aadd5aae5c1db39e6b9e4",
-    "semantic_hash": "d91fe3e7655aadd5aae5c1db39e6b9e4"
+    "mtime": 1793303030.2385845,
+    "seen": 1793303657.8519979,
+    "ast_hash": "ccceccb7476adaf92328e21bcb2f4b39",
+    "semantic_hash": ""
   },
   "src/eph_agent/__init__.py": {
     "mtime": 1793287257.187981,
@@ -78,10 +78,10 @@
     "semantic_hash": "1b39609bdb1eefe2aa5bf1f0f2417a91"
   },
   "tests/test_eph_a_sqlite.py": {
-    "mtime": 1793287678.5211246,
-    "seen": 1793288747.8523571,
-    "ast_hash": "674dfcb65d983769ebcbecc074a93ce1",
-    "semantic_hash": "674dfcb65d983769ebcbecc074a93ce1"
+    "mtime": 1793294140.3446963,
+    "seen": 1793303657.8521411,
+    "ast_hash": "5107b5c15970336a97c0f2e036e388e6",
+    "semantic_hash": ""
   },
   ".opencode/agents/eph-data-reviewer.md": {
     "mtime": 1793287257.0309722,
@@ -102,16 +102,16 @@
     "semantic_hash": "39d69844dfcb1e4415a1976594be203d"
   },
   "AGENTS.md": {
-    "mtime": 1793287256.89599,
-    "seen": 1793288747.85236,
-    "ast_hash": "27a44b615087fe13ef8830a046e1c9b2",
-    "semantic_hash": "27a44b615087fe13ef8830a046e1c9b2"
+    "mtime": 1793289145.4536903,
+    "seen": 1793303657.8522098,
+    "ast_hash": "ae61cab0af782b48c62d472cd2c40c5b",
+    "semantic_hash": ""
   },
   "dev-plans/2026-10-29-eph-web-agent.md": {
-    "mtime": 1793287257.454332,
-    "seen": 1793288747.852361,
-    "ast_hash": "6693a7ad1b9c56e39be2de8cd419d4d3",
-    "semantic_hash": "6693a7ad1b9c56e39be2de8cd419d4d3"
+    "mtime": 1793303538.2201455,
+    "seen": 1793303657.852214,
+    "ast_hash": "1432e09806c3c0d06bfbac3c27fe316b",
+    "semantic_hash": ""
   },
   "docs/architecture/database-backends.md": {
     "mtime": 1793287257.4281967,
@@ -120,15 +120,123 @@
     "semantic_hash": "5582055a3eded35ddcd81ecc236ebeb5"
   },
   "docs/decisiones/README.md": {
-    "mtime": 1793287621.9345262,
-    "seen": 1793288747.852362,
-    "ast_hash": "8f7783b0272734fe3680f2feccf3bc0b",
-    "semantic_hash": "8f7783b0272734fe3680f2feccf3bc0b"
+    "mtime": 1793303554.239904,
+    "seen": 1793303657.8522382,
+    "ast_hash": "54219a9e2e9a39ad9bde268f959953a4",
+    "semantic_hash": ""
   },
   "Agente de consultas en lenguaje natural sobre la EPH.pdf": {
     "mtime": 1793285769.504846,
     "seen": 1793288747.852364,
     "ast_hash": "fd834710abaf88906083abfb86643f3f",
     "semantic_hash": "fd834710abaf88906083abfb86643f3f"
+  },
+  ".codex/hooks.json": {
+    "mtime": 1793288884.6763144,
+    "seen": 1793303657.851993,
+    "ast_hash": "005ac71c84af2cae38e255e2b9de2411",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/api.py": {
+    "mtime": 1793295331.098226,
+    "seen": 1793303657.852084,
+    "ast_hash": "df165e90a4e26122573f235b9b139782",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/database/__init__.py": {
+    "mtime": 1793295308.925704,
+    "seen": 1793303657.8521101,
+    "ast_hash": "5cd60cc77680c157cce1f6d9a4274df0",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/database/base.py": {
+    "mtime": 1793295243.919468,
+    "seen": 1793303657.852111,
+    "ast_hash": "85ac2188d36cce7c80bd5cd3794e6eac",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/database/d1.py": {
+    "mtime": 1793295306.3519504,
+    "seen": 1793303657.8521118,
+    "ast_hash": "d2f64238363d4558c89ab836e09a859b",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/database/postgres.py": {
+    "mtime": 1793302967.643751,
+    "seen": 1793303657.852113,
+    "ast_hash": "ae198657c234be1f4819feec36d04fb4",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/database/sqlite.py": {
+    "mtime": 1793303020.6992545,
+    "seen": 1793303657.852113,
+    "ast_hash": "4c5c93edbd5a219e790844a35f34433e",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/profile.py": {
+    "mtime": 1793303020.6992521,
+    "seen": 1793303657.852114,
+    "ast_hash": "ec50f0108ffe7304eaa5506e17964f1d",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/schemas.py": {
+    "mtime": 1793295318.7519667,
+    "seen": 1793303657.852115,
+    "ast_hash": "e092d39b4261e40c8e7c5767ce107625",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/semantic.py": {
+    "mtime": 1793303029.7477162,
+    "seen": 1793303657.8521159,
+    "ast_hash": "e9be78d1256fd76b299e8ee4e1d0403e",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/sql_guard.py": {
+    "mtime": 1793295287.4722614,
+    "seen": 1793303657.8521159,
+    "ast_hash": "1d14fc1db9b67031e9dba41344d76a91",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/tools.py": {
+    "mtime": 1793295320.2308095,
+    "seen": 1793303657.852117,
+    "ast_hash": "fdb1938f15f5b1e5bdda571d1515bc73",
+    "semantic_hash": ""
+  },
+  "tests/conftest.py": {
+    "mtime": 1793297328.0178895,
+    "seen": 1793303657.852118,
+    "ast_hash": "5fe7fdb347daa71ac0761f180c1d232d",
+    "semantic_hash": ""
+  },
+  "tests/test_api.py": {
+    "mtime": 1793302958.2764654,
+    "seen": 1793303657.852119,
+    "ast_hash": "32a01e862a7341fcb5163f49fcb0d6d5",
+    "semantic_hash": ""
+  },
+  "tests/test_database.py": {
+    "mtime": 1793302958.2761772,
+    "seen": 1793303657.85214,
+    "ast_hash": "a262418df63ec5199ad24c8a45afb847",
+    "semantic_hash": ""
+  },
+  "tests/test_semantic_layer.py": {
+    "mtime": 1793303020.6992652,
+    "seen": 1793303657.852142,
+    "ast_hash": "caf96203f2161c9db44012a6565a733b",
+    "semantic_hash": ""
+  },
+  "tests/test_sql_guard.py": {
+    "mtime": 1793297319.3578017,
+    "seen": 1793303657.852143,
+    "ast_hash": "fda56acf6838d6c2a32646df16415fd3",
+    "semantic_hash": ""
+  },
+  "semantic/columns.yml": {
+    "mtime": 1793290013.3703358,
+    "seen": 1793303657.8522391,
+    "ast_hash": "27439d4664d6e4290e4abc5b59394c52",
+    "semantic_hash": ""
   }
 }

@@ -12,15 +12,52 @@
     "webfetch": "allow",
     "websearch": "allow",
     "task": "allow",
+    "edit": "allow",
+    "read": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "todowrite": "allow",
     "bash": {
       "*": "ask",
+      "pwd": "allow",
+      "ls*": "allow",
+      "cat*": "allow",
+      "head*": "allow",
+      "tail*": "allow",
+      "wc*": "allow",
+      "grep*": "allow",
+      "rg*": "allow",
+      "find*": "allow",
+      "jq*": "allow",
+      "sqlite3 *": "allow",
+      "python*": "allow",
+      "python3*": "allow",
+      ".venv/bin/*": "allow",
+      "PYTHONPATH=*": "allow",
+      "PATH=*": "allow",
+      "OLLAMA_API_KEY=*": "allow",
+      "pytest*": "allow",
+      "ruff*": "allow",
+      "make *": "allow",
+      "uv lock*": "allow",
+      "uv pip *": "allow",
+      "uv sync*": "allow",
+      "uv run*": "allow",
+      "uv tool *": "allow",
+      "graphify *": "allow",
       "git status*": "allow",
       "git diff*": "allow",
       "git log*": "allow",
-      "make test*": "allow",
-      "make check*": "allow",
-      "python -m unittest*": "allow",
-      "python3 -m unittest*": "allow"
+      "git show*": "allow",
+      "git add*": "allow",
+      "git commit*": "allow",
+      "git push*": "deny",
+      "sudo *": "deny",
+      "rm *": "ask",
+      "curl *": "ask",
+      "wget *": "ask",
+      "docker *": "ask"
     }
   },
   "agent": {
@@ -32,8 +69,7 @@
     },
     "build": {
       "permission": {
-        "edit": "allow",
-        "bash": "ask"
+        "edit": "allow"
       }
     }
   }

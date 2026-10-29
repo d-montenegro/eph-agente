@@ -21,8 +21,8 @@ source .venv/bin/activate          # en Windows: .venv\Scripts\activate
 make setup
 ```
 
-`make setup` equivale a `pip install -e '.[dev,postgres]'` y toma las dependencias de
-`pyproject.toml`.
+`make setup` equivale a `uv sync --extra dev --extra postgres` y toma las
+dependencias de `pyproject.toml`.
 
 ## Crear la base de datos
 

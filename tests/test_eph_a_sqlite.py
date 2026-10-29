@@ -1,13 +1,9 @@
 import sqlite3
-from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from eph_a_sqlite import construir_base, convertir_tipos, extraer_tablas, validar_periodo
-
-RAIZ_REPO = Path(__file__).resolve().parents[1]
-ZIP_1T2026 = RAIZ_REPO / "datos_indec" / "EPH_usu_1_Trim_2026_txt.zip"
+from eph_a_sqlite import construir_base, convertir_tipos, validar_periodo
 
 
 def test_convertir_tipos_preserves_identifiers_and_converts_numbers() -> None:
@@ -67,15 +63,8 @@ def test_construir_base_creates_tables_and_indexes(tmp_path) -> None:
     }.issubset(indexes_found)
 
 
-@pytest.mark.skipif(not ZIP_1T2026.exists(), reason="falta el zip versionado del 1T 2026")
-def test_reconstruye_el_1t2026_con_los_conteos_oficiales(tmp_path) -> None:
-    tablas = extraer_tablas(ZIP_1T2026)
-    validar_periodo(tablas)
-    database = tmp_path / "eph.sqlite"
-
-    construir_base(database, tablas)
-
-    with sqlite3.connect(database) as connection:
+def test_reconstruye_el_1t2026_con_los_conteos_oficiales(eph_raw_database) -> None:
+    with sqlite3.connect(eph_raw_database) as connection:
         tablas_crudas = {
             row[0]
             for row in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
