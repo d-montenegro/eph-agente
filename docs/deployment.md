@@ -11,7 +11,18 @@ make api-ollama         # FastAPI con el perfil local de Ollama
 make web                # Vite en http://127.0.0.1:5173 (proxy /api)
 ```
 
-`make api-ollama` usa `config/providers.ollama.example.yml`
+Para levantarlo todo en segundo plano, con API en 8010 y web en 5180:
+
+```bash
+make up       # crea el entorno/base si falta y arranca API + web
+make status
+make down
+```
+
+Los puertos se pueden cambiar con `EPH_API_PORT` y `EPH_WEB_PORT`; Vite usa
+`EPH_API_TARGET` para el proxy. Los logs quedan en `tmp/api.log` y `tmp/web.log`.
+
+`make api-ollama` y `make up` usan `config/providers.ollama.example.yml`
 (`http://127.0.0.1:11434/v1`, modelo `qwen2.5:7b`). Requiere Ollama corriendo y
 un modelo con tool calling. La calidad de un modelo 7B no es concluyente: para
 medir calidad usá un perfil `dev` o `eval`.

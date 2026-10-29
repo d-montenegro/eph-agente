@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "web/package.json": {
-    "mtime": 1793308556.9095218,
-    "seen": 1793309219.857813,
-    "ast_hash": "b653b1e7bbeb8f0b9ee5b7af794f6fce",
+    "mtime": 1793317376.6096802,
+    "seen": 1793317416.736167,
+    "ast_hash": "94262f6e6bc56c24b53169cae7807d58",
     "semantic_hash": ""
   },
   "web/src/App.test.tsx": {
@@ -450,15 +450,15 @@
     "semantic_hash": ""
   },
   "web/tsconfig.json": {
-    "mtime": 1793308556.9095244,
-    "seen": 1793309219.857832,
-    "ast_hash": "f45fef581b1bcbf977c2142d2be561b8",
+    "mtime": 1793317376.6100945,
+    "seen": 1793317416.736646,
+    "ast_hash": "bfbc17055214a028c9cbdb3f50375d4c",
     "semantic_hash": ""
   },
   "web/vite.config.ts": {
-    "mtime": 1793308995.256008,
-    "seen": 1793309219.857833,
-    "ast_hash": "74aff0e9786357ff843e41c363a932be",
+    "mtime": 1793317234.6947007,
+    "seen": 1793317416.736647,
+    "ast_hash": "dcb06f81d0c3435b0df1081988dd25ba",
     "semantic_hash": ""
   },
   "docs/proyecto.md": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "docs/deployment.md": {
-    "mtime": 1793315872.1556826,
-    "seen": 1793316001.934315,
-    "ast_hash": "66137daa6b67af33dc6bcc9520447c4a",
+    "mtime": 1793317394.2680843,
+    "seen": 1793317416.7370298,
+    "ast_hash": "d8c5b8289db9c4b216ef6f52c4511eae",
     "semantic_hash": ""
   },
   "render.yaml": {
@@ -525,6 +525,12 @@
     "mtime": 1793315850.8943672,
     "seen": 1793316001.934252,
     "ast_hash": "1e665cac6e544f1ed09a391dfa916b98",
+    "semantic_hash": ""
+  },
+  "scripts/dev.sh": {
+    "mtime": 1793317239.8663046,
+    "seen": 1793317416.735292,
+    "ast_hash": "88ad0376b4a5286bc78df3c596e0bfc7",
     "semantic_hash": ""
   }
 }

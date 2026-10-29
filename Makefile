@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build opencode-config
+.PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build up down status opencode-config
 
 setup:
 	uv sync --extra dev --extra postgres
@@ -30,6 +30,15 @@ eval:
 
 eval-reference:
 	PYTHONPATH=src $(PYTHON) -m eph_agent.evaluation --golden eval/golden.yml --reference
+
+up:
+	scripts/dev.sh up
+
+down:
+	scripts/dev.sh down
+
+status:
+	scripts/dev.sh status
 
 web:
 	npm --prefix web run dev
