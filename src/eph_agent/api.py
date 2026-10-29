@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from dataclasses import asdict, replace
 
 from fastapi import Depends, FastAPI, HTTPException
 
+from eph_agent.agent import AgentError, AgentService
+from eph_agent.answer import AgentAnswer
 from eph_agent.config import DatabaseSettings
 from eph_agent.database import (
     DatabaseAdapter,
@@ -14,10 +17,23 @@ from eph_agent.database import (
     QueryTimeoutError,
     create_database_adapter,
 )
+from eph_agent.providers import (
+    Message,
+    ProviderError,
+    ProviderRegistry,
+    ProviderRegistryError,
+    ToolDefinition,
+)
 from eph_agent.schemas import (
+    AgentAskRequest,
     DescribeTableRequest,
     ExecuteSQLRequest,
     HealthResponse,
+    ProviderHealthResponse,
+    ProviderProfilePublic,
+    ProviderSelectRequest,
+    ProvidersResponse,
+    ProviderTestRequest,
     QueryResultResponse,
     SchemaResponse,
     TableDescription,
@@ -45,6 +61,13 @@ def get_adapter(settings: DatabaseSettings = Depends(get_settings)) -> Iterator[
         yield adapter
     finally:
         adapter.close()
+
+
+def get_registry() -> ProviderRegistry:
+    try:
+        return ProviderRegistry.from_env()
+    except ProviderRegistryError as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -104,3 +127,96 @@ def execute_sql(
         sql=result.sql,
         elapsed_ms=result.elapsed_ms,
     )
+
+
+@app.get("/api/providers", response_model=ProvidersResponse)
+def list_providers(registry: ProviderRegistry = Depends(get_registry)) -> ProvidersResponse:
+    return ProvidersResponse(
+        mode=registry.mode,
+        selected=getattr(app.state, "selected_profile", None),
+        profiles=[ProviderProfilePublic(**profile) for profile in registry.public_profiles()],
+    )
+
+
+@app.post("/api/providers/test", response_model=ProviderHealthResponse)
+async def test_provider(
+    request: ProviderTestRequest,
+    registry: ProviderRegistry = Depends(get_registry),
+) -> ProviderHealthResponse:
+    try:
+        if request.profile:
+            provider = registry.create(request.profile)
+        else:
+            if not request.base_url or not request.model:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Indicá un profile o bien base_url y model",
+                )
+            provider = registry.create_transient(
+                base_url=request.base_url,
+                model=request.model,
+                api_key_env=request.api_key_env,
+            )
+    except ProviderRegistryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    health = await provider.health()
+    if request.check_tools and health.ok:
+        try:
+            turn = await provider.complete_with_tools(
+                [Message(role="user", content="Respondé usando la herramienta ping.")],
+                [
+                    ToolDefinition(
+                        name="ping",
+                        description="Herramienta de prueba; no recibe argumentos.",
+                        parameters={"type": "object", "properties": {}},
+                    )
+                ],
+                model=provider.model,
+                temperature=0.0,
+            )
+            health = replace(health, tools_supported=bool(turn.tool_calls))
+        except ProviderError:
+            health = replace(health, tools_supported=False)
+
+    return ProviderHealthResponse(**asdict(health))
+
+
+@app.post("/api/providers/select", response_model=ProviderProfilePublic)
+def select_provider(
+    request: ProviderSelectRequest,
+    registry: ProviderRegistry = Depends(get_registry),
+) -> ProviderProfilePublic:
+    try:
+        profile = registry.get(request.profile)
+    except ProviderRegistryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    app.state.selected_profile = profile.name
+    return ProviderProfilePublic(**profile.public(has_api_key=registry.has_api_key(profile)))
+
+
+@app.post("/api/agent/ask", response_model=AgentAnswer)
+async def ask_agent(
+    request: AgentAskRequest,
+    adapter: DatabaseAdapter = Depends(get_adapter),
+    registry: ProviderRegistry = Depends(get_registry),
+) -> AgentAnswer:
+    selected = request.profile or getattr(app.state, "selected_profile", None)
+    try:
+        profile = registry.get(selected) if selected else registry.default_profile()
+        provider = registry.create(profile.name)
+    except ProviderRegistryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    service = AgentService(
+        adapter,
+        provider,
+        model=provider.model,
+        profile=profile.name,
+    )
+    try:
+        return await service.ask(request.question)
+    except AgentError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error
+    except ProviderError as error:
+        raise HTTPException(status_code=502, detail=str(error)) from error

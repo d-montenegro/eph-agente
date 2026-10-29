@@ -55,7 +55,14 @@ class SQLiteAdapter:
         if not self.database_path.exists():
             raise DatabaseError(f"No existe la base {self.database_path.name}")
         uri = f"file:{self.database_path}?mode=ro"
-        connection = sqlite3.connect(uri, uri=True, timeout=self.timeout_ms / 1_000)
+        # La conexión es por request y se usa en un solo hilo a la vez; FastAPI
+        # crea la dependencia en un threadpool y la consume en el event loop.
+        connection = sqlite3.connect(
+            uri,
+            uri=True,
+            timeout=self.timeout_ms / 1_000,
+            check_same_thread=False,
+        )
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA query_only = ON")
         connection.set_authorizer(_authorizer)

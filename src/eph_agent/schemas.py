@@ -58,3 +58,48 @@ class HealthResponse(BaseModel):
     backend: str
     dialect: str
     views: list[str]
+
+
+class ProviderProfilePublic(BaseModel):
+    name: str
+    base_url: str
+    model: str
+    api_mode: str
+    timeout_seconds: float
+    max_retries: int
+    enabled: bool
+    hosted: bool
+    api_key_env: str | None = None
+    has_api_key: bool
+
+
+class ProvidersResponse(BaseModel):
+    mode: str
+    selected: str | None = None
+    profiles: list[ProviderProfilePublic]
+
+
+class ProviderTestRequest(BaseModel):
+    profile: str | None = None
+    base_url: str | None = None
+    model: str | None = None
+    api_key_env: str | None = None
+    check_tools: bool = False
+
+
+class ProviderHealthResponse(BaseModel):
+    ok: bool
+    status: str
+    latency_ms: float
+    models: list[str] = Field(default_factory=list)
+    detail: str | None = None
+    tools_supported: bool | None = None
+
+
+class ProviderSelectRequest(BaseModel):
+    profile: str = Field(min_length=1)
+
+
+class AgentAskRequest(BaseModel):
+    question: str = Field(min_length=1)
+    profile: str | None = None

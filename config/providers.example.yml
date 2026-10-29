@@ -1,0 +1,41 @@
+# Perfiles de modelos compatibles con la API de OpenAI.
+#
+# Nunca incluir el valor de una clave: solo el nombre de la variable de entorno
+# que la contiene. El backend resuelve la clave en el servidor y no la devuelve.
+
+mode: local # local | hosted
+
+# En modo hosted solo se permiten perfiles con hosted: true cuyo host esté en
+# esta lista. Vacío significa que no se permite ningún destino remoto.
+allowed_hosts: []
+
+profiles:
+  local:
+    base_url: http://127.0.0.1:20128/v1
+    model: auto
+    api_mode: chat_completions
+    api_key_env: EPH_LLM_API_KEY
+    timeout_seconds: 30
+    max_retries: 1
+    enabled: true
+    hosted: false
+
+  dev:
+    base_url: https://api.example.com/v1
+    model: example-model
+    api_mode: chat_completions
+    api_key_env: EPH_DEV_API_KEY
+    timeout_seconds: 60
+    max_retries: 2
+    enabled: false
+    hosted: true
+
+  eval:
+    base_url: https://api.example.com/v1
+    model: example-eval-model
+    api_mode: chat_completions
+    api_key_env: EPH_EVAL_API_KEY
+    timeout_seconds: 90
+    max_retries: 2
+    enabled: false
+    hosted: true

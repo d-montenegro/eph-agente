@@ -228,23 +228,23 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 ### Fase 0: datos
 
-- [ ] Cargar la EPH continua del 1T 2026
+- [x] Cargar la EPH continua del 1T 2026
 - [ ] Validar las tasas del 1T 2026 contra el informe técnico del INDEC
-- [ ] Crear el repositorio y un proceso reproducible para construir la base
+- [x] Crear el repositorio y un proceso reproducible para construir la base
 
 ### Fase 1: capa semántica inicial
 
-- [ ] Vistas `personas` y `hogares` para las variables de mercado laboral e ingresos
-- [ ] Valores especiales a `NULL`, universo aplicado y columnas derivadas
-- [ ] Metadatos de ese grupo de variables, a partir del diseño de registro
-- [ ] Script de profiling para validar el diccionario contra los datos
+- [x] Vistas `personas` y `hogares` para las variables de mercado laboral e ingresos
+- [x] Valores especiales a `NULL`, universo aplicado y columnas derivadas
+- [x] Metadatos de ese grupo de variables, a partir del diseño de registro
+- [x] Script de profiling para validar el diccionario contra los datos
 
 ### Fase 2: agente base
 
-- [ ] Loop con las dos herramientas y ejecución segura
-- [ ] Índice compacto de columnas generado desde los metadatos
-- [ ] Salida estructurada `{valor, sql, supuestos, respuesta}`
-- [ ] Perfiles `local` y `dev`
+- [x] Loop con las dos herramientas y ejecución segura
+- [x] Índice compacto de columnas generado desde los metadatos
+- [x] Salida estructurada `{valor, sql, supuestos, respuesta}`
+- [x] Perfiles `local` y `dev`
 
 ### Fase 3: evaluación
 
@@ -267,7 +267,7 @@ Las fases siguen el ciclo de desarrollo: primero una línea base mínima y medid
 
 - [ ] Contenedor con el agente y la base de solo lectura
 - [ ] Evaluación en CI como condición para desplegar
-- [ ] Dejar explícito en las respuestas el período que cubren los datos (1T 2026)
+- [x] Dejar explícito en las respuestas el período que cubren los datos (1T 2026)
 
 ## Mejoras futuras
 

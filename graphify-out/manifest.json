@@ -6,10 +6,10 @@
     "semantic_hash": "0455e452451c38afab474d67b7e7d422"
   },
   "README.md": {
-    "mtime": 1793287169.4510381,
-    "seen": 1793303657.852213,
-    "ast_hash": "31202e6085e2c0cf513937ffff8a9397",
-    "semantic_hash": "31202e6085e2c0cf513937ffff8a9397"
+    "mtime": 1793306105.684706,
+    "seen": 1793306209.208392,
+    "ast_hash": "8763815ef25069c97575adaf3df460f3",
+    "semantic_hash": ""
   },
   "datos_indec/README.md": {
     "mtime": 1793287169.46404,
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "pyproject.toml": {
-    "mtime": 1793303030.2385845,
-    "seen": 1793303657.8519979,
-    "ast_hash": "ccceccb7476adaf92328e21bcb2f4b39",
+    "mtime": 1793304240.30388,
+    "seen": 1793306209.2078688,
+    "ast_hash": "75e4e44c6dab878a797b8ce71aaaefaf",
     "semantic_hash": ""
   },
   "src/eph_agent/__init__.py": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "dev-plans/2026-10-29-eph-web-agent.md": {
-    "mtime": 1793303538.2201455,
-    "seen": 1793303657.852214,
-    "ast_hash": "1432e09806c3c0d06bfbac3c27fe316b",
+    "mtime": 1793306078.8137586,
+    "seen": 1793306209.208417,
+    "ast_hash": "dc056911d3921215a0bc231c6220119f",
     "semantic_hash": ""
   },
   "docs/architecture/database-backends.md": {
@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/api.py": {
-    "mtime": 1793295331.098226,
-    "seen": 1793303657.852084,
-    "ast_hash": "df165e90a4e26122573f235b9b139782",
+    "mtime": 1793304744.9125237,
+    "seen": 1793306209.207924,
+    "ast_hash": "0ef0a53d0337ca6135c5ec9428930bff",
     "semantic_hash": ""
   },
   "src/eph_agent/database/__init__.py": {
@@ -168,9 +168,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/database/sqlite.py": {
-    "mtime": 1793303020.6992545,
-    "seen": 1793303657.852113,
-    "ast_hash": "4c5c93edbd5a219e790844a35f34433e",
+    "mtime": 1793305911.3790133,
+    "seen": 1793306209.2080529,
+    "ast_hash": "2d4bbc32321b60b00d16d0825eeb4087",
     "semantic_hash": ""
   },
   "src/eph_agent/profile.py": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/schemas.py": {
-    "mtime": 1793295318.7519667,
-    "seen": 1793303657.852115,
-    "ast_hash": "e092d39b4261e40c8e7c5767ce107625",
+    "mtime": 1793304684.3630013,
+    "seen": 1793306209.208085,
+    "ast_hash": "05797cd6e9fc5a367a7d2277e16a559a",
     "semantic_hash": ""
   },
   "src/eph_agent/semantic.py": {
@@ -237,6 +237,90 @@
     "mtime": 1793290013.3703358,
     "seen": 1793303657.8522391,
     "ast_hash": "27439d4664d6e4290e4abc5b59394c52",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/agent.py": {
+    "mtime": 1793304744.8728786,
+    "seen": 1793306209.207922,
+    "ast_hash": "985381a8c96133aadff6e04123981606",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/answer.py": {
+    "mtime": 1793304744.8725722,
+    "seen": 1793306209.207923,
+    "ast_hash": "aeaeefb4fe3e349ce3d8f0b563a03c52",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/prompts/__init__.py": {
+    "mtime": 1793304435.9830909,
+    "seen": 1793306209.208077,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/prompts/schema_index.py": {
+    "mtime": 1793304435.7751324,
+    "seen": 1793306209.208079,
+    "ast_hash": "04c5cddac82e7d7824b90421927ab67b",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/providers/__init__.py": {
+    "mtime": 1793303883.8335474,
+    "seen": 1793306209.208081,
+    "ast_hash": "bad195d7f21b7b6d5ee7cea7badb6c28",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/providers/base.py": {
+    "mtime": 1793304606.922068,
+    "seen": 1793306209.208082,
+    "ast_hash": "a95989ce5244f0212016041b6d699668",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/providers/openai_compatible.py": {
+    "mtime": 1793304284.8833864,
+    "seen": 1793306209.208083,
+    "ast_hash": "c1d2d63146a1eeec3414576ada32542e",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/providers/registry.py": {
+    "mtime": 1793304670.8467567,
+    "seen": 1793306209.2080839,
+    "ast_hash": "57c0c87a337d78756f9325d01c5ad741",
+    "semantic_hash": ""
+  },
+  "tests/test_agent.py": {
+    "mtime": 1793305912.0880709,
+    "seen": 1793306209.2081761,
+    "ast_hash": "c6a613b8d6998f7151ce08a1edc38eb4",
+    "semantic_hash": ""
+  },
+  "tests/test_api_agent.py": {
+    "mtime": 1793304744.9136126,
+    "seen": 1793306209.208197,
+    "ast_hash": "9e04d3bfe764153507d82237d264cef0",
+    "semantic_hash": ""
+  },
+  "tests/test_api_providers.py": {
+    "mtime": 1793304133.5777802,
+    "seen": 1793306209.2081978,
+    "ast_hash": "1520bed92c714d1940e6f471a36b1f7e",
+    "semantic_hash": ""
+  },
+  "tests/test_providers.py": {
+    "mtime": 1793304123.3124583,
+    "seen": 1793306209.20826,
+    "ast_hash": "df9add07cb0549346bea496681b157db",
+    "semantic_hash": ""
+  },
+  "config/providers.example.yml": {
+    "mtime": 1793303820.3842142,
+    "seen": 1793306209.2083929,
+    "ast_hash": "334bbd5a65cb7a45ba64d6d5172e26f5",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/prompts/system.md": {
+    "mtime": 1793304455.648539,
+    "seen": 1793306209.2085161,
+    "ast_hash": "39dda5fe99962a44c4e6a73df72f1685",
     "semantic_hash": ""
   }
 }

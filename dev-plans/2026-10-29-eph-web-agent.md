@@ -317,17 +317,17 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] LM Studio/Ollama compatible puede configurarse con una URL local.
-- [ ] OmniRoute funciona con base URL terminada en `/v1` y modelo de `/v1/models`.
-- [ ] La UI distingue “servidor inaccesible”, “credencial inválida” y “modelo inexistente”.
-- [ ] Ningún endpoint devuelve el valor de una API key.
-- [ ] El modo hosted impide configurar destinos arbitrarios para evitar SSRF.
-- [ ] Cambiar de proveedor no modifica `AgentService` ni las herramientas.
+- [x] LM Studio/Ollama compatible puede configurarse con una URL local.
+- [ ] OmniRoute funciona con base URL terminada en `/v1` y modelo de `/v1/models` (configurado, falta prueba contra el servidor real).
+- [ ] La UI distingue “servidor inaccesible”, “credencial inválida” y “modelo inexistente” (la API ya devuelve los estados; la UI llega en la fase 5).
+- [x] Ningún endpoint devuelve el valor de una API key.
+- [x] El modo hosted impide configurar destinos arbitrarios para evitar SSRF.
+- [x] Cambiar de proveedor no modifica `AgentService` ni las herramientas.
 
 ### Checks
 
-- [ ] Revisión de seguridad de secretos y SSRF.
-- [ ] Pruebas de contrato con un servidor compatible simulado.
+- [ ] Revisión de seguridad de secretos y SSRF (pendiente de revisión independiente).
+- [x] Pruebas de contrato con un servidor compatible simulado.
 
 ## Fase 4: Loop del agente y salida auditable
 
@@ -367,16 +367,16 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Criterios de aceptación
 
-- [ ] Cada respuesta exitosa incluye resultado, SQL, supuestos y texto.
-- [ ] Preguntas sobre otro período se rechazan o aclaran indicando 1T 2026.
-- [ ] Si el SQL falla, el modelo recibe un error sanitizado y puede corregirlo dentro del límite.
-- [ ] Al agotarse los turnos se devuelve un error útil, no una respuesta inventada.
-- [ ] La respuesta identifica perfil y modelo para reproducibilidad.
+- [x] Cada respuesta exitosa incluye resultado, SQL, supuestos y texto.
+- [x] Preguntas sobre otro período se rechazan o aclaran indicando 1T 2026.
+- [x] Si el SQL falla, el modelo recibe un error sanitizado y puede corregirlo dentro del límite.
+- [x] Al agotarse los turnos se devuelve un error útil, no una respuesta inventada.
+- [x] La respuesta identifica perfil y modelo para reproducibilidad.
 
 ### Checks
 
-- [ ] Pruebas unitarias y de integración.
-- [ ] Revisión de seguridad y de costos/latencia.
+- [x] Pruebas unitarias y de integración.
+- [ ] Revisión de seguridad y de costos/latencia (pendiente).
 
 ## Fase 5: Web de proyecto, agente y configuración
 
