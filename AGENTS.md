@@ -56,3 +56,15 @@ Rules:
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+
+### Regeneración local (sin API key)
+
+Este proyecto usa Ollama para la extracción semántica; no hace falta configurar
+Gemini, Claude ni OpenAI. ChatGPT/Codex y OpenCode ejecutan `graphify` localmente
+sobre el mismo `graphify-out/graph.json`; no se delegan entre sí.
+
+- Consultar el grafo (`graphify query`, `explain`, `path`) no requiere API key.
+- Reconstruir solo código: `graphify update .`.
+- Reconstruir con docs y PDF (requiere Ollama en `localhost:11434`):
+  `OLLAMA_API_KEY=local graphify extract . --backend ollama --model qwen2.5:7b --token-budget 8000 --allow-partial`
+- Regenerar el reporte: `graphify cluster-only .`.
