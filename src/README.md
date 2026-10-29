@@ -3,22 +3,26 @@
 | Archivo | Qué hace |
 | --- | --- |
 | `eph_a_sqlite.py` | Construye la base de datos con los microdatos de la EPH del 1T 2026 que están en `datos_indec/`. |
-| `requirements.txt` | Dependencias de Python. |
+| `requirements.txt` | Dependencias mínimas del cargador (legado). El paquete y sus dependencias de desarrollo se instalan con `make setup`. |
 
 ## Requisitos
 
-- Python 3.10 o superior.
+- Python 3.12 o superior.
 - El zip de microdatos del 1T 2026 en la carpeta `datos_indec/` (ver [datos_indec/README.md](../datos_indec/README.md)).
 
-## Crear el entorno virtual
+## Preparar el entorno
 
-Desde la raíz del repositorio:
+Desde la raíz del repositorio, un único comando crea el entorno virtual e instala el
+paquete con sus dependencias de desarrollo:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # en Windows: .venv\Scripts\activate
-pip install -r src/requirements.txt
+make setup
 ```
+
+`make setup` equivale a `pip install -e '.[dev,postgres]'` y toma las dependencias de
+`pyproject.toml`.
 
 ## Crear la base de datos
 

@@ -16,7 +16,7 @@ las vuelve a crear desde el zip. Las tablas quedan tal como las publica el INDEC
 construye después, sobre ellas.
 
 Uso (desde la raíz del repositorio, con el entorno virtual activado):
-    python src/eph_a_sqlite.py                        # usa el zip de datos_indec/ y construye eph.sqlite
+    python src/eph_a_sqlite.py                        # zip de datos_indec/ -> eph.sqlite
     python src/eph_a_sqlite.py --zip otro/archivo.zip # usa un zip de otra ubicación
 
 Tablas resultantes:
@@ -53,6 +53,7 @@ TABLAS = ("individual", "hogar")
 # Ubicación del zip
 # ----------------------------------------------------------------------------
 
+
 def buscar_zip(carpeta: Path) -> Path:
     """Devuelve el único zip de microdatos que hay en la carpeta de datos del INDEC."""
     zips = sorted(p for p in carpeta.glob("*.zip") if zipfile.is_zipfile(p))
@@ -71,6 +72,7 @@ def buscar_zip(carpeta: Path) -> Path:
 # ----------------------------------------------------------------------------
 # Lectura del zip
 # ----------------------------------------------------------------------------
+
 
 def leer_txt(zf: zipfile.ZipFile, nombre: str) -> pd.DataFrame:
     crudo = zf.read(nombre)
@@ -134,6 +136,7 @@ def validar_periodo(tablas: dict[str, pd.DataFrame]) -> None:
 # Base de datos
 # ----------------------------------------------------------------------------
 
+
 def tipo_sql(serie: pd.Series) -> str:
     if pd.api.types.is_integer_dtype(serie):
         return "INTEGER"
@@ -142,12 +145,20 @@ def tipo_sql(serie: pd.Series) -> str:
     return "TEXT"
 
 
+def valor_sql(valor: object) -> object:
+    """Convierte un valor de pandas a algo que sqlite3 pueda guardar."""
+    if pd.isna(valor):
+        return None
+    return valor.item() if hasattr(valor, "item") else valor
+
+
 def construir_base(db: Path, tablas: dict[str, pd.DataFrame]) -> None:
     con = sqlite3.connect(db)
     try:
         with con:  # transacción: o queda la base completa o no cambia nada
             # Se eliminan vistas y tablas previas para reconstruir desde cero.
-            for (vista,) in con.execute("SELECT name FROM sqlite_master WHERE type='view'").fetchall():
+            vistas = con.execute("SELECT name FROM sqlite_master WHERE type='view'").fetchall()
+            for (vista,) in vistas:
                 con.execute(f'DROP VIEW "{vista}"')
             # "cargas" es una tabla de versiones anteriores del script.
             for tabla in (*TABLAS, "cargas"):
@@ -159,7 +170,7 @@ def construir_base(db: Path, tablas: dict[str, pd.DataFrame]) -> None:
                 cols = ", ".join(f'"{c}"' for c in df.columns)
                 marcas = ", ".join("?" for _ in df.columns)
                 filas = (
-                    tuple(None if pd.isna(v) else (v.item() if hasattr(v, "item") else v) for v in fila)
+                    tuple(valor_sql(v) for v in fila)
                     for fila in df.itertuples(index=False, name=None)
                 )
                 con.executemany(f'INSERT INTO "{nombre}" ({cols}) VALUES ({marcas})', filas)
@@ -176,12 +187,22 @@ def construir_base(db: Path, tablas: dict[str, pd.DataFrame]) -> None:
 # CLI
 # ----------------------------------------------------------------------------
 
+
 def main() -> int:
     p = argparse.ArgumentParser(
         description=f"Construye la base del agente EPH con el {ANIO}T{TRIMESTRE} del INDEC."
     )
-    p.add_argument("--db", type=Path, default=BASE_DEFAULT, help="archivo de la base (default: eph.sqlite en la raíz del repo)")
-    p.add_argument("--zip", type=Path, help="zip de microdatos (default: el que esté en datos_indec/)")
+    p.add_argument(
+        "--db",
+        type=Path,
+        default=BASE_DEFAULT,
+        help="archivo de la base (default: eph.sqlite en la raíz del repo)",
+    )
+    p.add_argument(
+        "--zip",
+        type=Path,
+        help="zip de microdatos (default: el que esté en datos_indec/)",
+    )
     args = p.parse_args()
 
     ruta = args.zip or buscar_zip(CARPETA_DATOS)

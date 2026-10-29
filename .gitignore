@@ -4,6 +4,11 @@
 __pycache__/
 *.pyc
 
+# Artefactos de build de Python
+*.egg-info/
+build/
+dist/
+
 # Datos regenerables con eph_a_sqlite.py
 eph_zips/
 *.sqlite
@@ -14,6 +19,10 @@ eph_zips/
 
 # Credenciales y configuración local
 .env
+
+# Artefactos locales de análisis y temporales
+graphify-out/
+tmp/
 
 # Sistema
 .DS_Store

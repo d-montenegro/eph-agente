@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "README.md",
+    "dev-plans/*.md",
+    "docs/**/*.md"
+  ],
+  "subagent_depth": 2,
+  "permission": {
+    "external_directory": "deny",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "task": "allow",
+    "bash": {
+      "*": "ask",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "make test*": "allow",
+      "make check*": "allow",
+      "python -m unittest*": "allow",
+      "python3 -m unittest*": "allow"
+    }
+  },
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": "ask"
+      }
+    },
+    "build": {
+      "permission": {
+        "edit": "allow",
+        "bash": "ask"
+      }
+    }
+  }
+}
