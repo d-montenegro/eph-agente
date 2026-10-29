@@ -52,12 +52,16 @@ cada columna y la evaluación verifica que el SQL lo use.
 
 ## Evaluación
 
-Un golden set de 16 preguntas visibles más 4 de reserva, con valores esperados,
-tolerancias y reglas sobre el SQL (vista, ponderador, universo). Incluye
-trampas: pedir la población total (donde `COUNT(*)` sin ponderar da 43.739 en
-lugar de 30 millones), períodos inexistentes, aglomerados que no están en la
-muestra y universos incorrectos. Cada corrida se repite tres veces y se guarda
-con commit, perfil, modelo, SQL y latencia.
+Un golden set de 22 preguntas visibles más 4 de reserva, con valores esperados,
+tolerancias y reglas sobre el SQL (vista, ponderador, universo). Los casos de
+ingresos se validaron contra el informe del INDEC
+(*Evolución de la distribución del ingreso, 1T 2026*): ingreso per cápita
+familiar $728.008, ocupados con ingresos $1.104.227, asalariados $1.136.558 y
+perceptores $1.153.457. Incluye trampas: pedir la población total (donde
+`COUNT(*)` sin ponderar da 43.739 en lugar de 30 millones), períodos
+inexistentes, aglomerados que no están en la muestra y universos incorrectos.
+Cada corrida se repite tres veces y se guarda con commit, perfil, modelo, SQL y
+latencia.
 
 ## Arquitectura
 

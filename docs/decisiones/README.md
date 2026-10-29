@@ -101,6 +101,27 @@ La bitácora sirve para dos cosas:
 - **Estado:** queda, sujeto a revisión humana final.
 - **Commit:** ver historial de la rama `codex/eph-web-configurable`.
 
+### 2026-10-29 · Validación con el informe de ingresos del INDEC (1T 2026)
+
+- **Fuente:** INDEC, *Evolución de la distribución del ingreso (EPH), primer
+  trimestre de 2026*, https://www.indec.gob.ar/uploads/informesdeprensa/ingresos1trim26536C8EDD3E.pdf
+- **Contraste:** se compararon los microdatos con las cifras publicadas.
+  Coinciden el ingreso per cápita familiar ($728.008), el promedio de la
+  ocupación principal de ocupados con ingresos ($1.104.227), el de asalariados
+  ($1.136.558), el de perceptores ($1.153.457), los promedios por sexo
+  ($959.030 mujeres y $1.352.247 varones), la población (30,1 millones), los
+  18.634 mil perceptores y el 61,9% de población con ingresos.
+- **Fallo:** `ing_001` promediaba `P21 IS NOT NULL`, incluyendo a los ocupados sin
+  ingresos (`P21 = 0`). El INDEC promedia solo ocupados con ingresos: daba
+  $1.076.056 en lugar de $1.104.227.
+- **Cambio:** `ing_001` e `ing_002` usan `P21 > 0`; se agregaron `ing_004` a
+  `ing_007` y `dem_004`/`dem_005` con valores oficiales y sus fuentes.
+- **Efecto:** el smoke de referencia da 19/19. Las diferencias restantes en
+  perceptores son menores al 0,1% y compatibles con redondeo/metodología.
+- **Estado:** queda; la validación de tasas laborales contra el informe de
+  mercado de trabajo sigue pendiente.
+- **Commit:** ver historial de la rama `codex/eph-web-configurable`.
+
 ### 2026-10-29 · Endurecimiento de proveedores y adaptadores
 
 - **Fallo:** la revisión de seguridad encontró cuatro riesgos: una `base_url` con

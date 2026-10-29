@@ -34,7 +34,7 @@ def test_carga_el_golden_set_visible() -> None:
     cases = load_cases(RAIZ / "eval" / "golden.yml")
     reserve = load_cases(RAIZ / "eval" / "reserve.yml")
 
-    assert len(cases) == 16
+    assert len(cases) == 22
     assert len(reserve) == 4
     assert {case["categoria"] for case in cases} >= {
         "tasas_laborales",
@@ -280,8 +280,8 @@ def test_reference_smoke_ejecuta_los_sql_esperados(semantic_database) -> None:
         adapter.close()
 
     assert result["summary"] == {
-        "total": 13,
-        "passed": 13,
+        "total": 19,
+        "passed": 19,
         "pass_rate": 1.0,
         "repetitions": 1,
         "skipped": 3,

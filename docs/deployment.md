@@ -4,10 +4,17 @@
 
 ```bash
 uv sync --extra dev --extra postgres
-make db            # reconstruye eph.sqlite + capa semántica
-make api           # FastAPI en http://127.0.0.1:8000
-make web           # Vite en http://127.0.0.1:5173 (proxy /api)
+make db                 # reconstruye eph.sqlite + capa semántica
+make eval-reference     # valida los valores del golden set sin LLM
+make api                # FastAPI en http://127.0.0.1:8000
+make api-ollama         # FastAPI con el perfil local de Ollama
+make web                # Vite en http://127.0.0.1:5173 (proxy /api)
 ```
+
+`make api-ollama` usa `config/providers.ollama.example.yml`
+(`http://127.0.0.1:11434/v1`, modelo `qwen2.5:7b`). Requiere Ollama corriendo y
+un modelo con tool calling. La calidad de un modelo 7B no es concluyente: para
+medir calidad usá un perfil `dev` o `eval`.
 
 Para servir la web compilada desde el propio FastAPI:
 

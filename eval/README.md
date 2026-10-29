@@ -23,9 +23,13 @@ universo). No evalúa la redacción salvo que el caso sea de rechazo o sin datos
 - Una regresión es un caso que pasaba 3/3 y pasa a 0/3. Una caída a 2/3 se
   registra como caso frágil, no como regresión.
 
-Los valores esperados se calcularon sobre los microdatos del 1T 2026 y quedan
-pendientes de validación contra el informe técnico del INDEC. Cuando exista el
-valor publicado, se reemplaza el esperado y se conserva la fuente.
+Los valores esperados se calcularon sobre los microdatos del 1T 2026. Los casos
+de ingresos se validaron contra el informe del INDEC *Evolución de la
+distribución del ingreso (EPH), 1T 2026*
+(https://www.indec.gob.ar/uploads/informesdeprensa/ingresos1trim26536C8EDD3E.pdf).
+Las tasas laborales quedan pendientes de validación contra el informe de mercado
+de trabajo. Cuando exista el valor publicado, se reemplaza el esperado y se
+conserva la fuente.
 
 ## Comandos
 

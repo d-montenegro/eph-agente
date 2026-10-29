@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: setup db test lint check api eval web web-test web-build opencode-config
+.PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build opencode-config
 
 setup:
 	uv sync --extra dev --extra postgres
@@ -21,8 +21,15 @@ check: lint test
 api:
 	PYTHONPATH=src $(PYTHON) -m uvicorn eph_agent.api:app --reload --port 8000
 
+api-ollama:
+	EPH_PROVIDERS_FILE=config/providers.ollama.example.yml \
+		PYTHONPATH=src $(PYTHON) -m uvicorn eph_agent.api:app --reload --port 8000
+
 eval:
 	PYTHONPATH=src $(PYTHON) -m eph_agent.evaluation --golden eval/golden.yml --repetitions 3 --profile local
+
+eval-reference:
+	PYTHONPATH=src $(PYTHON) -m eph_agent.evaluation --golden eval/golden.yml --reference
 
 web:
 	npm --prefix web run dev

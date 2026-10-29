@@ -189,55 +189,60 @@ casos:
       - Se excluyen las edades no informadas.
 
   - id: ing_001
-    pregunta: "¿Cuál es el ingreso medio de la ocupación principal en el 1T 2026?"
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal de los ocupados con ingresos en el 1T 2026?"
     tipo: numero
-    valor_esperado: 1076056.10
+    valor_esperado: 1104227
     unidad: absoluta
-    tolerancia: 2000
+    tolerancia: 200
     categoria: ingresos
     dificultad: media
-    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
-    sql_esperado: >-
-      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
-             / SUM(pondera_ingreso_ocupacion)
-      FROM personas WHERE ingreso_ocupacion_principal IS NOT NULL
-    reglas_sql:
-      vistas: [personas]
-      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
-    supuestos:
-      - Se usa PONDIIO, no PONDERA.
-      - Se excluyen ingresos no informados.
-
-  - id: ing_002
-    pregunta: "¿Cuál es el ingreso medio de la ocupación principal de las mujeres en el 1T 2026?"
-    tipo: numero
-    valor_esperado: 872863.13
-    unidad: absoluta
-    tolerancia: 2000
-    categoria: ingresos
-    dificultad: media
-    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 9: $1.104.227"
     sql_esperado: >-
       SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
              / SUM(pondera_ingreso_ocupacion)
       FROM personas
-      WHERE ingreso_ocupacion_principal IS NOT NULL AND sexo = 'Mujer'
+      WHERE estado_actividad = 'Ocupado' AND ingreso_ocupacion_principal > 0
     reglas_sql:
       vistas: [personas]
       columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
-      texto: [Mujer]
+      texto: [Ocupado]
     supuestos:
       - Se usa PONDIIO, no PONDERA.
+      - Se excluyen los ocupados sin ingresos, como en el informe del INDEC.
+
+  - id: ing_002
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal de las mujeres ocupadas con ingresos en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 898054
+    unidad: absoluta
+    tolerancia: 500
+    categoria: ingresos
+    dificultad: media
+    fuente: "Cálculo de referencia sobre microdatos; la brecha de género de 29,0% coincide con INDEC, Cuadro 5.2"
+    sql_esperado: >-
+      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
+             / SUM(pondera_ingreso_ocupacion)
+      FROM personas
+      WHERE estado_actividad = 'Ocupado'
+        AND ingreso_ocupacion_principal > 0 AND sexo = 'Mujer'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
+      texto: [Ocupado, Mujer]
+    supuestos:
+      - Se usa PONDIIO, no PONDERA.
+      - Se excluyen las ocupadas sin ingresos.
+      - La brecha resultante (29,3%) coincide con el 29,0% publicado.
 
   - id: ing_003
     pregunta: "¿Cuál es el ingreso per cápita familiar medio de las personas en el 1T 2026?"
     tipo: numero
-    valor_esperado: 728007.57
+    valor_esperado: 728008
     unidad: absoluta
-    tolerancia: 2000
+    tolerancia: 200
     categoria: ingresos
     dificultad: alta
-    fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 5: $728.008"
     sql_esperado: >-
       SELECT SUM(ingreso_per_capita_familiar * pondera_ingreso_familiar) * 1.0
              / SUM(pondera_ingreso_familiar)
@@ -248,6 +253,130 @@ casos:
     supuestos:
       - Se usa PONDIH, no PONDERA.
       - El promedio es sobre personas (cada una ponderada por PONDIH); no es el promedio por hogar.
+
+  - id: ing_004
+    pregunta: "¿Cuál es el ingreso medio de la ocupación principal de los asalariados con ingresos en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1136558
+    unidad: absoluta
+    tolerancia: 200
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 11: $1.136.558"
+    sql_esperado: >-
+      SELECT SUM(ingreso_ocupacion_principal * pondera_ingreso_ocupacion) * 1.0
+             / SUM(pondera_ingreso_ocupacion)
+      FROM personas
+      WHERE categoria_ocupacion = 'Obrero o empleado'
+        AND ingreso_ocupacion_principal > 0
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_ocupacion_principal, pondera_ingreso_ocupacion]
+      texto: [Obrero o empleado]
+    supuestos:
+      - Se usa PONDIIO.
+      - Asalariados = categoría ocupacional 'Obrero o empleado'.
+      - Se excluyen los asalariados sin ingresos.
+
+  - id: ing_005
+    pregunta: "¿Cuál es el ingreso medio de los perceptores de ingresos individuales en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1153457
+    unidad: absoluta
+    tolerancia: 1500
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 8: $1.153.457"
+    sql_esperado: >-
+      SELECT SUM(ingreso_total_individual * pondera_ingreso_total) * 1.0
+             / SUM(pondera_ingreso_total)
+      FROM personas WHERE ingreso_total_individual > 0
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_total_individual, pondera_ingreso_total]
+    supuestos:
+      - Se usa PONDII.
+      - Perceptor = ingreso total individual mayor a 0.
+
+  - id: ing_006
+    pregunta: "¿Cuál es el ingreso medio de las mujeres que percibieron ingresos individuales en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 959030
+    unidad: absoluta
+    tolerancia: 1500
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 8: $959.030"
+    sql_esperado: >-
+      SELECT SUM(ingreso_total_individual * pondera_ingreso_total) * 1.0
+             / SUM(pondera_ingreso_total)
+      FROM personas
+      WHERE ingreso_total_individual > 0 AND sexo = 'Mujer'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_total_individual, pondera_ingreso_total]
+      texto: [Mujer]
+    supuestos:
+      - Se usa PONDII.
+
+  - id: ing_007
+    pregunta: "¿Cuál es el ingreso medio de los varones que percibieron ingresos individuales en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 1352247
+    unidad: absoluta
+    tolerancia: 2000
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 8: $1.352.247"
+    sql_esperado: >-
+      SELECT SUM(ingreso_total_individual * pondera_ingreso_total) * 1.0
+             / SUM(pondera_ingreso_total)
+      FROM personas
+      WHERE ingreso_total_individual > 0 AND sexo = 'Varón'
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_total_individual, pondera_ingreso_total]
+      texto: [Varón]
+    supuestos:
+      - Se usa PONDII.
+
+  - id: dem_004
+    pregunta: "¿Cuántas personas percibieron algún ingreso en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 18634000
+    unidad: absoluta
+    tolerancia: 30000
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 8: 18.634 mil personas"
+    sql_esperado: >-
+      SELECT SUM(pondera_ingreso_total)
+      FROM personas WHERE ingreso_total_individual > 0
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_total_individual, pondera_ingreso_total]
+    supuestos:
+      - Perceptor = ingreso total individual mayor a 0.
+      - Se usa PONDII para expandir a los perceptores.
+
+  - id: dem_005
+    pregunta: "¿Qué porcentaje de la población total percibió algún ingreso en el 1T 2026?"
+    tipo: numero
+    valor_esperado: 0.619
+    unidad: fraccion
+    tolerancia: 0.002
+    categoria: ingresos
+    dificultad: media
+    fuente: "INDEC, Evolución de la distribución del ingreso (EPH), 1T 2026, p. 8: 61,9%"
+    sql_esperado: >-
+      SELECT SUM(CASE WHEN ingreso_total_individual > 0 THEN pondera_ingreso_total ELSE 0 END) * 1.0
+             / SUM(pondera)
+      FROM personas
+    reglas_sql:
+      vistas: [personas]
+      columnas: [ingreso_total_individual, pondera_ingreso_total, pondera]
+    supuestos:
+      - Numerador con PONDII y denominador con PONDERA, como publica el INDEC.
 
   - id: trap_001
     pregunta: "¿Cuántas personas viven en los 31 aglomerados según la EPH del 1T 2026?"

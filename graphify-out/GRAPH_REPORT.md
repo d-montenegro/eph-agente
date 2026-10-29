@@ -1,7 +1,7 @@
 # Graph Report - Trabajo Final Diplomatura  (2026-10-29)
 
 ## Corpus Check
-- 76 files · ~34,907 words
+- 76 files · ~35,820 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 1, .zip 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `92d56e28`
+- Built from commit: `13dcd6e8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
