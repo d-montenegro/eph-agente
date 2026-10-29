@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "dev-plans/2026-10-29-eph-web-agent.md": {
-    "mtime": 1793309931.1984544,
-    "seen": 1793310022.695515,
-    "ast_hash": "9777dcc9b88e9272cd9d5cd38fa1d9de",
+    "mtime": 1793312399.4033551,
+    "seen": 1793314841.4673579,
+    "ast_hash": "e6e79148b336632ab589b288dc291cff",
     "semantic_hash": ""
   },
   "docs/architecture/database-backends.md": {
@@ -120,9 +120,9 @@
     "semantic_hash": "5582055a3eded35ddcd81ecc236ebeb5"
   },
   "docs/decisiones/README.md": {
-    "mtime": 1793309906.9271572,
-    "seen": 1793310022.695543,
-    "ast_hash": "779a52a6ddddfc762fb4d7f085594fc1",
+    "mtime": 1793312398.4368668,
+    "seen": 1793314841.4673831,
+    "ast_hash": "f5fe748a10f009fc914646c90c0eebf1",
     "semantic_hash": ""
   },
   "Agente de consultas en lenguaje natural sobre la EPH.pdf": {
@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/semantic.py": {
-    "mtime": 1793309417.2685208,
-    "seen": 1793310022.694577,
-    "ast_hash": "f9f76e7047f4681606127ce6050deed8",
+    "mtime": 1793312431.4939249,
+    "seen": 1793314841.465594,
+    "ast_hash": "e6e055c771d965635c3ded96a2e96efa",
     "semantic_hash": ""
   },
   "src/eph_agent/sql_guard.py": {
@@ -222,9 +222,9 @@
     "semantic_hash": ""
   },
   "tests/test_semantic_layer.py": {
-    "mtime": 1793303020.6992652,
-    "seen": 1793303657.852142,
-    "ast_hash": "caf96203f2161c9db44012a6565a733b",
+    "mtime": 1793312423.1295793,
+    "seen": 1793314841.46585,
+    "ast_hash": "937f28162d7454ea04f0eb11ec289801",
     "semantic_hash": ""
   },
   "tests/test_sql_guard.py": {
@@ -234,9 +234,9 @@
     "semantic_hash": ""
   },
   "semantic/columns.yml": {
-    "mtime": 1793290013.3703358,
-    "seen": 1793303657.8522391,
-    "ast_hash": "27439d4664d6e4290e4abc5b59394c52",
+    "mtime": 1793312141.383719,
+    "seen": 1793314841.467485,
+    "ast_hash": "7cab13b23dd1eadd0392fbb223c77dff",
     "semantic_hash": ""
   },
   "src/eph_agent/agent.py": {
@@ -318,9 +318,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/prompts/system.md": {
-    "mtime": 1793309896.6502233,
-    "seen": 1793310022.69566,
-    "ast_hash": "39dda5fe99962a44c4e6a73df72f1685",
+    "mtime": 1793312196.954334,
+    "seen": 1793314841.467507,
+    "ast_hash": "b8c41b0aaf20ad6ea2a181d16f602904",
     "semantic_hash": ""
   },
   "src/eph_agent/evaluation.py": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "eval/golden.yml": {
-    "mtime": 1793309375.2843926,
-    "seen": 1793310022.695592,
-    "ast_hash": "c1a90744165d6a39bce41309c7401a12",
+    "mtime": 1793312229.9933197,
+    "seen": 1793314841.467446,
+    "ast_hash": "288ff82d5ee7088877273862dad04c8f",
     "semantic_hash": ""
   },
   "eval/reserve.yml": {

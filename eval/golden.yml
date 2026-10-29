@@ -51,7 +51,7 @@ casos:
   - id: lab_003
     pregunta: "¿Cuál fue la tasa de actividad total en el 1T 2026?"
     tipo: numero
-    valor_esperado: 0.487406
+    valor_esperado: 0.560534
     unidad: fraccion
     tolerancia: 0.0005
     categoria: tasas_laborales
@@ -60,34 +60,35 @@ casos:
     sql_esperado: >-
       SELECT SUM(CASE WHEN estado_actividad IN ('Ocupado', 'Desocupado') THEN pondera ELSE 0 END) * 1.0
              / SUM(pondera)
-      FROM personas WHERE estado_actividad IS NOT NULL
+      FROM personas WHERE estado_actividad IN ('Ocupado', 'Desocupado', 'Inactivo')
     reglas_sql:
       vistas: [personas]
       columnas: [pondera]
-      texto: [Ocupado, Desocupado]
+      texto: [Ocupado, Desocupado, Inactivo]
     supuestos:
       - Se usa PONDERA.
-      - El denominador es la población con entrevista individual realizada.
+      - El denominador es la población de 10 años y más (ESTADO 1, 2 o 3); excluye menores y no respuesta.
 
   - id: lab_004
     pregunta: "¿Cuál fue la tasa de empleo total en el 1T 2026?"
     tipo: numero
-    valor_esperado: 0.449238
+    valor_esperado: 0.516639
     unidad: fraccion
     tolerancia: 0.0005
     categoria: tasas_laborales
     dificultad: media
     fuente: "Cálculo de referencia sobre microdatos EPH 1T 2026; pendiente informe INDEC"
     sql_esperado: >-
-      SELECT SUM(CASE WHEN estado_actividad = 'Ocupado' THEN pondera ELSE 0 END) * 1.0 / SUM(pondera)
-      FROM personas WHERE estado_actividad IS NOT NULL
+      SELECT SUM(CASE WHEN estado_actividad = 'Ocupado' THEN pondera ELSE 0 END) * 1.0
+             / SUM(pondera)
+      FROM personas WHERE estado_actividad IN ('Ocupado', 'Desocupado', 'Inactivo')
     reglas_sql:
       vistas: [personas]
       columnas: [pondera]
-      texto: [Ocupado]
+      texto: [Ocupado, Desocupado, Inactivo]
     supuestos:
       - Se usa PONDERA.
-      - El denominador es la población con entrevista individual realizada.
+      - El denominador es la población de 10 años y más (ESTADO 1, 2 o 3); excluye menores y no respuesta.
 
   - id: lab_005
     pregunta: "¿Cuántas personas desocupadas hay en el total de los 31 aglomerados en el 1T 2026?"
@@ -229,7 +230,7 @@ casos:
       - Se usa PONDIIO, no PONDERA.
 
   - id: ing_003
-    pregunta: "¿Cuál es el ingreso per cápita familiar medio en el 1T 2026?"
+    pregunta: "¿Cuál es el ingreso per cápita familiar medio de las personas en el 1T 2026?"
     tipo: numero
     valor_esperado: 728007.57
     unidad: absoluta
@@ -246,7 +247,7 @@ casos:
       columnas: [ingreso_per_capita_familiar, pondera_ingreso_familiar]
     supuestos:
       - Se usa PONDIH, no PONDERA.
-      - Los hogares con ponderador 0 no aportan al promedio.
+      - El promedio es sobre personas (cada una ponderada por PONDIH); no es el promedio por hogar.
 
   - id: trap_001
     pregunta: "¿Cuántas personas viven en los 31 aglomerados según la EPH del 1T 2026?"

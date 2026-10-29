@@ -13,6 +13,54 @@ period:
   anio: 2026
   trimestre: 1
 
+# Invariantes que validate_dictionary ejecuta contra la base real. Cada check
+# devuelve un único número que debe coincidir con expected.
+validation:
+  - name: p21_solo_ocupados
+    description: El ingreso de la ocupación principal no existe fuera de los ocupados.
+    sql: "SELECT COUNT(*) FROM personas WHERE estado_actividad <> 'Ocupado' AND ingreso_ocupacion_principal IS NOT NULL"
+    expected: 0
+  - name: p21_sin_codigo_no_respuesta
+    description: El -9 de no respuesta no debe sobrevivir en la vista.
+    sql: "SELECT COUNT(*) FROM personas WHERE ingreso_ocupacion_principal = -9"
+    expected: 0
+  - name: p47t_solo_entrevista_individual
+    description: El ingreso total individual no existe para menores de 10 años.
+    sql: "SELECT COUNT(*) FROM personas WHERE estado_actividad = 'Menor de 10 años' AND ingreso_total_individual IS NOT NULL"
+    expected: 0
+  - name: edad_y_grupo_edad_coherentes
+    description: grupo_edad es NULL si y solo si edad es NULL.
+    sql: "SELECT COUNT(*) FROM personas WHERE (edad IS NULL) <> (grupo_edad IS NULL)"
+    expected: 0
+  - name: peso_ingreso_ocupacion_presente
+    description: Todo ingreso de ocupación principal informado tiene su ponderador.
+    sql: "SELECT COUNT(*) FROM personas WHERE ingreso_ocupacion_principal IS NOT NULL AND pondera_ingreso_ocupacion IS NULL"
+    expected: 0
+  - name: peso_ingreso_total_presente
+    description: Todo ingreso total individual informado tiene su ponderador.
+    sql: "SELECT COUNT(*) FROM personas WHERE ingreso_total_individual IS NOT NULL AND pondera_ingreso_total IS NULL"
+    expected: 0
+  - name: peso_ingreso_familiar_presente
+    description: Todo ingreso familiar informado tiene su ponderador.
+    sql: "SELECT COUNT(*) FROM personas WHERE ingreso_total_familiar IS NOT NULL AND pondera_ingreso_familiar IS NULL"
+    expected: 0
+  - name: claves_unicas_personas
+    description: CODUSU + NRO_HOGAR + COMPONENTE identifica una persona.
+    sql: "SELECT COUNT(*) - COUNT(DISTINCT codusu || '|' || nro_hogar || '|' || componente) FROM personas"
+    expected: 0
+  - name: claves_unicas_hogares
+    description: CODUSU + NRO_HOGAR identifica un hogar.
+    sql: "SELECT COUNT(*) - COUNT(DISTINCT codusu || '|' || nro_hogar) FROM hogares"
+    expected: 0
+  - name: personas_sin_hogar
+    description: Toda persona debe tener su hogar en la vista hogares.
+    sql: "SELECT COUNT(*) FROM personas p LEFT JOIN hogares h USING (codusu, nro_hogar) WHERE h.codusu IS NULL"
+    expected: 0
+  - name: categoria_ocupacional_fuera_universo
+    description: La categoría ocupacional solo existe para ocupados o desocupados con ocupación anterior.
+    sql: "SELECT COUNT(*) FROM personas WHERE estado_actividad NOT IN ('Ocupado', 'Desocupado') AND categoria_ocupacion IS NOT NULL"
+    expected: 0
+
 views:
   personas:
     source_table: individual
@@ -22,7 +70,7 @@ views:
     columns:
       codusu:
         source: CODUSU
-        description: Identificador del hogar al que pertenece la persona.
+        description: Identificador de la vivienda.
         type: identificador
         null_meaning: No debería ser NULL en la base del INDEC.
         universe: Todas las personas.
@@ -118,7 +166,7 @@ views:
         type: numerica
         null_meaning: No debería ser NULL.
         universe: Todas las personas.
-        weight: PONDERA
+        weight: pondera
         synonyms: [ponderador, peso, expansión]
         notes: >-
           Se usa para todas las variables salvo los ingresos, que tienen
@@ -179,8 +227,12 @@ views:
         universe: Todas las personas.
         synonyms: [ocupación, desempleo, inactividad, condición de actividad]
         notes: >-
-          La tasa de desocupación se calcula sobre ocupados + desocupados
-          (población activa), no sobre el total de personas.
+          Tasa de desocupación = desocupados / (ocupados + desocupados).
+          Tasa de actividad = (ocupados + desocupados) / población de 10 años
+          y más (ESTADO 1, 2 o 3).
+          Tasa de empleo = ocupados / población de 10 años y más.
+          Nunca uses menores de 10 (ESTADO = 4) ni no respuesta (ESTADO = 0)
+          en el denominador.
       es_ocupado:
         source: ESTADO
         description: Vale 1 si la persona está ocupada y 0 en caso contrario.
@@ -189,7 +241,10 @@ views:
         null_meaning: No debería ser NULL.
         universe: Todas las personas.
         synonyms: [ocupado, empleado, trabajando]
-        notes: Derivada de ESTADO; no existe como columna cruda.
+        notes: >-
+          Derivada de ESTADO; no existe como columna cruda. No usar
+          AVG(es_ocupado) sobre toda la población: las tasas usan el
+          denominador documentado.
       es_desocupado:
         source: ESTADO
         description: Vale 1 si la persona está desocupada y 0 en caso contrario.
@@ -198,7 +253,9 @@ views:
         null_meaning: No debería ser NULL.
         universe: Todas las personas.
         synonyms: [desocupado, desempleado, buscando trabajo]
-        notes: Derivada de ESTADO.
+        notes: >-
+          Derivada de ESTADO. No usar AVG(es_desocupado) sobre toda la
+          población: la tasa usa desocupados / (ocupados + desocupados).
       es_inactivo:
         source: ESTADO
         description: Vale 1 si la persona está inactiva y 0 en caso contrario.
@@ -207,7 +264,9 @@ views:
         null_meaning: No debería ser NULL.
         universe: Todas las personas.
         synonyms: [inactivo, fuera de la fuerza laboral]
-        notes: Derivada de ESTADO.
+        notes: >-
+          Derivada de ESTADO. No usar AVG(es_inactivo) sobre toda la
+          población: la inactividad se mide sobre población de 10 años y más.
       categoria_ocupacion:
         source: CAT_OCUP
         description: Categoría ocupacional de la ocupación principal.
@@ -230,7 +289,9 @@ views:
         null_meaning: NULL fuera del universo o cuando la respuesta es Ns/Nr.
         universe: Ocupados.
         synonyms: [formalidad, empleo formal, empleo informal]
-        notes: La definición de formalidad del INDEC no equivale a tener recibo de sueldo.
+        notes: >-
+          La definición de formalidad del INDEC no equivale a tener recibo de
+          sueldo. Los Ns/Nr (EMPLEO = 9) quedan NULL: declarar cómo se tratan.
       sector:
         source: SECTOR
         description: Sector institucional del empleo.
@@ -239,7 +300,9 @@ views:
         null_meaning: NULL fuera del universo o cuando la respuesta es Ns/Nr.
         universe: Ocupados.
         synonyms: [sector, sector formal, sector informal]
-        notes: Hogares corresponde al servicio doméstico en hogares.
+        notes: >-
+          Hogares corresponde al servicio doméstico en hogares. Los Ns/Nr
+          (SECTOR = 9) quedan NULL; en el 1T 2026 son 752 ocupados.
       ingreso_ocupacion_principal:
         source: P21
         description: Monto de ingreso de la ocupación principal, en pesos.
@@ -248,7 +311,7 @@ views:
           NULL fuera del universo (no ocupado) o cuando no hubo respuesta de
           ingresos (P21 = -9).
         universe: Ocupados.
-        weight: PONDIIO
+        weight: pondera_ingreso_ocupacion
         synonyms: [sueldo, salario, ingreso laboral, ingreso de la ocupación principal]
         notes: >-
           Debe estimarse con pondera_ingreso_ocupacion, no con pondera.
@@ -259,26 +322,29 @@ views:
         type: numerica
         null_meaning: NULL fuera del universo o cuando el ingreso no es válido.
         universe: Ocupados con ingreso de ocupación principal informado.
-        weight: PONDIIO
+        weight: pondera_ingreso_ocupacion
         synonyms: [ponderador de ingreso laboral]
       ingreso_total_individual:
         source: P47T
         description: Ingreso total individual, laboral y no laboral, en pesos.
         type: numerica
         null_meaning: >-
-          NULL cuando la entrevista individual no se realizó (ESTADO = 0) o
+          NULL cuando la entrevista individual no se realizó (ESTADO = 0),
+          cuando la persona es menor de 10 años (ESTADO = 4, H15 = 0) o
           cuando no hubo respuesta de ingresos (P47T = -9).
-        universe: Personas con entrevista individual realizada.
-        weight: PONDII
+        universe: Personas de 10 años y más con entrevista individual realizada (ESTADO 1, 2 o 3).
+        weight: pondera_ingreso_total
         synonyms: [ingreso individual, ingreso total, ingreso personal]
-        notes: Debe estimarse con pondera_ingreso_total.
+        notes: >-
+          Debe estimarse con pondera_ingreso_total. Excluye a los menores de
+          10 años y a las entrevistas no realizadas.
       pondera_ingreso_total:
         source: PONDII
         description: Ponderador del ingreso total individual, con corrección por no respuesta.
         type: numerica
         null_meaning: NULL fuera del universo o cuando el ingreso no es válido.
         universe: Personas con ingreso total individual informado.
-        weight: PONDII
+        weight: pondera_ingreso_total
         synonyms: [ponderador de ingreso individual]
       ingreso_total_familiar:
         source: ITF
@@ -288,11 +354,13 @@ views:
           No se documenta un NULL; 0 indica un hogar sin ingresos o sin
           ingresos informados.
         universe: Todos los hogares (se repite en cada persona del hogar).
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ingreso familiar, ingreso del hogar]
         notes: >-
           Es una variable de hogar repetida en la tabla de personas. Debe
-          estimarse con pondera_ingreso_familiar.
+          estimarse con pondera_ingreso_familiar. No la sumes sobre personas:
+          para totales de hogar usá la vista hogares o deduplicá por
+          codusu + nro_hogar.
       ingreso_per_capita_familiar:
         source: IPCF
         description: Ingreso per cápita familiar (ingreso total familiar dividido los miembros).
@@ -301,16 +369,21 @@ views:
           No se documenta un NULL; 0 indica un hogar sin ingresos o sin
           ingresos informados.
         universe: Todos los hogares (se repite en cada persona del hogar).
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ingreso per cápita, ingreso por persona]
-        notes: Es una variable de hogar repetida en la tabla de personas.
+        notes: >-
+          Es una variable de hogar repetida en la tabla de personas. El
+          promedio sobre personas no es el promedio sobre hogares: declarar
+          el estimando.
       pondera_ingreso_familiar:
         source: PONDIH
         description: Ponderador de los ingresos del hogar, con corrección por no respuesta.
         type: numerica
-        null_meaning: No se documenta un NULL; 0 indica un hogar sin respuesta de ingresos.
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos informados y
+          lo excluye de las estimaciones corregidas.
         universe: Todos los hogares.
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ponderador de ingreso familiar]
 
   hogares:
@@ -408,7 +481,7 @@ views:
         type: numerica
         null_meaning: No debería ser NULL.
         universe: Todos los hogares.
-        weight: PONDERA
+        weight: pondera
         synonyms: [ponderador, peso, expansión]
       cantidad_miembros:
         source: IX_TOT
@@ -426,7 +499,7 @@ views:
           No se documenta un NULL; 0 indica un hogar sin ingresos o sin
           ingresos informados.
         universe: Todos los hogares.
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ingreso familiar, ingreso del hogar]
       ingreso_per_capita_familiar:
         source: IPCF
@@ -436,13 +509,15 @@ views:
           No se documenta un NULL; 0 indica un hogar sin ingresos o sin
           ingresos informados.
         universe: Todos los hogares.
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ingreso per cápita, ingreso por persona]
       pondera_ingreso_familiar:
         source: PONDIH
         description: Ponderador de los ingresos del hogar, con corrección por no respuesta.
         type: numerica
-        null_meaning: No se documenta un NULL; 0 indica un hogar sin respuesta de ingresos.
+        null_meaning: >-
+          No se documenta un NULL; 0 indica un hogar sin ingresos informados y
+          lo excluye de las estimaciones corregidas.
         universe: Todos los hogares.
-        weight: PONDIH
+        weight: pondera_ingreso_familiar
         synonyms: [ponderador de ingreso familiar]

@@ -9,6 +9,16 @@ relacional de solo lectura. Los datos cargados cubren únicamente el **1T 2026**
   corresponde. Para ingreso de la ocupación principal usá `PONDIIO`; para
   ingreso total individual, `PONDII`; para ingreso familiar y per cápita,
   `PONDIH`; para el resto, `PONDERA`.
+- Las columnas de ponderación que existen en las vistas son `pondera`,
+  `pondera_ingreso_ocupacion`, `pondera_ingreso_total` y
+  `pondera_ingreso_familiar`. Los códigos `PONDERA`, `PONDIIO`, `PONDII` y
+  `PONDIH` son los nombres crudos del INDEC: no son columnas consultables.
+- La población de referencia de las tasas es la de 10 años y más: `ESTADO` 1, 2
+  o 3. Nunca incluyas menores de 10 (`ESTADO = 4`) ni no respuesta (`ESTADO = 0`)
+  en el denominador.
+- Fórmulas: desocupación = desocupados / (ocupados + desocupados);
+  actividad = (ocupados + desocupados) / (ocupados + desocupados + inactivos);
+  empleo = ocupados / (ocupados + desocupados + inactivos).
 - La tasa de desocupación se calcula sobre la población activa:
   desocupados / (ocupados + desocupados), nunca sobre el total de personas.
 - No inventes valores, columnas ni categorías. Si no sabés qué columna usar,

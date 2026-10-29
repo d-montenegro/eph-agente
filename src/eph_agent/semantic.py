@@ -43,7 +43,7 @@ def _check_dictionary_structure(dictionary: Any, source: Path) -> None:
         if not columns:
             raise SemanticLayerError(f"La vista {view_name} no declara columnas")
         for column_name, column in columns.items():
-            for required in ("description", "type"):
+            for required in ("description", "type", "null_meaning", "universe"):
                 if not column.get(required):
                     raise SemanticLayerError(f"{view_name}.{column_name} no declara '{required}'")
 
@@ -193,7 +193,29 @@ def validate_dictionary(
                 problems.append(
                     f"{view_name}.{column_name}: falta la columna cruda {source_column}"
                 )
+            weight = column.get("weight")
+            if weight and weight not in declared:
+                problems.append(
+                    f"{view_name}.{column_name}: el ponderador {weight} "
+                    "no es una columna de la vista"
+                )
             problems.extend(_check_column_values(connection, view_name, column_name, column))
+
+    for check in dictionary.get("validation", []):
+        name = check.get("name")
+        sql = check.get("sql")
+        expected_value = check.get("expected")
+        if not name or not sql or expected_value is None:
+            problems.append(f"check de validación inválido: {check!r}")
+            continue
+        try:
+            actual = connection.execute(sql).fetchone()[0]
+        except sqlite3.Error as error:
+            problems.append(f"check {name}: error al ejecutar ({error})")
+            continue
+        if actual != expected_value:
+            description = check.get("description", "")
+            problems.append(f"check {name}: {actual} != {expected_value} ({description})")
 
     if problems:
         raise SemanticLayerError(

@@ -503,7 +503,7 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 - [ ] El perfil hosted funciona con secretos server-side (requiere despliegue con proveedor real).
 - [x] La web ofrece las tres secciones acordadas y modo presentación.
 - [x] El golden set mide resultados, SQL y estructura de salida.
-- [ ] La bitácora explica al menos una mejora guiada por un fallo medido (hay fallo registrado, pero el cambio se revirtió).
+- [x] La bitácora explica al menos una mejora guiada por un fallo medido (tasas de actividad/empleo y ponderadores).
 - [ ] La demo pública y el plan de contingencia local están probados antes de la defensa.
 
 ### Checks

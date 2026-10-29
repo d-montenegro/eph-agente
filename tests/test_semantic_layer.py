@@ -163,3 +163,59 @@ def test_profiling_resume_nulos_rangos_y_valores(semantic_connection) -> None:
 def test_profiling_rechaza_nombres_inseguros(semantic_connection) -> None:
     with pytest.raises(ValueError, match="inválido"):
         profile_view(semantic_connection, "personas; DROP TABLE individual")
+
+
+def test_p47t_excluye_a_los_menores_de_diez(semantic_connection) -> None:
+    assert (
+        count(
+            semantic_connection,
+            """
+            SELECT COUNT(*) FROM personas
+            WHERE estado_actividad = 'Menor de 10 años'
+              AND ingreso_total_individual IS NOT NULL
+            """,
+        )
+        == 0
+    )
+
+
+def test_el_ponderador_declarado_es_una_columna_de_la_vista(semantic_connection) -> None:
+    columns = describe_table(semantic_connection, "personas")
+    names = {column["column"] for column in columns}
+    ingreso = next(
+        column for column in columns if column["column"] == "ingreso_ocupacion_principal"
+    )
+
+    assert ingreso["weight"] == "pondera_ingreso_ocupacion"
+    assert ingreso["weight"] in names
+
+
+def test_grupo_edad_es_null_si_la_edad_es_null(semantic_connection) -> None:
+    semantic_connection.execute(
+        "UPDATE individual SET CH06 = NULL WHERE rowid = (SELECT MIN(rowid) FROM individual)"
+    )
+    install_semantic_layer(semantic_connection)
+
+    assert (
+        count(
+            semantic_connection,
+            "SELECT COUNT(*) FROM personas WHERE edad IS NULL AND grupo_edad IS NOT NULL",
+        )
+        == 0
+    )
+
+
+def test_la_validacion_ejecuta_los_checks_del_diccionario(semantic_connection) -> None:
+    dictionary = copy.deepcopy(load_dictionary())
+    dictionary["validation"].append({"name": "check_de_prueba", "sql": "SELECT 1", "expected": 0})
+
+    with pytest.raises(SemanticLayerError, match="check_de_prueba"):
+        validate_dictionary(semantic_connection, dictionary)
+
+
+def test_la_validacion_rechaza_un_ponderador_inexistente(semantic_connection) -> None:
+    dictionary = copy.deepcopy(load_dictionary())
+    dictionary["views"]["personas"]["columns"]["sexo"]["weight"] = "NO_EXISTE"
+
+    with pytest.raises(SemanticLayerError, match="no es una columna de la vista"):
+        validate_dictionary(semantic_connection, dictionary)

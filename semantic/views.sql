@@ -61,7 +61,7 @@ SELECT
     END AS sexo,
     CASE WHEN CH06 < 0 OR CH06 = 99 THEN NULL ELSE CH06 END AS edad,
     CASE
-        WHEN CH06 < 0 OR CH06 = 99 THEN NULL
+        WHEN CH06 IS NULL OR CH06 < 0 OR CH06 = 99 THEN NULL
         WHEN CH06 < 10 THEN '0-9'
         WHEN CH06 < 15 THEN '10-14'
         WHEN CH06 < 25 THEN '15-24'
@@ -109,8 +109,8 @@ SELECT
     END AS sector,
     CASE WHEN ESTADO = 1 AND P21 <> -9 THEN P21 END AS ingreso_ocupacion_principal,
     CASE WHEN ESTADO = 1 AND P21 <> -9 THEN PONDIIO END AS pondera_ingreso_ocupacion,
-    CASE WHEN ESTADO <> 0 AND P47T <> -9 THEN P47T END AS ingreso_total_individual,
-    CASE WHEN ESTADO <> 0 AND P47T <> -9 THEN PONDII END AS pondera_ingreso_total,
+    CASE WHEN ESTADO IN (1, 2, 3) AND P47T <> -9 THEN P47T END AS ingreso_total_individual,
+    CASE WHEN ESTADO IN (1, 2, 3) AND P47T <> -9 THEN PONDII END AS pondera_ingreso_total,
     ITF AS ingreso_total_familiar,
     IPCF AS ingreso_per_capita_familiar,
     PONDIH AS pondera_ingreso_familiar
