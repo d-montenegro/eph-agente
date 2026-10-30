@@ -1,5 +1,17 @@
 # Despliegue
 
+## Demo rápida
+
+Para mostrar el trabajo en un solo comando, ver [`docs/demo.md`](demo.md):
+
+```bash
+make demo       # Docker Compose en http://localhost:8010
+make demo-down
+```
+
+La demo permite cambiar la URL y el modelo desde la web, usar Ollama local o un
+proveedor cloud, y activar el modo debugging para ver la traza del agente.
+
 ## Local
 
 ```bash

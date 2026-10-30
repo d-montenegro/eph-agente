@@ -216,3 +216,30 @@ def test_validacion_rechaza_texto_vacio() -> None:
                 "model": "m",
             }
         )
+
+
+async def test_debug_incluye_la_traza_del_loop(adapter) -> None:
+    provider = FakeProvider(
+        [
+            ModelTurn(tool_calls=[sql_call("SELECT COUNT(*) AS total FROM personas")]),
+            final("Hay 43.739 personas."),
+        ]
+    )
+    service = AgentService(adapter, provider, model="fake-model", debug=True)
+
+    answer = await service.ask("¿Cuántas personas hay?")
+
+    assert answer.trace is not None
+    assert len(answer.trace) == 2
+    assert answer.trace[0]["tool_calls"][0]["name"] == "ejecutar_sql"
+    assert answer.trace[0]["tool_results"][0]["result"]["row_count"] == 1
+    assert answer.trace[1]["content"]
+
+
+async def test_sin_debug_no_expone_traza(adapter) -> None:
+    provider = FakeProvider([final("ok")])
+    service = AgentService(adapter, provider, model="fake-model")
+
+    answer = await service.ask("¿?")
+
+    assert answer.trace is None

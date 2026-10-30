@@ -82,3 +82,49 @@ describe("SettingsPage", () => {
     ).toBeInTheDocument();
   });
 });
+
+it("agrega un perfil personalizado en modo local", async () => {
+  const custom: ProviderProfile = {
+    ...localProfile,
+    name: "mi-ollama",
+    base_url: "http://127.0.0.1:11434/v1",
+    model: "qwen2.5:7b",
+    api_key_env: null,
+    has_api_key: true,
+  };
+  vi.spyOn(api, "getProviders")
+    .mockResolvedValueOnce(providers)
+    .mockResolvedValueOnce({ ...providers, profiles: [...providers.profiles, custom] });
+  const addSpy = vi.spyOn(api, "addCustomProvider").mockResolvedValue(custom);
+  render(<SettingsPage />);
+  await screen.findByRole("heading", { name: "local" });
+
+  fireEvent.change(screen.getByLabelText("Nombre"), { target: { value: "mi-ollama" } });
+  fireEvent.change(screen.getByLabelText("URL base"), {
+    target: { value: "http://127.0.0.1:11434/v1" },
+  });
+  fireEvent.change(screen.getByLabelText("Modelo"), {
+    target: { value: "qwen2.5:7b" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Agregar perfil" }));
+
+  await screen.findByText(/Perfil "mi-ollama" agregado/);
+  expect(addSpy).toHaveBeenCalledWith(
+    expect.objectContaining({
+      name: "mi-ollama",
+      base_url: "http://127.0.0.1:11434/v1",
+      model: "qwen2.5:7b",
+    }),
+  );
+  expect(await screen.findByRole("heading", { name: "mi-ollama" })).toBeInTheDocument();
+});
+
+it("no muestra el formulario personalizado en modo hosted", async () => {
+  vi.spyOn(api, "getProviders").mockResolvedValue({ ...providers, mode: "hosted" });
+  render(<SettingsPage />);
+
+  expect(
+    await screen.findByText(/solo se permiten destinos de la lista blanca/i),
+  ).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Agregar perfil" })).not.toBeInTheDocument();
+});

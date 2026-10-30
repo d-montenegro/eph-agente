@@ -1,0 +1,11 @@
+services:
+  eph:
+    build: .
+    ports:
+      - "8010:8000"
+    environment:
+      EPH_MODE: local
+      EPH_PROVIDERS_FILE: config/providers.demo.yml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

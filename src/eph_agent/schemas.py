@@ -104,6 +104,16 @@ class ProviderSelectRequest(BaseModel):
 class AgentAskRequest(BaseModel):
     question: str = Field(min_length=1)
     profile: str | None = None
+    debug: bool = False
+
+
+class CustomProviderRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=32, pattern=r"^[a-z0-9_-]+$")
+    base_url: str = Field(min_length=1)
+    model: str = Field(min_length=1)
+    api_key: str | None = None
+    api_key_env: str | None = None
+    timeout_seconds: float = Field(default=60, gt=0, le=600)
 
 
 class ProjectResponse(BaseModel):

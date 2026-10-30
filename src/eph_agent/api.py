@@ -22,12 +22,14 @@ from eph_agent.paths import repo_root
 from eph_agent.providers import (
     Message,
     ProviderError,
+    ProviderProfile,
     ProviderRegistry,
     ProviderRegistryError,
     ToolDefinition,
 )
 from eph_agent.schemas import (
     AgentAskRequest,
+    CustomProviderRequest,
     DescribeTableRequest,
     ExecuteSQLRequest,
     HealthResponse,
@@ -47,6 +49,9 @@ from eph_agent.tools import describir_tabla, ejecutar_sql
 
 app = FastAPI(title="Agente EPH", version="0.1.0")
 PROJECT_DOC = repo_root() / "docs" / "proyecto.md"
+app.state.custom_profiles = {}
+app.state.custom_keys = {}
+app.state.selected_profile = None
 
 
 def get_settings() -> DatabaseSettings:
@@ -69,9 +74,17 @@ def get_adapter(settings: DatabaseSettings = Depends(get_settings)) -> Iterator[
 
 def get_registry() -> ProviderRegistry:
     try:
-        return ProviderRegistry.from_env()
+        registry = ProviderRegistry.from_env()
     except ProviderRegistryError as error:
         raise HTTPException(status_code=500, detail=str(error)) from error
+    for profile in getattr(app.state, "custom_profiles", {}).values():
+        try:
+            registry.add_profile(profile)
+        except ProviderRegistryError:
+            continue
+    for name, key in getattr(app.state, "custom_keys", {}).items():
+        registry.set_runtime_key(name, key)
+    return registry
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -230,15 +243,54 @@ async def ask_agent(
         provider,
         model=provider.model,
         profile=profile.name,
+        debug=request.debug,
     )
     try:
         return await service.ask(request.question)
     except AgentError as error:
-        raise HTTPException(status_code=502, detail=str(error)) from error
+        detail = {"message": str(error), "trace": getattr(error, "trace", None)}
+        raise HTTPException(status_code=502, detail=detail) from error
     except ProviderError as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
 
 
+@app.post("/api/providers/custom", response_model=ProviderProfilePublic)
+def add_custom_provider(
+    request: CustomProviderRequest,
+    registry: ProviderRegistry = Depends(get_registry),
+) -> ProviderProfilePublic:
+    if registry.mode != "local":
+        raise HTTPException(
+            status_code=400,
+            detail="Solo se permiten perfiles personalizados en modo local",
+        )
+    if request.name in registry.profiles:
+        raise HTTPException(status_code=400, detail="Ya existe un perfil con ese nombre")
+
+    try:
+        profile = ProviderProfile.from_dict(
+            request.name,
+            {
+                "base_url": request.base_url,
+                "model": request.model,
+                "api_key_env": request.api_key_env,
+                "timeout_seconds": request.timeout_seconds,
+                "hosted": False,
+            },
+        )
+    except ProviderRegistryError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+    app.state.custom_profiles[request.name] = profile
+    if request.api_key:
+        app.state.custom_keys[request.name] = request.api_key
+    registry.add_profile(profile)
+    if request.api_key:
+        registry.set_runtime_key(request.name, request.api_key)
+    return ProviderProfilePublic(**profile.public(has_api_key=registry.has_api_key(profile)))
+
+
+# El mount va al final para no interceptar las rutas /api registradas después.
 WEB_DIST = repo_root() / "web" / "dist"
 if WEB_DIST.is_dir():
     app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")

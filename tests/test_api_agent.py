@@ -109,10 +109,56 @@ def test_agent_ask_falla_si_no_termina(client, monkeypatch) -> None:
     response = client.post("/api/agent/ask", json={"question": "¿Cuántas personas hay?"})
 
     assert response.status_code == 502
-    assert "No se devuelve una respuesta inventada" in response.json()["detail"]
+    detail = response.json()["detail"]
+    message = detail["message"] if isinstance(detail, dict) else detail
+    assert "No se devuelve una respuesta inventada" in message
+    assert detail["trace"] is None
+
+
+def test_agent_ask_error_con_debug_incluye_traza(client, monkeypatch) -> None:
+    patch_provider(monkeypatch, AlwaysToolsProvider([]))
+
+    response = client.post(
+        "/api/agent/ask",
+        json={"question": "¿Cuántas personas hay?", "debug": True},
+    )
+
+    assert response.status_code == 502
+    detail = response.json()["detail"]
+    assert len(detail["trace"]) == 6
+    assert detail["trace"][0]["tool_calls"][0]["name"] == "ejecutar_sql"
 
 
 def test_agent_ask_rechaza_pregunta_vacia(client) -> None:
     response = client.post("/api/agent/ask", json={"question": ""})
 
     assert response.status_code == 422
+
+
+def test_agent_ask_con_debug_devuelve_traza(client, monkeypatch) -> None:
+    provider = FakeProvider(
+        [
+            ModelTurn(
+                tool_calls=[
+                    ToolCall(
+                        id="c1",
+                        name="ejecutar_sql",
+                        arguments={"query": "SELECT COUNT(*) AS total FROM personas"},
+                    )
+                ]
+            ),
+            ModelTurn(content=json.dumps({"answer": "Hay 43.739 personas."})),
+        ]
+    )
+    patch_provider(monkeypatch, provider)
+
+    response = client.post(
+        "/api/agent/ask",
+        json={"question": "¿Cuántas personas hay?", "debug": True},
+    )
+
+    assert response.status_code == 200
+    trace = response.json()["trace"]
+    assert len(trace) == 2
+    assert trace[0]["tool_calls"][0]["name"] == "ejecutar_sql"
+    assert trace[0]["tool_results"][0]["result"]["row_count"] == 1

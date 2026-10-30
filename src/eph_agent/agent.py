@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -53,6 +54,8 @@ TOOL_DEFINITIONS = [
 
 class AgentError(RuntimeError):
     """El agente no pudo completar una respuesta auditable."""
+
+    trace: list[dict[str, Any]] | None = None
 
 
 def detect_period_conflict(question: str) -> str | None:
@@ -105,6 +108,7 @@ class AgentService:
         profile: str = "local",
         max_turns: int = 6,
         system_prompt: str | None = None,
+        debug: bool = False,
     ) -> None:
         self.adapter = adapter
         self.provider = provider
@@ -112,13 +116,17 @@ class AgentService:
         self.profile = profile
         self.max_turns = max(1, max_turns)
         self._system_prompt = system_prompt
+        self.debug = debug
 
     async def ask(self, question: str) -> AgentAnswer:
         if not question.strip():
             raise AgentError("La pregunta está vacía")
 
+        trace: list[dict[str, Any]] = []
         conflict = detect_period_conflict(question)
         if conflict:
+            if self.debug:
+                trace.append({"event": "period_conflict", "detail": conflict})
             return validate_agent_answer(
                 {
                     "result": ResultPayload().model_dump(),
@@ -129,6 +137,7 @@ class AgentService:
                     "profile": self.profile,
                     "model": self.model,
                     "sample_size": 0,
+                    "trace": trace if self.debug else None,
                 }
             )
 
@@ -138,13 +147,23 @@ class AgentService:
         ]
         last_result: QueryResult | None = None
 
-        for _turn in range(self.max_turns):
+        for turn_number in range(1, self.max_turns + 1):
+            started = time.perf_counter()
             reply: ModelTurn = await self.provider.complete_with_tools(
                 messages,
                 TOOL_DEFINITIONS,
                 model=self.model,
                 temperature=0.0,
             )
+            entry: dict[str, Any] = {
+                "turn": turn_number,
+                "elapsed_ms": round((time.perf_counter() - started) * 1_000, 2),
+                "content": reply.content,
+                "tool_calls": [
+                    {"name": call.name, "arguments": call.arguments} for call in reply.tool_calls
+                ],
+                "tool_results": [],
+            }
 
             if reply.tool_calls:
                 messages.append(
@@ -156,6 +175,7 @@ class AgentService:
                 )
                 for call in reply.tool_calls:
                     payload, result = self._run_tool(call)
+                    entry["tool_results"].append({"name": call.name, "result": payload})
                     messages.append(
                         Message(
                             role="tool",
@@ -165,14 +185,19 @@ class AgentService:
                     )
                     if result is not None:
                         last_result = result
+                trace.append(entry)
                 continue
 
-            return self._finalize(reply.content, last_result)
+            trace.append(entry)
+            return self._finalize(reply.content, last_result, trace)
 
-        raise AgentError(
+        error = AgentError(
             f"No se pudo completar la consulta en {self.max_turns} turnos. "
             "No se devuelve una respuesta inventada."
         )
+        if self.debug:
+            error.trace = trace
+        raise error
 
     def _render_system_prompt(self) -> str:
         template = self._system_prompt
@@ -217,7 +242,12 @@ class AgentService:
 
         return {"error": f"Herramienta desconocida: {call.name}"}, None
 
-    def _finalize(self, content: str | None, last_result: QueryResult | None) -> AgentAnswer:
+    def _finalize(
+        self,
+        content: str | None,
+        last_result: QueryResult | None,
+        trace: list[dict[str, Any]] | None = None,
+    ) -> AgentAnswer:
         parsed = parse_structured_answer(content)
         structured = normalize_structured(parsed)
         warnings = list(structured["warnings"])
@@ -252,6 +282,7 @@ class AgentService:
                 "profile": self.profile,
                 "model": self.model,
                 "sample_size": sample_size,
+                "trace": trace if self.debug else None,
             }
         )
 

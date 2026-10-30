@@ -37,6 +37,8 @@ def write_providers(tmp_path) -> str:
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
     app.state.selected_profile = None
+    app.state.custom_profiles = {}
+    app.state.custom_keys = {}
     monkeypatch.setenv("EPH_PROVIDERS_FILE", write_providers(tmp_path))
     monkeypatch.setenv("EPH_MODE", "local")
     monkeypatch.delenv("EPH_ALLOWED_LLM_HOSTS", raising=False)
@@ -80,6 +82,8 @@ def test_test_sin_destino_devuelve_400(client) -> None:
 
 def test_hosted_solo_lista_perfiles_permitidos(tmp_path, monkeypatch) -> None:
     app.state.selected_profile = None
+    app.state.custom_profiles = {}
+    app.state.custom_keys = {}
     monkeypatch.setenv("EPH_PROVIDERS_FILE", write_providers(tmp_path))
     monkeypatch.setenv("EPH_MODE", "hosted")
     monkeypatch.setenv("EPH_ALLOWED_LLM_HOSTS", "api.permitida.test")
@@ -93,6 +97,8 @@ def test_hosted_solo_lista_perfiles_permitidos(tmp_path, monkeypatch) -> None:
 
 def test_hosted_rechaza_base_url_arbitraria(tmp_path, monkeypatch) -> None:
     app.state.selected_profile = None
+    app.state.custom_profiles = {}
+    app.state.custom_keys = {}
     monkeypatch.setenv("EPH_PROVIDERS_FILE", write_providers(tmp_path))
     monkeypatch.setenv("EPH_MODE", "hosted")
     monkeypatch.setenv("EPH_ALLOWED_LLM_HOSTS", "api.permitida.test")
@@ -105,3 +111,47 @@ def test_hosted_rechaza_base_url_arbitraria(tmp_path, monkeypatch) -> None:
 
     assert response.status_code == 400
     assert "destinos arbitrarios" in response.json()["detail"]
+
+
+def test_agrega_un_perfil_personalizado_en_local(client) -> None:
+    response = client.post(
+        "/api/providers/custom",
+        json={
+            "name": "mi-ollama",
+            "base_url": "http://127.0.0.1:11434/v1",
+            "model": "qwen2.5:7b",
+            "api_key": "clave-runtime",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["name"] == "mi-ollama"
+    assert payload["has_api_key"] is True
+    assert "clave-runtime" not in response.text
+    names = {profile["name"] for profile in client.get("/api/providers").json()["profiles"]}
+    assert "mi-ollama" in names
+
+
+def test_rechaza_perfil_personalizado_duplicado(client) -> None:
+    body = {"name": "mi-ollama", "base_url": "http://127.0.0.1:11434/v1", "model": "m"}
+    assert client.post("/api/providers/custom", json=body).status_code == 200
+
+    assert client.post("/api/providers/custom", json=body).status_code == 400
+
+
+def test_hosted_no_permite_perfiles_personalizados(tmp_path, monkeypatch) -> None:
+    app.state.custom_profiles = {}
+    app.state.custom_keys = {}
+    monkeypatch.setenv("EPH_PROVIDERS_FILE", write_providers(tmp_path))
+    monkeypatch.setenv("EPH_MODE", "hosted")
+    monkeypatch.setenv("EPH_ALLOWED_LLM_HOSTS", "api.permitida.test")
+
+    with TestClient(app) as hosted:
+        response = hosted.post(
+            "/api/providers/custom",
+            json={"name": "x", "base_url": "https://otro.test/v1", "model": "m"},
+        )
+
+    assert response.status_code == 400
+    assert "modo local" in response.json()["detail"]

@@ -9,6 +9,8 @@ export default function AgentPage() {
   const [answer, setAnswer] = useState<AgentAnswer | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [debug, setDebug] = useState(false);
+  const [errorTrace, setErrorTrace] = useState<Array<Record<string, unknown>> | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -16,11 +18,18 @@ export default function AgentPage() {
     if (!trimmed) return;
     setLoading(true);
     setError(null);
+    setErrorTrace(null);
     try {
-      setAnswer(await api.askAgent(trimmed));
+      setAnswer(await api.askAgent(trimmed, debug));
     } catch (cause) {
       setAnswer(null);
-      setError(cause instanceof ApiError ? cause.message : "No se pudo consultar al agente");
+      if (cause instanceof ApiError) {
+        setError(cause.message);
+        setErrorTrace(cause.trace);
+      } else {
+        setError("No se pudo consultar al agente");
+        setErrorTrace(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -45,12 +54,30 @@ export default function AgentPage() {
         <button type="submit" disabled={loading || !question.trim()}>
           {loading ? "Consultando…" : "Consultar"}
         </button>
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={debug}
+            onChange={(event) => setDebug(event.target.checked)}
+          />
+          Modo debugging (ver traza del loop y las herramientas)
+        </label>
       </form>
 
       {error && (
         <p role="alert" className="error">
           {error}
         </p>
+      )}
+
+      {errorTrace && (
+        <details className="trace" open>
+          <summary>
+            Traza del error · {errorTrace.length} turno
+            {errorTrace.length === 1 ? "" : "s"}
+          </summary>
+          <pre>{JSON.stringify(errorTrace, null, 2)}</pre>
+        </details>
       )}
 
       <div aria-live="polite">
@@ -101,6 +128,16 @@ export default function AgentPage() {
             </p>
 
             <SqlPanel sql={answer.sql} />
+
+            {debug && answer.trace && (
+              <details className="trace">
+                <summary>
+                  Traza de depuración · {answer.trace.length} turno
+                  {answer.trace.length === 1 ? "" : "s"}
+                </summary>
+                <pre>{JSON.stringify(answer.trace, null, 2)}</pre>
+              </details>
+            )}
           </section>
         )}
       </div>

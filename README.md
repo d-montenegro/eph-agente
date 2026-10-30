@@ -199,10 +199,13 @@ Si el cambio no mejora o genera regresiones, se revierte y se vuelve a la hipót
 ### Bitácora de decisiones
 
 Cada cambio queda registrado como fallo, hipótesis, cambio y efecto medido. Por ejemplo: *“lab\_007 y lab\_012 promediaban ingreso sobre toda la población → la vista pone NULL fuera del universo → 2 preguntas corregidas, 0 regresiones”*. Sirve para entender por qué existe cada pieza y para revisar qué sobra al cambiar de modelo.
-
 ## Despliegue
 
-Si el desarrollo sigue el ciclo anterior, desplegar es empaquetar lo que ya existe, sin rediseño:
+Para una demo local en un comando, ver [`docs/demo.md`](docs/demo.md)
+(`make demo` levanta todo en Docker y abre en `http://localhost:8010`).
+
+Si el desarrollo sigue el ciclo anterior, desplegar es empaquetar lo que ya
+existe, sin rediseño:
 
 - **Contenedor** con el agente y la base, generada con el mismo proceso que en desarrollo y en modo solo lectura.
 - **Configuración de producción** con el modelo elegido en la etapa de evaluación; las credenciales como secretos.

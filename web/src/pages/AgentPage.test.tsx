@@ -69,3 +69,45 @@ describe("AgentPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("El modelo no respondió");
   });
 });
+
+it("envía debug y muestra la traza del loop", async () => {
+  const trace = [
+    {
+      turn: 1,
+      elapsed_ms: 12,
+      content: null,
+      tool_calls: [{ name: "ejecutar_sql", arguments: { query: "SELECT 1" } }],
+      tool_results: [{ name: "ejecutar_sql", result: { row_count: 1 } }],
+    },
+  ];
+  const spy = vi
+    .spyOn(api, "askAgent")
+    .mockResolvedValue({ ...answer, trace });
+  render(<AgentPage />);
+
+  fireEvent.change(screen.getByLabelText("Pregunta"), {
+    target: { value: "¿Cuántas personas hay?" },
+  });
+  fireEvent.click(screen.getByLabelText(/Modo debugging/));
+  fireEvent.click(screen.getByRole("button", { name: "Consultar" }));
+
+  await screen.findByText("Hay 43.739 personas en la muestra.");
+  expect(spy).toHaveBeenCalledWith("¿Cuántas personas hay?", true);
+  expect(screen.getByText(/Traza de depuración/)).toBeInTheDocument();
+});
+
+it("muestra la traza cuando el agente falla en modo debugging", async () => {
+  vi.spyOn(api, "askAgent").mockRejectedValue(
+    new ApiError(502, "No se pudo completar la consulta", null, [
+      { turn: 1, tool_calls: [{ name: "ejecutar_sql", arguments: {} }] },
+    ]),
+  );
+  render(<AgentPage />);
+
+  fireEvent.change(screen.getByLabelText("Pregunta"), { target: { value: "¿?" } });
+  fireEvent.click(screen.getByLabelText(/Modo debugging/));
+  fireEvent.click(screen.getByRole("button", { name: "Consultar" }));
+
+  expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo completar");
+  expect(screen.getByText(/Traza del error/)).toBeInTheDocument();
+});

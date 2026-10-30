@@ -29,6 +29,7 @@ class AgentAnswer(BaseModel):
     profile: str
     model: str
     sample_size: int = 0
+    trace: list[dict[str, Any]] | None = None
 
 
 def parse_structured_answer(content: str | None) -> dict[str, Any] | None:

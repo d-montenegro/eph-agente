@@ -112,6 +112,7 @@ class ProviderRegistry:
         self.mode = mode
         self.allowed_hosts = frozenset(host.lower() for host in allowed_hosts)
         self._env = dict(os.environ) if env is None else dict(env)
+        self._runtime_keys: dict[str, str] = {}
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> ProviderRegistry:
@@ -157,7 +158,19 @@ class ProviderRegistry:
         return profile
 
     def has_api_key(self, profile: ProviderProfile) -> bool:
+        if profile.name in self._runtime_keys:
+            return True
         return bool(profile.api_key_env and self._env.get(profile.api_key_env))
+
+    def add_profile(self, profile: ProviderProfile) -> None:
+        """Agrega un perfil en memoria; solo para demos locales."""
+        if self.mode != "local":
+            raise ProviderRegistryError("Solo se pueden agregar perfiles en modo local")
+        self.profiles[profile.name] = profile
+
+    def set_runtime_key(self, name: str, api_key: str) -> None:
+        """Guarda una clave solo en memoria; nunca se devuelve al cliente."""
+        self._runtime_keys[name] = api_key
 
     def default_profile(self) -> ProviderProfile:
         """Perfil preferido: local si está disponible; si no, el primero permitido."""
@@ -223,7 +236,9 @@ class ProviderRegistry:
         *,
         transport: Any | None = None,
     ) -> OpenAICompatibleProvider:
-        api_key = self._env.get(profile.api_key_env) if profile.api_key_env else None
+        api_key = self._runtime_keys.get(profile.name)
+        if api_key is None and profile.api_key_env:
+            api_key = self._env.get(profile.api_key_env)
         try:
             return OpenAICompatibleProvider(
                 base_url=profile.base_url,

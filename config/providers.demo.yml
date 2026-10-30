@@ -1,0 +1,14 @@
+# Perfil para la demo con Docker.
+# host.docker.internal apunta a la máquina anfitriona desde el contenedor.
+mode: local
+
+profiles:
+  local:
+    base_url: http://host.docker.internal:11434/v1
+    model: qwen2.5:7b
+    api_mode: chat_completions
+    api_key_env: OLLAMA_API_KEY
+    timeout_seconds: 120
+    max_retries: 0
+    enabled: true
+    hosted: false

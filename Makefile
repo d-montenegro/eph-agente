@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build up down status opencode-config
+.PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build up down status demo demo-down opencode-config
 
 setup:
 	uv sync --extra dev --extra postgres
@@ -39,6 +39,12 @@ down:
 
 status:
 	scripts/dev.sh status
+
+demo:
+	docker compose up --build
+
+demo-down:
+	docker compose down
 
 web:
 	npm --prefix web run dev

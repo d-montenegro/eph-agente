@@ -21,6 +21,7 @@ export type AgentAnswer = {
   profile: string;
   model: string;
   sample_size: number;
+  trace?: Array<Record<string, unknown>> | null;
 };
 
 export type ProviderProfile = {
@@ -42,6 +43,15 @@ export type ProvidersResponse = {
   profiles: ProviderProfile[];
 };
 
+export type CustomProviderInput = {
+  name: string;
+  base_url: string;
+  model: string;
+  api_key?: string;
+  api_key_env?: string;
+  timeout_seconds?: number;
+};
+
 export type ProviderHealth = {
   ok: boolean;
   status: string;
@@ -53,10 +63,19 @@ export type ProviderHealth = {
 
 export class ApiError extends Error {
   status: number;
+  detail: unknown;
+  trace: Array<Record<string, unknown>> | null;
 
-  constructor(status: number, message: string) {
+  constructor(
+    status: number,
+    message: string,
+    detail: unknown = null,
+    trace: Array<Record<string, unknown>> | null = null,
+  ) {
     super(message);
     this.status = status;
+    this.detail = detail;
+    this.trace = trace;
     this.name = "ApiError";
   }
 }
@@ -69,14 +88,25 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
   });
   if (!response.ok) {
-    let detail = response.statusText;
+    let message = response.statusText;
+    let detail: unknown = null;
+    let trace: Array<Record<string, unknown>> | null = null;
     try {
-      const payload = (await response.json()) as { detail?: string };
-      detail = payload.detail ?? detail;
+      const payload = (await response.json()) as { detail?: unknown };
+      detail = payload.detail ?? payload;
+      if (typeof detail === "string") {
+        message = detail;
+      } else if (detail && typeof detail === "object") {
+        const object = detail as { message?: unknown; trace?: unknown };
+        if (typeof object.message === "string") message = object.message;
+        if (Array.isArray(object.trace)) {
+          trace = object.trace as Array<Record<string, unknown>>;
+        }
+      }
     } catch {
       // La respuesta de error no era JSON.
     }
-    throw new ApiError(response.status, detail);
+    throw new ApiError(response.status, message || "Error del servidor", detail, trace);
   }
   return (await response.json()) as T;
 }
@@ -85,14 +115,20 @@ export const api = {
   getProject(): Promise<{ markdown: string }> {
     return request<{ markdown: string }>("/api/project");
   },
-  askAgent(question: string): Promise<AgentAnswer> {
+  askAgent(question: string, debug = false): Promise<AgentAnswer> {
     return request<AgentAnswer>("/api/agent/ask", {
       method: "POST",
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, debug }),
     });
   },
   getProviders(): Promise<ProvidersResponse> {
     return request<ProvidersResponse>("/api/providers");
+  },
+  addCustomProvider(input: CustomProviderInput): Promise<ProviderProfile> {
+    return request<ProviderProfile>("/api/providers/custom", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
   },
   selectProvider(profile: string): Promise<ProviderProfile> {
     return request<ProviderProfile>("/api/providers/select", {
