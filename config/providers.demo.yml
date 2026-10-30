@@ -5,10 +5,10 @@ mode: local
 profiles:
   local:
     base_url: http://host.docker.internal:11434/v1
-    model: qwen2.5:7b
+    model: qwen3.5:latest
     api_mode: chat_completions
     api_key_env: OLLAMA_API_KEY
-    timeout_seconds: 120
+    timeout_seconds: 240
     max_retries: 0
     enabled: true
     hosted: false

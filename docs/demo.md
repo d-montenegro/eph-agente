@@ -14,7 +14,7 @@ Abrir **http://localhost:8010**.
 1. Ir a **Configuración**.
 2. Probar el perfil `local` (Ollama en la máquina anfitriona) o agregar uno:
    - **Ollama local:** URL `http://host.docker.internal:11434/v1`, modelo
-     `qwen2.5:7b` (o uno más grande).
+     `qwen3.5:latest` (recomendado) o `qwen2.5:7b` (más rápido, menos confiable).
    - **Proveedor cloud:** URL `https://.../v1`, modelo, y pegar la clave. La
      clave queda solo en memoria del servidor y no se muestra.
 3. **Probar conexión** y después **Usar**.

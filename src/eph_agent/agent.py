@@ -41,7 +41,8 @@ TOOL_DEFINITIONS = [
         name="ejecutar_sql",
         description=(
             "Ejecuta una única consulta SELECT de solo lectura sobre las vistas "
-            "personas u hogares. Devuelve columnas, filas y el SQL ejecutado."
+            "personas u hogares. Dialecto SQLite: para población usá SUM(pondera), "
+            "para contar casos COUNT(*). No uses COUNT(DISTINCT a, b)."
         ),
         parameters={
             "type": "object",
@@ -91,8 +92,6 @@ def quality_warnings(result: ResultPayload, sample_size: int, truncated: bool) -
         warnings.append("La consulta no devolvió un valor.")
     if truncated:
         warnings.append("El resultado se truncó al límite de filas configurado.")
-    if result.kind == "table" and 0 < sample_size < 30:
-        warnings.append(f"Pocas filas en el resultado (n={sample_size}); interpretar con cautela.")
     return warnings
 
 
@@ -146,6 +145,8 @@ class AgentService:
             Message(role="user", content=question),
         ]
         last_result: QueryResult | None = None
+        seen_calls: set[str] = set()
+        repeated = False
 
         for turn_number in range(1, self.max_turns + 1):
             started = time.perf_counter()
@@ -174,6 +175,13 @@ class AgentService:
                     )
                 )
                 for call in reply.tool_calls:
+                    signature = (
+                        f"{call.name}:{json.dumps(call.arguments, sort_keys=True, default=str)}"
+                    )
+                    if signature in seen_calls:
+                        repeated = True
+                        continue
+                    seen_calls.add(signature)
                     payload, result = self._run_tool(call)
                     entry["tool_results"].append({"name": call.name, "result": payload})
                     messages.append(
@@ -186,10 +194,24 @@ class AgentService:
                     if result is not None:
                         last_result = result
                 trace.append(entry)
+                if repeated:
+                    break
                 continue
 
             trace.append(entry)
             return self._finalize(reply.content, last_result, trace)
+
+        if last_result is not None:
+            reason = (
+                "El modelo repitió una herramienta sin llegar a una respuesta final; "
+                "se devuelve el último resultado ejecutado."
+                if repeated
+                else (
+                    f"El modelo no produjo una respuesta final en {self.max_turns} turnos; "
+                    "se devuelve el último resultado ejecutado."
+                )
+            )
+            return self._fallback(last_result, trace, reason)
 
         error = AgentError(
             f"No se pudo completar la consulta en {self.max_turns} turnos. "
@@ -282,6 +304,39 @@ class AgentService:
                 "profile": self.profile,
                 "model": self.model,
                 "sample_size": sample_size,
+                "trace": trace if self.debug else None,
+            }
+        )
+
+    def _fallback(
+        self,
+        last_result: QueryResult,
+        trace: list[dict[str, Any]],
+        reason: str,
+    ) -> AgentAnswer:
+        """Devuelve el último resultado ejecutado si el modelo no cierra el loop."""
+        result_payload = _to_payload(last_result)
+        if result_payload.kind == "scalar":
+            answer_text = f"Resultado: {result_payload.value}"
+        else:
+            answer_text = f"La consulta devolvió {len(result_payload.rows)} fila(s)."
+        warnings = [
+            reason,
+            "La respuesta se armó con el SQL ejecutado; no hubo texto final del modelo.",
+        ]
+        warnings.extend(
+            quality_warnings(result_payload, last_result.row_count, last_result.truncated)
+        )
+        return validate_agent_answer(
+            {
+                "result": result_payload.model_dump(),
+                "sql": last_result.sql,
+                "assumptions": [],
+                "warnings": _dedupe(warnings),
+                "answer": answer_text,
+                "profile": self.profile,
+                "model": self.model,
+                "sample_size": last_result.row_count,
                 "trace": trace if self.debug else None,
             }
         )

@@ -20,9 +20,13 @@ class FakeProvider:
 
 
 class AlwaysToolsProvider(FakeProvider):
+    def __init__(self, query: str = "SELECT * FROM individual") -> None:
+        super().__init__([])
+        self.query = query
+
     async def complete_with_tools(self, messages, tools, *, model, temperature):
         return ModelTurn(
-            tool_calls=[ToolCall(id="c", name="ejecutar_sql", arguments={"query": "SELECT 1"})]
+            tool_calls=[ToolCall(id="c", name="ejecutar_sql", arguments={"query": self.query})]
         )
 
 
@@ -104,7 +108,7 @@ def test_agent_ask_acota_periodo(client, monkeypatch) -> None:
 
 
 def test_agent_ask_falla_si_no_termina(client, monkeypatch) -> None:
-    patch_provider(monkeypatch, AlwaysToolsProvider([]))
+    patch_provider(monkeypatch, AlwaysToolsProvider())
 
     response = client.post("/api/agent/ask", json={"question": "¿Cuántas personas hay?"})
 
@@ -116,7 +120,7 @@ def test_agent_ask_falla_si_no_termina(client, monkeypatch) -> None:
 
 
 def test_agent_ask_error_con_debug_incluye_traza(client, monkeypatch) -> None:
-    patch_provider(monkeypatch, AlwaysToolsProvider([]))
+    patch_provider(monkeypatch, AlwaysToolsProvider())
 
     response = client.post(
         "/api/agent/ask",
@@ -125,8 +129,19 @@ def test_agent_ask_error_con_debug_incluye_traza(client, monkeypatch) -> None:
 
     assert response.status_code == 502
     detail = response.json()["detail"]
-    assert len(detail["trace"]) == 6
+    assert len(detail["trace"]) == 2
     assert detail["trace"][0]["tool_calls"][0]["name"] == "ejecutar_sql"
+
+
+def test_agent_ask_devuelve_ultimo_resultado_si_no_cierra(client, monkeypatch) -> None:
+    patch_provider(monkeypatch, AlwaysToolsProvider("SELECT 1 AS uno"))
+
+    response = client.post("/api/agent/ask", json={"question": "¿Uno?"})
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["result"]["value"] == 1
+    assert any("se devuelve" in warning for warning in payload["warnings"])
 
 
 def test_agent_ask_rechaza_pregunta_vacia(client) -> None:

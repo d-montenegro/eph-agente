@@ -96,14 +96,30 @@ async def test_reintenta_cuando_el_sql_falla(adapter) -> None:
 async def test_agota_los_turnos_sin_inventar(adapter) -> None:
     provider = FakeProvider(
         [
-            ModelTurn(tool_calls=[sql_call("SELECT 1")]),
-            ModelTurn(tool_calls=[sql_call("SELECT 2", "call-2")]),
+            ModelTurn(tool_calls=[sql_call("SELECT * FROM individual")]),
+            ModelTurn(tool_calls=[sql_call("SELECT * FROM individual", "call-2")]),
         ]
     )
     service = AgentService(adapter, provider, model="fake-model", max_turns=2)
 
     with pytest.raises(AgentError, match="No se devuelve una respuesta inventada"):
         await service.ask("¿Cuántas personas hay?")
+
+
+async def test_devuelve_el_ultimo_resultado_si_el_modelo_no_cierra(adapter) -> None:
+    provider = FakeProvider(
+        [
+            ModelTurn(tool_calls=[sql_call("SELECT COUNT(*) AS total FROM personas")]),
+            ModelTurn(tool_calls=[sql_call("SELECT COUNT(*) AS total FROM personas", "call-2")]),
+        ]
+    )
+    service = AgentService(adapter, provider, model="fake-model", max_turns=2)
+
+    answer = await service.ask("¿Cuántas personas hay?")
+
+    assert answer.result.value == 43_739
+    assert answer.sql and "personas" in answer.sql
+    assert any("se devuelve" in warning for warning in answer.warnings)
 
 
 async def test_rechaza_otro_periodo_antes_de_llamar_al_modelo(adapter) -> None:

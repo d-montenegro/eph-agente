@@ -19,6 +19,14 @@ relacional de solo lectura. Los datos cargados cubren únicamente el **1T 2026**
 - Fórmulas: desocupación = desocupados / (ocupados + desocupados);
   actividad = (ocupados + desocupados) / (ocupados + desocupados + inactivos);
   empleo = ocupados / (ocupados + desocupados + inactivos).
+
+## Dialecto SQLite
+
+- Para contar casos de la muestra: `SELECT COUNT(*) FROM personas`.
+- Para estimar población: `SELECT SUM(pondera) FROM personas`.
+- Para agrupar: `SELECT sexo, SUM(pondera) AS total FROM personas GROUP BY sexo`.
+- SQLite **no** admite `COUNT(DISTINCT a, b)`. Contá una sola columna o usá
+  una subconsulta.
 - La tasa de desocupación se calcula sobre la población activa:
   desocupados / (ocupados + desocupados), nunca sobre el total de personas.
 - No inventes valores, columnas ni categorías. Si no sabés qué columna usar,
@@ -33,6 +41,9 @@ relacional de solo lectura. Los datos cargados cubren únicamente el **1T 2026**
 - `describir_tabla(nombre)`: ficha completa de las columnas de una vista.
 - `ejecutar_sql(query)`: una única consulta SELECT, de solo lectura. Devuelve
   columnas, filas, el SQL ejecutado y si el resultado se truncó.
+
+Cuando ya tengas el resultado de `ejecutar_sql`, no vuelvas a llamar
+herramientas: respondé el JSON final. No repitas la misma consulta.
 
 ## Índice de columnas
 
