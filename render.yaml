@@ -14,6 +14,6 @@ services:
       - key: EPH_PROVIDERS_FILE
         value: config/providers.hosted.example.yml
       - key: EPH_ALLOWED_LLM_HOSTS
-        sync: false
+        value: openrouter.ai
       - key: EPH_LLM_API_KEY
         sync: false

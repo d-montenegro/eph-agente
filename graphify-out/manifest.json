@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "pyproject.toml": {
-    "mtime": 1793309439.7400317,
-    "seen": 1793310022.694145,
-    "ast_hash": "fa36d68ce0a45bfef97158b0b276c7fb",
+    "mtime": 1793488364.6308706,
+    "seen": 1793489953.4401221,
+    "ast_hash": "f6a2b87eec2a2a6c248bc8536c6332bd",
     "semantic_hash": ""
   },
   "src/eph_agent/__init__.py": {
@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "config/providers.hosted.example.yml": {
-    "mtime": 1793309457.625295,
-    "seen": 1793310022.695489,
-    "ast_hash": "8cd27cd8d1ba7b8b074c51bcfea51b74",
+    "mtime": 1793489949.3330228,
+    "seen": 1793489953.441945,
+    "ast_hash": "4c60e2e911c6d7bea5746989199bd6bb",
     "semantic_hash": ""
   },
   "docs/deployment.md": {
@@ -516,9 +516,9 @@
     "semantic_hash": ""
   },
   "render.yaml": {
-    "mtime": 1793309458.831146,
-    "seen": 1793310022.695616,
-    "ast_hash": "2e14b1d495580030b78223e47e083337",
+    "mtime": 1793489949.3648062,
+    "seen": 1793489953.442239,
+    "ast_hash": "6be9390984e0621e2db7e7165dd9e1f8",
     "semantic_hash": ""
   },
   "config/providers.ollama.example.yml": {
@@ -552,9 +552,9 @@
     "semantic_hash": ""
   },
   "tests/test_colab_notebook.py": {
-    "mtime": 1793488354.8411255,
-    "seen": 1793488359.4870589,
-    "ast_hash": "53a91d345b18f6a405c05ba0bce3cb09",
+    "mtime": 1793488368.51032,
+    "seen": 1793489953.440966,
+    "ast_hash": "dcfc5242e195f6918b97712ac520a7f4",
     "semantic_hash": ""
   }
 }

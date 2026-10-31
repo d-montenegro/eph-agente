@@ -1,17 +1,16 @@
-# Ejemplo de perfiles para un despliegue hosted.
-# Copiar a config/providers.yml (o apuntar EPH_PROVIDERS_FILE acá) y reemplazar
-# base_url y model por el proveedor real. La clave se inyecta como secreto.
+# Perfil público para la demo en Render usando OpenRouter.
+# La clave se inyecta únicamente como secreto EPH_LLM_API_KEY.
 
 mode: hosted
 
 # Solo se permiten hosts de esta lista; sin lista no hay destinos remotos.
 allowed_hosts:
-  - api.example.com
+  - openrouter.ai
 
 profiles:
-  demo:
-    base_url: https://api.example.com/v1
-    model: example-model
+  openrouter-free:
+    base_url: https://openrouter.ai/api/v1
+    model: openrouter/free
     api_mode: chat_completions
     api_key_env: EPH_LLM_API_KEY
     timeout_seconds: 60
