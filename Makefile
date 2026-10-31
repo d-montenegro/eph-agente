@@ -1,4 +1,4 @@
-PYTHON ?= python3
+PYTHON ?= .venv/bin/python
 
 .PHONY: setup db test lint check api api-ollama eval eval-reference web web-test web-build up down status demo demo-down opencode-config
 

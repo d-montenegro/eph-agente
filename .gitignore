@@ -22,6 +22,7 @@ eph_zips/
 
 # Artefactos locales de análisis y temporales
 tmp/
+eval/runs/*.json
 
 # Frontend
 web/node_modules/
