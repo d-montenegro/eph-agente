@@ -508,8 +508,8 @@ N/A para el MVP: el corte es instantáneo y no hay dos fuentes superpuestas de m
 
 ### Checks
 
-- [ ] Lint y formato de todos los archivos modificados.
-- [ ] Pruebas backend y frontend.
+- [x] Lint y formato de todos los archivos modificados.
+- [x] Pruebas backend y frontend (131 backend y 28 frontend, verificadas el 2026-10-31).
 - [ ] Revisión de seguridad.
 - [ ] Revisión de rendimiento y latencia.
 - [ ] Golden set completo y conjunto de reserva.
