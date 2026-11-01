@@ -7,6 +7,7 @@ import App from "./App";
 beforeEach(() => {
   window.localStorage.clear();
   window.location.hash = "#/agente";
+  vi.spyOn(api, "me").mockResolvedValue({ username: "jairo" });
 });
 
 describe("App", () => {
@@ -14,7 +15,7 @@ describe("App", () => {
     vi.spyOn(api, "getProject").mockResolvedValue({ markdown: "# Proyecto\n\nTexto." });
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Agente EPH" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Agente EPH" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("link", { name: "Proyecto" }));
     if (!window.location.hash.includes("proyecto")) {
@@ -29,13 +30,20 @@ describe("App", () => {
     );
   });
 
-  it("ofrece las tres secciones", () => {
+  it("ofrece las tres secciones", async () => {
     vi.spyOn(api, "getProject").mockResolvedValue({ markdown: "# Proyecto" });
     render(<App />);
 
-    const nav = screen.getByRole("navigation", { name: "Secciones" });
+    const nav = await screen.findByRole("navigation", { name: "Secciones" });
     expect(nav).toHaveTextContent("Proyecto");
     expect(nav).toHaveTextContent("Agente");
     expect(nav).toHaveTextContent("Configuración");
+  });
+
+  it("muestra el login cuando no hay sesión", async () => {
+    vi.spyOn(api, "me").mockRejectedValue(new Error("401"));
+    render(<App />);
+
+    expect(await screen.findByRole("button", { name: "Ingresar" })).toBeInTheDocument();
   });
 });

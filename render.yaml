@@ -17,5 +17,13 @@ services:
         value: openrouter.ai
       - key: EPH_DAILY_QUERY_LIMIT
         value: "20"
+      - key: EPH_AUTH_ENABLED
+        value: "1"
+      - key: EPH_USERS_FILE
+        value: config/users.yml
+      - key: EPH_COOKIE_SECURE
+        value: "1"
+      - key: EPH_SESSION_SECRET
+        sync: false
       - key: EPH_LLM_API_KEY
         sync: false

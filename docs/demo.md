@@ -11,6 +11,10 @@ make demo          # docker compose up --build
 
 Abrir **http://localhost:8010**.
 
+La demo pide usuario y contraseña. Usuarios: **damian**, **jairo** y **profe**.
+La contraseña se comparte por fuera del repositorio; no está escrita en el
+código.
+
 1. Ir a **Configuración**.
 2. Probar el perfil `local` (Ollama en la máquina anfitriona) o agregar uno:
    - **Ollama local:** URL `http://host.docker.internal:11434/v1`, modelo
@@ -58,3 +62,16 @@ make eval-reference
 
 Ejecuta el `sql_esperado` del golden set (19 casos con SQL) y no necesita API
 key ni modelo.
+
+## Usuarios y seguridad
+
+- `config/users.yml` guarda solo hashes PBKDF2, nunca la contraseña.
+- Para cambiar una contraseña:
+  ```bash
+  PYTHONPATH=src .venv/bin/python scripts/hash_password.py
+  ```
+  Pegar el hash en `config/users.yml`.
+- Si alguna IP debe quedar bloqueada, usar `EPH_BLOCKED_IPS` (separadas por
+  coma). El login también frena intentos fallidos por IP.
+- En una demo pública con HTTPS, definir `EPH_SESSION_SECRET` y
+  `EPH_COOKIE_SECURE=1`.

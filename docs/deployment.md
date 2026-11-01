@@ -78,6 +78,7 @@ microdatos, se reconstruye la imagen.
 1. Crear el servicio desde el repo (Blueprint o Web Service Docker).
 2. Cargar los secretos en el panel:
    - `EPH_LLM_API_KEY`
+   - `EPH_SESSION_SECRET` (clave larga y aleatoria para firmar la cookie)
    - `EPH_ALLOWED_LLM_HOSTS` (host del proveedor, sin `https://`)
 3. Ajustar `config/providers.hosted.example.yml` (o crear
    `config/providers.yml`) con la `base_url` y el `model` reales.
@@ -99,6 +100,26 @@ VITE_API_BASE=https://eph-agente.onrender.com npm run build
 Sin esa variable usa rutas relativas (`/api/...`), que es lo recomendado cuando
 FastAPI sirve también el build estático.
 
+## Autenticación
+
+La demo se comparte con login. Se activa con `EPH_AUTH_ENABLED=1` y lee los
+usuarios desde `EPH_USERS_FILE` (por defecto `config/users.yml`). El archivo
+guarda solo hashes PBKDF2, nunca la contraseña.
+
+- Usuarios de la demo: `damian`, `jairo` y `profe`. La contraseña se comparte
+  por fuera del repositorio.
+- Para cambiar una contraseña:
+  ```bash
+  PYTHONPATH=src .venv/bin/python scripts/hash_password.py
+  ```
+  Pegar el hash en `config/users.yml`.
+- `/api/health` y `/api/auth/*` son públicos; el resto de `/api/*` exige sesión.
+- `EPH_BLOCKED_IPS` bloquea IPs concretas (separadas por coma). El login también
+  frena intentos fallidos por IP (`EPH_LOGIN_MAX_FAILURES`,
+  `EPH_LOGIN_WINDOW_SECONDS`, `EPH_LOGIN_BLOCK_SECONDS`).
+- En producción con HTTPS: definir `EPH_SESSION_SECRET` y
+  `EPH_COOKIE_SECURE=1`.
+
 ## Variables
 
 | Variable | Uso |
@@ -109,12 +130,19 @@ FastAPI sirve también el build estático.
 | `EPH_PROVIDERS_FILE` | Ruta al YAML de perfiles. |
 | `EPH_ALLOWED_LLM_HOSTS` | Hosts remotos permitidos en hosted, separados por coma. |
 | `EPH_LLM_API_KEY` | Clave del proveedor; solo como secreto. |
+| `EPH_AUTH_ENABLED` | `1` activa el login; `0` lo desactiva. |
+| `EPH_USERS_FILE` | YAML con usuarios y hashes PBKDF2. |
+| `EPH_SESSION_SECRET` | Clave para firmar la cookie de sesión. |
+| `EPH_COOKIE_SECURE` | `1` exige HTTPS para la cookie. |
+| `EPH_BLOCKED_IPS` | IPs bloqueadas, separadas por coma. |
+| `EPH_DAILY_QUERY_LIMIT` | Límite diario de consultas al agente (0 lo desactiva). |
 | `VITE_API_BASE` | URL del backend cuando la web se despliega aparte. |
 
 ## Secretos
 
 - Las claves viven en variables de entorno o en el gestor de secretos de la
   plataforma, nunca en el YAML ni en el frontend.
+- Las contraseñas no se versionan: `config/users.yml` guarda solo hashes PBKDF2.
 - `GET /api/providers` devuelve `api_key_env` y `has_api_key`, jamás el valor.
 - En modo hosted no se aceptan `base_url` arbitrarias: solo perfiles con
   `hosted: true` y host en la lista blanca.

@@ -6,6 +6,9 @@ services:
     environment:
       EPH_MODE: local
       EPH_PROVIDERS_FILE: config/providers.demo.yml
+      EPH_AUTH_ENABLED: "1"
+      EPH_USERS_FILE: config/users.yml
+      EPH_DAILY_QUERY_LIMIT: "100"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped

@@ -58,6 +58,8 @@ case "${1:-up}" in
   up)
     ensure_setup
     start_one api env \
+      EPH_AUTH_ENABLED=1 \
+      EPH_USERS_FILE=config/users.yml \
       EPH_PROVIDERS_FILE=config/providers.ollama.example.yml \
       PYTHONPATH=src \
       .venv/bin/python -m uvicorn eph_agent.api:app \

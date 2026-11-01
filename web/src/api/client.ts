@@ -52,6 +52,10 @@ export type CustomProviderInput = {
   timeout_seconds?: number;
 };
 
+export type AuthUser = {
+  username: string;
+};
+
 export type ProviderHealth = {
   ok: boolean;
   status: string;
@@ -85,9 +89,13 @@ const BASE = import.meta.env.VITE_API_BASE ?? "";
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE}${path}`, {
     ...init,
+    credentials: "same-origin",
     headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
   });
   if (!response.ok) {
+    if (response.status === 401 && !path.startsWith("/api/auth/")) {
+      window.dispatchEvent(new Event("eph:unauthorized"));
+    }
     let message = response.statusText;
     let detail: unknown = null;
     let trace: Array<Record<string, unknown>> | null = null;
@@ -112,6 +120,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  me(): Promise<AuthUser> {
+    return request<AuthUser>("/api/auth/me");
+  },
+  login(username: string, password: string): Promise<AuthUser> {
+    return request<AuthUser>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    });
+  },
+  logout(): Promise<{ ok: boolean }> {
+    return request<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
+  },
   getProject(): Promise<{ markdown: string }> {
     return request<{ markdown: string }>("/api/project");
   },

@@ -1,6 +1,8 @@
 import { useEffect, useState, type ComponentType } from "react";
 
+import { api, type AuthUser } from "./api/client";
 import AgentPage from "./pages/AgentPage";
+import LoginPage from "./pages/LoginPage";
 import ProjectPage from "./pages/ProjectPage";
 import SettingsPage from "./pages/SettingsPage";
 
@@ -23,6 +25,25 @@ function routeFromHash(): string {
 
 export default function App() {
   const [current, setCurrent] = useState(routeFromHash);
+  const [user, setUser] = useState<AuthUser | null | undefined>(undefined);
+
+  useEffect(() => {
+    let active = true;
+    api
+      .me()
+      .then((value) => {
+        if (active) setUser(value);
+      })
+      .catch(() => {
+        if (active) setUser(null);
+      });
+    const onUnauthorized = () => setUser(null);
+    window.addEventListener("eph:unauthorized", onUnauthorized);
+    return () => {
+      active = false;
+      window.removeEventListener("eph:unauthorized", onUnauthorized);
+    };
+  }, []);
 
   useEffect(() => {
     if (!window.location.hash) {
@@ -33,8 +54,30 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onChange);
   }, []);
 
+  if (user === undefined) {
+    return (
+      <div className="app-shell">
+        <main>
+          <p className="muted">Cargando…</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (user === null) {
+    return <LoginPage onLogin={setUser} />;
+  }
+
   const route = ROUTES.find((item) => item.path === current) ?? ROUTES[0];
   const Active = route.Component;
+
+  async function logout() {
+    try {
+      await api.logout();
+    } finally {
+      setUser(null);
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -56,6 +99,12 @@ export default function App() {
             </a>
           ))}
         </nav>
+        <div className="user-menu">
+          <span title="Usuario conectado">{user.username}</span>
+          <button type="button" onClick={logout}>
+            Salir
+          </button>
+        </div>
       </header>
       <main id="main">
         <Active />

@@ -1,0 +1,8 @@
+# Usuarios de la demo. Solo se guardan hashes PBKDF2, nunca la contraseña.
+users:
+  damian:
+    password_hash: "pbkdf2_sha256$260000$HtZ_dBSjktITUWDSxeN_iQ$2sapy9rSTKMdW-vjLEmEhNGGh7KUId-ayYzZYFvVlNA"
+  jairo:
+    password_hash: "pbkdf2_sha256$260000$bQv7no2zTTzrTxkWAVb-Ug$w_6pncml8EBYHFtZFzjGLn4k50QHqGrhXN-CnrQCMvg"
+  profe:
+    password_hash: "pbkdf2_sha256$260000$F1yWiJ7gbZooPXjTzUD0gw$tUdyxUM1mcSTxaPQQoP7yZAPaZMIPiVwQTTHg64Y9Rw"

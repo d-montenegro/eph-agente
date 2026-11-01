@@ -2,14 +2,25 @@
 
 from __future__ import annotations
 
+import os
+import secrets
 from collections.abc import Iterator
 from dataclasses import asdict, replace
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 
 from eph_agent.agent import AgentError, AgentService
 from eph_agent.answer import AgentAnswer
+from eph_agent.auth import (
+    AuthConfigError,
+    LoginThrottle,
+    UserStore,
+    auth_enabled,
+    blocked_ips,
+)
 from eph_agent.config import DatabaseSettings
 from eph_agent.database import (
     DatabaseAdapter,
@@ -30,10 +41,12 @@ from eph_agent.providers import (
 from eph_agent.rate_limit import DailyRequestLimiter
 from eph_agent.schemas import (
     AgentAskRequest,
+    AuthUser,
     CustomProviderRequest,
     DescribeTableRequest,
     ExecuteSQLRequest,
     HealthResponse,
+    LoginRequest,
     ProjectResponse,
     ProviderHealthResponse,
     ProviderProfilePublic,
@@ -54,6 +67,53 @@ app.state.custom_profiles = {}
 app.state.custom_keys = {}
 app.state.selected_profile = None
 app.state.query_limiter = None
+
+SESSION_SECRET = os.environ.get("EPH_SESSION_SECRET") or secrets.token_urlsafe(32)
+LOGIN_THROTTLE = LoginThrottle(
+    max_failures=int(os.environ.get("EPH_LOGIN_MAX_FAILURES", "10")),
+    window_seconds=float(os.environ.get("EPH_LOGIN_WINDOW_SECONDS", "300")),
+    block_seconds=float(os.environ.get("EPH_LOGIN_BLOCK_SECONDS", "600")),
+)
+PUBLIC_API_PATHS = {
+    "/api/auth/login",
+    "/api/auth/logout",
+    "/api/auth/me",
+    "/api/health",
+}
+
+
+@app.middleware("http")
+async def auth_guard(request: Request, call_next):
+    client_ip = request.client.host if request.client else "desconocida"
+    if client_ip in blocked_ips():
+        return JSONResponse({"detail": "IP bloqueada"}, status_code=403)
+    if not auth_enabled():
+        return await call_next(request)
+
+    path = request.url.path
+    if not path.startswith("/api/") or path in PUBLIC_API_PATHS:
+        return await call_next(request)
+
+    username = request.session.get("auth_user")
+    if not username:
+        return JSONResponse({"detail": "No autenticado"}, status_code=401)
+    try:
+        store = UserStore.from_env()
+    except AuthConfigError as error:
+        return JSONResponse({"detail": str(error)}, status_code=503)
+    if not store.has_user(username):
+        request.session.clear()
+        return JSONResponse({"detail": "Sesión inválida"}, status_code=401)
+    return await call_next(request)
+
+
+# Debe quedar por fuera del guard para que request.session exista.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SESSION_SECRET,
+    same_site="lax",
+    https_only=os.environ.get("EPH_COOKIE_SECURE", "0") == "1",
+)
 
 
 def get_query_limiter() -> DailyRequestLimiter:
@@ -308,6 +368,44 @@ def add_custom_provider(
     if request.api_key:
         registry.set_runtime_key(request.name, request.api_key)
     return ProviderProfilePublic(**profile.public(has_api_key=registry.has_api_key(profile)))
+
+
+@app.post("/api/auth/login", response_model=AuthUser)
+def login(request: LoginRequest, http_request: Request) -> AuthUser:
+    if not auth_enabled():
+        raise HTTPException(status_code=400, detail="La autenticación está deshabilitada")
+    client_ip = http_request.client.host if http_request.client else "desconocida"
+    if LOGIN_THROTTLE.is_blocked(client_ip):
+        raise HTTPException(
+            status_code=429,
+            detail="Demasiados intentos fallidos; esperá unos minutos",
+        )
+    try:
+        store = UserStore.from_env()
+    except AuthConfigError as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
+    if not store.verify(request.username, request.password):
+        LOGIN_THROTTLE.record_failure(client_ip)
+        raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
+    LOGIN_THROTTLE.reset(client_ip)
+    http_request.session["auth_user"] = request.username
+    return AuthUser(username=request.username)
+
+
+@app.get("/api/auth/me", response_model=AuthUser)
+def me(http_request: Request) -> AuthUser:
+    if not auth_enabled():
+        return AuthUser(username="demo")
+    username = http_request.session.get("auth_user")
+    if not username:
+        raise HTTPException(status_code=401, detail="No autenticado")
+    return AuthUser(username=username)
+
+
+@app.post("/api/auth/logout")
+def logout(http_request: Request) -> dict[str, bool]:
+    http_request.session.clear()
+    return {"ok": True}
 
 
 # El mount va al final para no interceptar las rutas /api registradas después.
