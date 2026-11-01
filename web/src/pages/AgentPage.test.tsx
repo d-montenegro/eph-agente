@@ -22,6 +22,7 @@ const answer: AgentAnswer = {
 
 describe("AgentPage", () => {
   it("muestra respuesta, valor, supuestos y SQL", async () => {
+    localStorage.clear();
     vi.spyOn(api, "askAgent").mockResolvedValue(answer);
     render(<AgentPage />);
 
@@ -35,9 +36,13 @@ describe("AgentPage", () => {
     expect(screen.getByText("Se contaron personas sin ponderar.")).toBeInTheDocument();
     expect(screen.getByText(/SELECT COUNT/)).toBeInTheDocument();
     expect(screen.getByText("modelo-prueba")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Historial de consultas" })).toHaveTextContent(
+      "¿Cuántas personas hay?",
+    );
   });
 
   it("muestra una tabla cuando el resultado no es escalar", async () => {
+    localStorage.clear();
     vi.spyOn(api, "askAgent").mockResolvedValue({
       ...answer,
       result: {
@@ -60,6 +65,7 @@ describe("AgentPage", () => {
   });
 
   it("muestra el error del backend", async () => {
+    localStorage.clear();
     vi.spyOn(api, "askAgent").mockRejectedValue(new ApiError(502, "El modelo no respondió"));
     render(<AgentPage />);
 
@@ -68,6 +74,29 @@ describe("AgentPage", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("El modelo no respondió");
   });
+});
+
+it("recupera y borra el historial del navegador", async () => {
+  localStorage.setItem(
+    "eph-agent-history-v1",
+    JSON.stringify([
+      {
+        id: "1",
+        question: "Consulta anterior",
+        createdAt: "2026-10-31T12:00:00Z",
+        answer,
+      },
+    ]),
+  );
+  render(<AgentPage />);
+
+  fireEvent.click(screen.getByRole("button", { name: /Consulta anterior/ }));
+  expect(screen.getByLabelText("Pregunta")).toHaveValue("Consulta anterior");
+  expect(screen.getByText("Hay 43.739 personas en la muestra.")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "Borrar historial" }));
+  expect(screen.getByText("Todavía no hay consultas guardadas.")).toBeInTheDocument();
+  expect(localStorage.getItem("eph-agent-history-v1")).toBeNull();
 });
 
 it("envía debug y muestra la traza del loop", async () => {

@@ -15,5 +15,7 @@ services:
         value: config/providers.hosted.example.yml
       - key: EPH_ALLOWED_LLM_HOSTS
         value: openrouter.ai
+      - key: EPH_DAILY_QUERY_LIMIT
+        value: "20"
       - key: EPH_LLM_API_KEY
         sync: false

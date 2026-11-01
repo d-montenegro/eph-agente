@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/api.py": {
-    "mtime": 1793318594.036004,
-    "seen": 1793320046.0107331,
-    "ast_hash": "03e6a1aecf8a0040747f1448eda93d51",
+    "mtime": 1793491518.345715,
+    "seen": 1793491555.920152,
+    "ast_hash": "52ac05e5c55650b9b3fe9945fde6228c",
     "semantic_hash": ""
   },
   "src/eph_agent/database/__init__.py": {
@@ -294,9 +294,9 @@
     "semantic_hash": ""
   },
   "tests/test_api_agent.py": {
-    "mtime": 1793383356.4119232,
-    "seen": 1793385832.650232,
-    "ast_hash": "007cb30f5b21b20aba8ed6960ba407de",
+    "mtime": 1793491518.4016838,
+    "seen": 1793491555.920686,
+    "ast_hash": "27b259a7180aca53029ae5640835af15",
     "semantic_hash": ""
   },
   "tests/test_api_providers.py": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793319810.0005534,
-    "seen": 1793320046.01159,
-    "ast_hash": "65399239e8cef65755840222ce3bfb80",
+    "mtime": 1793491525.5277987,
+    "seen": 1793491555.921178,
+    "ast_hash": "2606d397e891ab4213e7809205512714",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793318622.767113,
-    "seen": 1793320046.01159,
-    "ast_hash": "47365f3754134c79657a283d0560537c",
+    "mtime": 1793491525.4892876,
+    "seen": 1793491555.9211788,
+    "ast_hash": "5063499c334081324ca9feba28d2bd5f",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {
@@ -516,9 +516,9 @@
     "semantic_hash": ""
   },
   "render.yaml": {
-    "mtime": 1793489949.3648062,
-    "seen": 1793489953.442239,
-    "ast_hash": "6be9390984e0621e2db7e7165dd9e1f8",
+    "mtime": 1793491518.429343,
+    "seen": 1793491555.9218922,
+    "ast_hash": "1627dc386b08bb58f2ee8a6318ab4618",
     "semantic_hash": ""
   },
   "config/providers.ollama.example.yml": {
@@ -555,6 +555,18 @@
     "mtime": 1793488368.51032,
     "seen": 1793489953.440966,
     "ast_hash": "dcfc5242e195f6918b97712ac520a7f4",
+    "semantic_hash": ""
+  },
+  "src/eph_agent/rate_limit.py": {
+    "mtime": 1793491518.3164835,
+    "seen": 1793491555.920523,
+    "ast_hash": "2bf333bc136fa32294fbaeecbfdd3cb0",
+    "semantic_hash": ""
+  },
+  "tests/test_rate_limit.py": {
+    "mtime": 1793491518.37311,
+    "seen": 1793491555.920844,
+    "ast_hash": "2cf75de63971a5b6ca76cafadb62e1cf",
     "semantic_hash": ""
   }
 }

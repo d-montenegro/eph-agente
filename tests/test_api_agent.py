@@ -52,7 +52,9 @@ def client(semantic_database, tmp_path, monkeypatch):
     monkeypatch.setenv("EPH_DATABASE_URL", f"sqlite:///{semantic_database}")
     monkeypatch.setenv("EPH_PROVIDERS_FILE", str(providers))
     monkeypatch.setenv("EPH_MODE", "local")
+    monkeypatch.setenv("EPH_DAILY_QUERY_LIMIT", "20")
     app.state.selected_profile = None
+    app.state.query_limiter = None
     with TestClient(app) as test_client:
         yield test_client
 
@@ -177,3 +179,16 @@ def test_agent_ask_con_debug_devuelve_traza(client, monkeypatch) -> None:
     assert len(trace) == 2
     assert trace[0]["tool_calls"][0]["name"] == "ejecutar_sql"
     assert trace[0]["tool_results"][0]["result"]["row_count"] == 1
+
+
+def test_agent_ask_respeta_limite_diario(client, monkeypatch) -> None:
+    monkeypatch.setenv("EPH_DAILY_QUERY_LIMIT", "1")
+    app.state.query_limiter = None
+    patch_provider(monkeypatch, FakeProvider([]))
+
+    first = client.post("/api/agent/ask", json={"question": "¿Tasa de 2025?"})
+    second = client.post("/api/agent/ask", json={"question": "¿Tasa de 2025?"})
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+    assert "límite diario" in second.json()["detail"]

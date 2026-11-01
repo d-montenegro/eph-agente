@@ -4,6 +4,28 @@ import { api, ApiError, type AgentAnswer } from "../api/client";
 import ResultTable, { formatValue } from "../components/ResultTable";
 import SqlPanel from "../components/SqlPanel";
 
+const HISTORY_KEY = "eph-agent-history-v1";
+const HISTORY_LIMIT = 20;
+
+type HistoryEntry = {
+  id: string;
+  question: string;
+  createdAt: string;
+  answer: AgentAnswer;
+};
+
+function loadHistory(): HistoryEntry[] {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]").slice(0, HISTORY_LIMIT);
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entries: HistoryEntry[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries.slice(0, HISTORY_LIMIT)));
+}
+
 export default function AgentPage() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<AgentAnswer | null>(null);
@@ -11,6 +33,7 @@ export default function AgentPage() {
   const [error, setError] = useState<string | null>(null);
   const [debug, setDebug] = useState(false);
   const [errorTrace, setErrorTrace] = useState<Array<Record<string, unknown>> | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -20,7 +43,19 @@ export default function AgentPage() {
     setError(null);
     setErrorTrace(null);
     try {
-      setAnswer(await api.askAgent(trimmed, debug));
+      const nextAnswer = await api.askAgent(trimmed, debug);
+      setAnswer(nextAnswer);
+      const nextHistory = [
+        {
+          id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          question: trimmed,
+          createdAt: new Date().toISOString(),
+          answer: nextAnswer,
+        },
+        ...history,
+      ].slice(0, HISTORY_LIMIT);
+      setHistory(nextHistory);
+      saveHistory(nextHistory);
     } catch (cause) {
       setAnswer(null);
       if (cause instanceof ApiError) {
@@ -141,6 +176,50 @@ export default function AgentPage() {
           </section>
         )}
       </div>
+
+      <section className="history" aria-label="Historial de consultas">
+        <div className="history-header">
+          <div>
+            <h3>Historial</h3>
+            <p>Últimas {HISTORY_LIMIT} respuestas guardadas solo en este navegador.</p>
+          </div>
+          {history.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setHistory([]);
+                localStorage.removeItem(HISTORY_KEY);
+              }}
+            >
+              Borrar historial
+            </button>
+          )}
+        </div>
+        {history.length === 0 ? (
+          <p className="muted">Todavía no hay consultas guardadas.</p>
+        ) : (
+          <ol className="history-list">
+            {history.map((entry) => (
+              <li key={entry.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuestion(entry.question);
+                    setAnswer(entry.answer);
+                    setError(null);
+                    setErrorTrace(null);
+                  }}
+                >
+                  <span>{entry.question}</span>
+                  <time dateTime={entry.createdAt}>
+                    {new Date(entry.createdAt).toLocaleString("es-AR")}
+                  </time>
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
     </div>
   );
 }

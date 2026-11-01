@@ -27,6 +27,7 @@ from eph_agent.providers import (
     ProviderRegistryError,
     ToolDefinition,
 )
+from eph_agent.rate_limit import DailyRequestLimiter
 from eph_agent.schemas import (
     AgentAskRequest,
     CustomProviderRequest,
@@ -52,6 +53,16 @@ PROJECT_DOC = repo_root() / "docs" / "proyecto.md"
 app.state.custom_profiles = {}
 app.state.custom_keys = {}
 app.state.selected_profile = None
+app.state.query_limiter = None
+
+
+def get_query_limiter() -> DailyRequestLimiter:
+    limiter = getattr(app.state, "query_limiter", None)
+    configured = DailyRequestLimiter.from_env().limit
+    if limiter is None or limiter.limit != configured:
+        limiter = DailyRequestLimiter(configured)
+        app.state.query_limiter = limiter
+    return limiter
 
 
 def get_settings() -> DatabaseSettings:
@@ -231,6 +242,15 @@ async def ask_agent(
     adapter: DatabaseAdapter = Depends(get_adapter),
     registry: ProviderRegistry = Depends(get_registry),
 ) -> AgentAnswer:
+    try:
+        allowed, _remaining = get_query_limiter().consume()
+    except ValueError as error:
+        raise HTTPException(status_code=500, detail=str(error)) from error
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Se alcanzó el límite diario de consultas de la demo. Probá nuevamente mañana.",
+        )
     selected = request.profile or getattr(app.state, "selected_profile", None)
     try:
         profile = registry.get(selected) if selected else registry.default_profile()
