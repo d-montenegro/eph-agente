@@ -373,6 +373,15 @@ main {
   text-align: left;
 }
 
+.history-list span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.history-list small {
+  color: var(--accent);
+}
+
 .history-list time {
   color: var(--muted);
   flex: 0 0 auto;
@@ -676,6 +685,27 @@ main {
   border-radius: var(--radius);
   padding: 0.6rem 0.8rem;
   background: #0b1226;
+}
+
+.debug-pipeline {
+  border-left: 4px solid var(--accent);
+  background: rgba(99, 179, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+}
+
+.debug-pipeline ol {
+  margin: 0.5rem 0;
+  padding-left: 1.4rem;
+}
+
+.debug-pipeline li + li {
+  margin-top: 0.45rem;
+}
+
+.debug-note {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
 }
 
 .trace summary {

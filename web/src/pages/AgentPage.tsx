@@ -12,7 +12,35 @@ type HistoryEntry = {
   question: string;
   createdAt: string;
   answer: AgentAnswer;
+  debug?: boolean;
 };
+
+const VIEW_LINEAGE = {
+  personas: {
+    source: "individual",
+    description: "Una fila por persona; actividad, empleo, demografía e ingresos.",
+  },
+  hogares: {
+    source: "hogar",
+    description: "Una fila por hogar; composición e ingresos familiares.",
+  },
+} as const;
+
+function viewsUsed(sql: string | null) {
+  if (!sql) return [];
+  return Object.entries(VIEW_LINEAGE).filter(([view]) =>
+    new RegExp(`\\b${view}\\b`, "i").test(sql),
+  );
+}
+
+function toolCalls(trace: Array<Record<string, unknown>> | null | undefined) {
+  if (!trace) return [];
+  return trace.flatMap((turn) =>
+    Array.isArray(turn.tool_calls)
+      ? (turn.tool_calls as Array<{ name?: string; arguments?: Record<string, unknown> }>)
+      : [],
+  );
+}
 
 function loadHistory(): HistoryEntry[] {
   try {
@@ -51,6 +79,7 @@ export default function AgentPage() {
           question: trimmed,
           createdAt: new Date().toISOString(),
           answer: nextAnswer,
+          debug,
         },
         ...history,
       ].slice(0, HISTORY_LIMIT);
@@ -164,7 +193,59 @@ export default function AgentPage() {
 
             <SqlPanel sql={answer.sql} />
 
-            {debug && answer.trace && (
+            {answer.trace && (
+              <section className="debug-pipeline" aria-label="Recorrido de la consulta">
+                <h3>Cómo llegó al resultado</h3>
+                <ol>
+                  <li>
+                    <strong>Pregunta:</strong> el modelo interpreta el pedido en lenguaje natural.
+                  </li>
+                  <li>
+                    <strong>Herramientas:</strong>{" "}
+                    {toolCalls(answer.trace).length
+                      ? toolCalls(answer.trace)
+                          .map((call) => call.name ?? "herramienta")
+                          .join(" → ")
+                      : "no necesitó llamar herramientas"}
+                    .
+                  </li>
+                  <li>
+                    <strong>Vista semántica:</strong>{" "}
+                    {viewsUsed(answer.sql).length ? (
+                      viewsUsed(answer.sql).map(([view, lineage], index) => (
+                        <span key={view}>
+                          {index > 0 ? ", " : ""}
+                          <code>{view}</code> — {lineage.description}
+                        </span>
+                      ))
+                    ) : (
+                      <span>no se ejecutó SQL</span>
+                    )}
+                  </li>
+                  <li>
+                    <strong>Origen INDEC:</strong>{" "}
+                    {viewsUsed(answer.sql).length
+                      ? viewsUsed(answer.sql)
+                          .map(([, lineage]) => lineage.source)
+                          .join(", ")
+                      : "sin tabla de origen"}
+                    . Las tablas crudas no se consultan directamente.
+                  </li>
+                  <li>
+                    <strong>SQL y resultado:</strong> el SQL visible arriba se valida como solo
+                    lectura y después se ejecuta.
+                  </li>
+                </ol>
+                {answer.sql?.includes("empleo_formal") && (
+                  <p className="debug-note">
+                    <code>empleo_formal</code> es una columna derivada dentro de la vista{" "}
+                    <code>personas</code>; no es una tabla independiente.
+                  </p>
+                )}
+              </section>
+            )}
+
+            {answer.trace && (
               <details className="trace">
                 <summary>
                   Traza de depuración · {answer.trace.length} turno
@@ -206,11 +287,20 @@ export default function AgentPage() {
                   onClick={() => {
                     setQuestion(entry.question);
                     setAnswer(entry.answer);
+                    setDebug(Boolean(entry.debug ?? entry.answer.trace?.length));
                     setError(null);
                     setErrorTrace(null);
                   }}
                 >
-                  <span>{entry.question}</span>
+                  <span>
+                    {entry.question}
+                    {(entry.debug || entry.answer.trace?.length) && (
+                      <small>
+                        Debug · {toolCalls(entry.answer.trace).length} llamada
+                        {toolCalls(entry.answer.trace).length === 1 ? "" : "s"}
+                      </small>
+                    )}
+                  </span>
                   <time dateTime={entry.createdAt}>
                     {new Date(entry.createdAt).toLocaleString("es-AR")}
                   </time>

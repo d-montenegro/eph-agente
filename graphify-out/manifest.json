@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793491525.5277987,
-    "seen": 1793491555.921178,
-    "ast_hash": "2606d397e891ab4213e7809205512714",
+    "mtime": 1793910961.05525,
+    "seen": 1793910999.2493582,
+    "ast_hash": "c951d762a11e070256476c2e9d94de9b",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793491525.4892876,
-    "seen": 1793491555.9211788,
-    "ast_hash": "5063499c334081324ca9feba28d2bd5f",
+    "mtime": 1793910961.0255735,
+    "seen": 1793910999.2493598,
+    "ast_hash": "99fc31a91dbcdbbe9a14b8ead0cac2d6",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {

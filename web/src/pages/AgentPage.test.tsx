@@ -100,6 +100,7 @@ it("recupera y borra el historial del navegador", async () => {
 });
 
 it("envía debug y muestra la traza del loop", async () => {
+  localStorage.clear();
   const trace = [
     {
       turn: 1,
@@ -123,6 +124,46 @@ it("envía debug y muestra la traza del loop", async () => {
   await screen.findByText("Hay 43.739 personas en la muestra.");
   expect(spy).toHaveBeenCalledWith("¿Cuántas personas hay?", true);
   expect(screen.getByText(/Traza de depuración/)).toBeInTheDocument();
+  expect(screen.getByRole("region", { name: "Recorrido de la consulta" })).toHaveTextContent(
+    "personas",
+  );
+  expect(screen.getByRole("region", { name: "Recorrido de la consulta" })).toHaveTextContent(
+    "individual",
+  );
+  expect(screen.getByText(/Debug · 1 llamada/)).toBeInTheDocument();
+});
+
+it("restaura el modo debugging y la traza desde el historial", () => {
+  const tracedAnswer = {
+    ...answer,
+    trace: [
+      {
+        turn: 1,
+        tool_calls: [{ name: "ejecutar_sql", arguments: { query: answer.sql } }],
+      },
+    ],
+  };
+  localStorage.setItem(
+    "eph-agent-history-v1",
+    JSON.stringify([
+      {
+        id: "debug-1",
+        question: "Consulta con debug",
+        createdAt: "2026-11-05T12:00:00Z",
+        answer: tracedAnswer,
+        debug: true,
+      },
+    ]),
+  );
+  render(<AgentPage />);
+
+  fireEvent.click(screen.getByRole("button", { name: /Consulta con debug/ }));
+
+  expect(screen.getByLabelText(/Modo debugging/)).toBeChecked();
+  expect(screen.getByText(/Traza de depuración/)).toBeInTheDocument();
+  expect(screen.getByRole("region", { name: "Recorrido de la consulta" })).toHaveTextContent(
+    "individual",
+  );
 });
 
 it("muestra la traza cuando el agente falla en modo debugging", async () => {
