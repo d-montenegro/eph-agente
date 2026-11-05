@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import secrets
 from collections.abc import Iterator
@@ -67,6 +68,7 @@ app.state.custom_profiles = {}
 app.state.custom_keys = {}
 app.state.selected_profile = None
 app.state.query_limiter = None
+app.state.active_queries = {}
 
 SESSION_SECRET = os.environ.get("EPH_SESSION_SECRET") or secrets.token_urlsafe(32)
 LOGIN_THROTTLE = LoginThrottle(
@@ -312,26 +314,41 @@ async def ask_agent(
             detail="Se alcanzó el límite diario de consultas de la demo. Probá nuevamente mañana.",
         )
     selected = request.profile or getattr(app.state, "selected_profile", None)
+    current_task = asyncio.current_task()
+    if request.request_id and current_task is not None:
+        app.state.active_queries[request.request_id] = current_task
     try:
         profile = registry.get(selected) if selected else registry.default_profile()
         provider = registry.create(profile.name)
+        service = AgentService(
+            adapter,
+            provider,
+            model=provider.model,
+            profile=profile.name,
+            debug=request.debug,
+        )
+        return await service.ask(request.question)
     except ProviderRegistryError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
-
-    service = AgentService(
-        adapter,
-        provider,
-        model=provider.model,
-        profile=profile.name,
-        debug=request.debug,
-    )
-    try:
-        return await service.ask(request.question)
+    except asyncio.CancelledError as error:
+        raise HTTPException(status_code=499, detail="Consulta cancelada por el usuario") from error
     except AgentError as error:
         detail = {"message": str(error), "trace": getattr(error, "trace", None)}
         raise HTTPException(status_code=502, detail=detail) from error
     except ProviderError as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
+    finally:
+        if request.request_id and app.state.active_queries.get(request.request_id) is current_task:
+            app.state.active_queries.pop(request.request_id, None)
+
+
+@app.post("/api/agent/cancel/{request_id}")
+async def cancel_agent(request_id: str) -> dict[str, bool]:
+    task = app.state.active_queries.pop(request_id, None)
+    if task is None or task.done():
+        return {"cancelled": False}
+    task.cancel()
+    return {"cancelled": True}
 
 
 @app.post("/api/providers/custom", response_model=ProviderProfilePublic)

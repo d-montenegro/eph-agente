@@ -135,10 +135,21 @@ export const api = {
   getProject(): Promise<{ markdown: string }> {
     return request<{ markdown: string }>("/api/project");
   },
-  askAgent(question: string, debug = false): Promise<AgentAnswer> {
+  askAgent(
+    question: string,
+    debug = false,
+    requestId?: string,
+    signal?: AbortSignal,
+  ): Promise<AgentAnswer> {
     return request<AgentAnswer>("/api/agent/ask", {
       method: "POST",
-      body: JSON.stringify({ question, debug }),
+      body: JSON.stringify({ question, debug, request_id: requestId }),
+      signal,
+    });
+  },
+  cancelAgent(requestId: string): Promise<{ cancelled: boolean }> {
+    return request<{ cancelled: boolean }>(`/api/agent/cancel/${encodeURIComponent(requestId)}`, {
+      method: "POST",
     });
   },
   getProviders(): Promise<ProvidersResponse> {

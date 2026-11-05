@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/api.py": {
-    "mtime": 1793493541.8304112,
-    "seen": 1793493969.838749,
-    "ast_hash": "a9113369dfaac848fed7f7daef74c2fa",
+    "mtime": 1793911474.1778452,
+    "seen": 1793911507.629003,
+    "ast_hash": "65b060ff9083b8d140d938462726246d",
     "semantic_hash": ""
   },
   "src/eph_agent/database/__init__.py": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/schemas.py": {
-    "mtime": 1793493419.241898,
-    "seen": 1793493969.839218,
-    "ast_hash": "ee302991d183e5995a731b817ae03dcf",
+    "mtime": 1793911462.3064427,
+    "seen": 1793911507.629399,
+    "ast_hash": "3c4347651bca05527528ecf418790503",
     "semantic_hash": ""
   },
   "src/eph_agent/semantic.py": {
@@ -294,9 +294,9 @@
     "semantic_hash": ""
   },
   "tests/test_api_agent.py": {
-    "mtime": 1793491518.4016838,
-    "seen": 1793491555.920686,
-    "ast_hash": "27b259a7180aca53029ae5640835af15",
+    "mtime": 1793911462.3665705,
+    "seen": 1793911507.629526,
+    "ast_hash": "39c0dde431fe4f2b6a5a55a58c4fe168",
     "semantic_hash": ""
   },
   "tests/test_api_providers.py": {
@@ -354,9 +354,9 @@
     "semantic_hash": ""
   },
   "web/src/api/client.ts": {
-    "mtime": 1793493551.2055905,
-    "seen": 1793493969.839621,
-    "ast_hash": "50eb7a0e23484cfc5d139cf242bd6044",
+    "mtime": 1793911462.3961914,
+    "seen": 1793911507.629807,
+    "ast_hash": "d4a8c7d58f89d11e9429c0c5d616767e",
     "semantic_hash": ""
   },
   "web/src/components/ProviderStatus.tsx": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793910961.05525,
-    "seen": 1793910999.2493582,
-    "ast_hash": "c951d762a11e070256476c2e9d94de9b",
+    "mtime": 1793911474.2393706,
+    "seen": 1793911507.629994,
+    "ast_hash": "455005e9caa420de1eaa562cd6e2f81d",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793910961.0255735,
-    "seen": 1793910999.2493598,
-    "ast_hash": "99fc31a91dbcdbbe9a14b8ead0cac2d6",
+    "mtime": 1793911474.2094083,
+    "seen": 1793911507.629995,
+    "ast_hash": "cddc9cb9a1873ea8265caf28854e1f4e",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {

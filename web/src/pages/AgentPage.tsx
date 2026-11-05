@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import { api, ApiError, type AgentAnswer } from "../api/client";
 import ResultTable, { formatValue } from "../components/ResultTable";
@@ -62,6 +62,7 @@ export default function AgentPage() {
   const [debug, setDebug] = useState(false);
   const [errorTrace, setErrorTrace] = useState<Array<Record<string, unknown>> | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
+  const activeRequest = useRef<{ id: string; controller: AbortController } | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,8 +71,14 @@ export default function AgentPage() {
     setLoading(true);
     setError(null);
     setErrorTrace(null);
+    const requestId =
+      typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const controller = new AbortController();
+    activeRequest.current = { id: requestId, controller };
     try {
-      const nextAnswer = await api.askAgent(trimmed, debug);
+      const nextAnswer = await api.askAgent(trimmed, debug, requestId, controller.signal);
       setAnswer(nextAnswer);
       const nextHistory = [
         {
@@ -87,7 +94,10 @@ export default function AgentPage() {
       saveHistory(nextHistory);
     } catch (cause) {
       setAnswer(null);
-      if (cause instanceof ApiError) {
+      if (cause instanceof DOMException && cause.name === "AbortError") {
+        setError("Consulta detenida por el usuario.");
+        setErrorTrace(null);
+      } else if (cause instanceof ApiError) {
         setError(cause.message);
         setErrorTrace(cause.trace);
       } else {
@@ -95,8 +105,16 @@ export default function AgentPage() {
         setErrorTrace(null);
       }
     } finally {
+      if (activeRequest.current?.id === requestId) activeRequest.current = null;
       setLoading(false);
     }
+  }
+
+  function cancelCurrentQuery() {
+    const current = activeRequest.current;
+    if (!current) return;
+    current.controller.abort();
+    void api.cancelAgent(current.id).catch(() => undefined);
   }
 
   return (
@@ -115,9 +133,16 @@ export default function AgentPage() {
           placeholder="¿Cuál fue la tasa de desocupación de las mujeres en Gran Córdoba en el 1T 2026?"
           rows={3}
         />
-        <button type="submit" disabled={loading || !question.trim()}>
-          {loading ? "Consultando…" : "Consultar"}
-        </button>
+        <div className="ask-actions">
+          <button type="submit" disabled={loading || !question.trim()}>
+            {loading ? "Consultando…" : "Consultar"}
+          </button>
+          {loading && (
+            <button type="button" className="danger" onClick={cancelCurrentQuery}>
+              Detener consulta
+            </button>
+          )}
+        </div>
         <label className="checkbox">
           <input
             type="checkbox"

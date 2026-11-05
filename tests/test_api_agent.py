@@ -181,6 +181,32 @@ def test_agent_ask_con_debug_devuelve_traza(client, monkeypatch) -> None:
     assert trace[0]["tool_results"][0]["result"]["row_count"] == 1
 
 
+def test_cancel_agent_cancela_tarea_activa(client) -> None:
+    class FakeTask:
+        cancelled = False
+
+        def done(self) -> bool:
+            return False
+
+        def cancel(self) -> None:
+            self.cancelled = True
+
+    task = FakeTask()
+    app.state.active_queries["consulta-123"] = task
+
+    response = client.post("/api/agent/cancel/consulta-123")
+
+    assert response.status_code == 200
+    assert response.json() == {"cancelled": True}
+    assert task.cancelled is True
+
+
+def test_cancel_agent_informa_si_ya_termino(client) -> None:
+    response = client.post("/api/agent/cancel/inexistente")
+    assert response.status_code == 200
+    assert response.json() == {"cancelled": False}
+
+
 def test_agent_ask_respeta_limite_diario(client, monkeypatch) -> None:
     monkeypatch.setenv("EPH_DAILY_QUERY_LIMIT", "1")
     app.state.query_limiter = None

@@ -105,6 +105,7 @@ class AgentAskRequest(BaseModel):
     question: str = Field(min_length=1)
     profile: str | None = None
     debug: bool = False
+    request_id: str | None = Field(default=None, min_length=8, max_length=128)
 
 
 class CustomProviderRequest(BaseModel):

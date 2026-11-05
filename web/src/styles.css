@@ -320,7 +320,18 @@ main {
 }
 
 .ask-form button {
-  align-self: flex-end;
+  align-self: center;
+}
+
+.ask-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+button.danger {
+  border-color: var(--error);
+  color: var(--error);
 }
 
 .answer {

@@ -122,7 +122,12 @@ it("envía debug y muestra la traza del loop", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Consultar" }));
 
   await screen.findByText("Hay 43.739 personas en la muestra.");
-  expect(spy).toHaveBeenCalledWith("¿Cuántas personas hay?", true);
+  expect(spy).toHaveBeenCalledWith(
+    "¿Cuántas personas hay?",
+    true,
+    expect.any(String),
+    expect.any(AbortSignal),
+  );
   expect(screen.getByText(/Traza de depuración/)).toBeInTheDocument();
   expect(screen.getByRole("region", { name: "Recorrido de la consulta" })).toHaveTextContent(
     "personas",
@@ -180,4 +185,25 @@ it("muestra la traza cuando el agente falla en modo debugging", async () => {
 
   expect(await screen.findByRole("alert")).toHaveTextContent("No se pudo completar");
   expect(screen.getByText(/Traza del error/)).toBeInTheDocument();
+});
+
+it("permite detener una consulta en curso", async () => {
+  localStorage.clear();
+  vi.spyOn(api, "askAgent").mockImplementation((_question, _debug, _requestId, signal) =>
+    new Promise((_resolve, reject) => {
+      signal?.addEventListener("abort", () =>
+        reject(new DOMException("Cancelada", "AbortError")),
+      );
+    }),
+  );
+  const cancel = vi.spyOn(api, "cancelAgent").mockResolvedValue({ cancelled: true });
+  render(<AgentPage />);
+
+  fireEvent.change(screen.getByLabelText("Pregunta"), { target: { value: "Cancelar esto" } });
+  fireEvent.click(screen.getByRole("button", { name: "Consultar" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Detener consulta" }));
+
+  expect(await screen.findByRole("alert")).toHaveTextContent("Consulta detenida");
+  expect(cancel).toHaveBeenCalledWith(expect.any(String));
+  expect(screen.queryByRole("button", { name: "Detener consulta" })).not.toBeInTheDocument();
 });
