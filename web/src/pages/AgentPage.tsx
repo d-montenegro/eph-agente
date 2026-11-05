@@ -42,6 +42,36 @@ function toolCalls(trace: Array<Record<string, unknown>> | null | undefined) {
   );
 }
 
+type SemanticColumn = {
+  column?: string;
+  source_column?: string | null;
+  description?: string;
+  possible_values?: unknown[] | null;
+  notes?: string | null;
+};
+
+function describedColumns(trace: Array<Record<string, unknown>> | null | undefined) {
+  if (!trace) return [] as SemanticColumn[];
+  const columns: SemanticColumn[] = [];
+  for (const turn of trace) {
+    if (!Array.isArray(turn.tool_results)) continue;
+    for (const item of turn.tool_results as Array<Record<string, unknown>>) {
+      const result = item.result;
+      if (!result || typeof result !== "object") continue;
+      const resultColumns = (result as { columns?: unknown }).columns;
+      if (Array.isArray(resultColumns)) columns.push(...(resultColumns as SemanticColumn[]));
+    }
+  }
+  return columns;
+}
+
+function columnsUsed(sql: string | null, trace: Array<Record<string, unknown>> | null | undefined) {
+  if (!sql) return [];
+  return describedColumns(trace).filter(
+    (column) => column.column && new RegExp(`\\b${column.column}\\b`, "i").test(sql),
+  );
+}
+
 function loadHistory(): HistoryEntry[] {
   try {
     return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? "[]").slice(0, HISTORY_LIMIT);
@@ -267,6 +297,41 @@ export default function AgentPage() {
                     <code>personas</code>; no es una tabla independiente.
                   </p>
                 )}
+                {columnsUsed(answer.sql, answer.trace).length > 0 && (
+                  <div className="semantic-translations">
+                    <h4>Traducciones semánticas utilizadas</h4>
+                    <ul>
+                      {columnsUsed(answer.sql, answer.trace).map((column) => (
+                        <li key={column.column}>
+                          <code>{column.column}</code>
+                          {column.source_column ? (
+                            <>
+                              {" "}← columna INDEC <code>{column.source_column}</code>
+                            </>
+                          ) : (
+                            " ← columna derivada"
+                          )}
+                          {column.notes && <span> · {column.notes}</span>}
+                          {!column.notes && column.possible_values && (
+                            <span> · valores: {column.possible_values.join(", ")}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="tool-details">
+                  <h4>Parámetros enviados a las herramientas</h4>
+                  {toolCalls(answer.trace).map((call, index) => (
+                    <details key={`${call.name}-${index}`}>
+                      <summary>
+                        {index + 1}. <code>{call.name ?? "herramienta"}</code>
+                      </summary>
+                      <p>Parámetros:</p>
+                      <pre>{JSON.stringify(call.arguments ?? {}, null, 2)}</pre>
+                    </details>
+                  ))}
+                </div>
               </section>
             )}
 

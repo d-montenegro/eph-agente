@@ -719,6 +719,39 @@ button.danger {
   color: var(--muted);
 }
 
+.semantic-translations,
+.tool-details {
+  margin-top: 1rem;
+}
+
+.semantic-translations h4,
+.tool-details h4 {
+  margin: 0 0 0.4rem;
+}
+
+.semantic-translations ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.tool-details details {
+  margin-top: 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.6rem;
+}
+
+.tool-details p {
+  margin: 0.5rem 0 0.2rem;
+  color: var(--muted);
+}
+
+.tool-details pre {
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 .trace summary {
   cursor: pointer;
   color: var(--accent);

@@ -179,6 +179,7 @@ views:
         null_meaning: No se documenta un NULL.
         universe: Todas las personas.
         synonyms: [género, varón, mujer]
+        notes: "Traducción versionada: CH04 = 1 → Varón; CH04 = 2 → Mujer."
       edad:
         source: CH06
         description: Años cumplidos de la persona.
@@ -290,6 +291,7 @@ views:
         universe: Ocupados.
         synonyms: [formalidad, empleo formal, empleo informal]
         notes: >-
+          Traducción versionada: EMPLEO = 1 → Formal; EMPLEO = 2 → Informal.
           La definición de formalidad del INDEC no equivale a tener recibo de
           sueldo. Los Ns/Nr (EMPLEO = 9) quedan NULL: declarar cómo se tratan.
       sector:

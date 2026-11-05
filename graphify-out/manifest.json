@@ -234,9 +234,9 @@
     "semantic_hash": ""
   },
   "semantic/columns.yml": {
-    "mtime": 1793315782.7580938,
-    "seen": 1793316001.934355,
-    "ast_hash": "81f01d369fdb7ddba4dcf0feceb8caeb",
+    "mtime": 1793912067.3249304,
+    "seen": 1793917831.1821709,
+    "ast_hash": "af8603829df94daf5778184dffba6d1b",
     "semantic_hash": ""
   },
   "src/eph_agent/agent.py": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793911474.2393706,
-    "seen": 1793911507.629994,
-    "ast_hash": "455005e9caa420de1eaa562cd6e2f81d",
+    "mtime": 1793917820.492289,
+    "seen": 1793917831.1813052,
+    "ast_hash": "e04acb360c5348f1657918072a6439bb",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793911474.2094083,
-    "seen": 1793911507.629995,
-    "ast_hash": "cddc9cb9a1873ea8265caf28854e1f4e",
+    "mtime": 1793912067.3564675,
+    "seen": 1793917831.1813061,
+    "ast_hash": "7bbdf672397aa2b82c3fb72617d6e94c",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {
@@ -603,6 +603,12 @@
     "mtime": 1793493389.9401987,
     "seen": 1793493969.840279,
     "ast_hash": "d5c55c0e62497982e201385dd99dafc9",
+    "semantic_hash": ""
+  },
+  "eph_1t2026.manifest.json": {
+    "mtime": 1793915777.6572134,
+    "seen": 1793917831.179463,
+    "ast_hash": "e63ac37e20541856623dc41afe6c357c",
     "semantic_hash": ""
   }
 }

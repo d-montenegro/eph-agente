@@ -106,13 +106,45 @@ it("envía debug y muestra la traza del loop", async () => {
       turn: 1,
       elapsed_ms: 12,
       content: null,
-      tool_calls: [{ name: "ejecutar_sql", arguments: { query: "SELECT 1" } }],
+      tool_calls: [{ name: "describir_tabla", arguments: { nombre: "personas" } }],
+      tool_results: [
+        {
+          name: "describir_tabla",
+          result: {
+            view: "personas",
+            columns: [
+              {
+                column: "sexo",
+                source_column: "CH04",
+                description: "Sexo de la persona",
+                possible_values: ["Varón", "Mujer"],
+                notes: "CH04 = 1 → Varón; CH04 = 2 → Mujer.",
+              },
+            ],
+          },
+        },
+      ],
+    },
+    {
+      turn: 2,
+      elapsed_ms: 8,
+      content: null,
+      tool_calls: [
+        {
+          name: "ejecutar_sql",
+          arguments: { query: "SELECT COUNT(*) FROM personas WHERE sexo = 'Varón'" },
+        },
+      ],
       tool_results: [{ name: "ejecutar_sql", result: { row_count: 1 } }],
     },
   ];
   const spy = vi
     .spyOn(api, "askAgent")
-    .mockResolvedValue({ ...answer, trace });
+    .mockResolvedValue({
+      ...answer,
+      sql: "SELECT COUNT(*) FROM personas WHERE sexo = 'Varón'",
+      trace,
+    });
   render(<AgentPage />);
 
   fireEvent.change(screen.getByLabelText("Pregunta"), {
@@ -135,7 +167,9 @@ it("envía debug y muestra la traza del loop", async () => {
   expect(screen.getByRole("region", { name: "Recorrido de la consulta" })).toHaveTextContent(
     "individual",
   );
-  expect(screen.getByText(/Debug · 1 llamada/)).toBeInTheDocument();
+  expect(screen.getByText(/Debug · 2 llamadas/)).toBeInTheDocument();
+  expect(screen.getAllByText(/CH04 = 1 → Varón/).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/"nombre": "personas"/).length).toBeGreaterThan(0);
 });
 
 it("restaura el modo debugging y la traza desde el historial", () => {
