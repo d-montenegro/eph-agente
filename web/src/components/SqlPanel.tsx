@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
-export default function SqlPanel({ sql }: { sql: string | null }) {
+export default function SqlPanel({
+  sql,
+  title = "SQL ejecutado",
+}: {
+  sql: string | null;
+  title?: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -20,9 +26,9 @@ export default function SqlPanel({ sql }: { sql: string | null }) {
   }
 
   return (
-    <section className="sql-panel" aria-label="SQL ejecutado">
+    <section className="sql-panel" aria-label={title}>
       <header>
-        <h3>SQL ejecutado</h3>
+        <h3>{title}</h3>
         {sql && (
           <button type="button" onClick={copy}>
             {copied ? "Copiado" : "Copiar"}

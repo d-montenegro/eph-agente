@@ -112,6 +112,8 @@ it("envía debug y muestra la traza del loop", async () => {
           name: "describir_tabla",
           result: {
             view: "personas",
+            view_sql:
+              "SELECT CASE CH04 WHEN 1 THEN 'Varón' WHEN 2 THEN 'Mujer' END AS sexo FROM individual",
             columns: [
               {
                 column: "sexo",
@@ -144,7 +146,8 @@ it("envía debug y muestra la traza del loop", async () => {
     .spyOn(api, "askAgent")
     .mockResolvedValue({
       ...answer,
-      sql: "SELECT COUNT(*) FROM personas WHERE sexo = 'Varón'",
+      sql:
+        "SELECT * FROM (SELECT COUNT(*) FROM personas WHERE sexo = 'Varón') AS _guard LIMIT 1001",
       trace,
     });
   render(<AgentPage />);
@@ -172,8 +175,10 @@ it("envía debug y muestra la traza del loop", async () => {
   expect(screen.getByText(/Debug · 2 llamadas/)).toBeInTheDocument();
   expect(screen.getAllByText(/CH04 = 1 → Varón/).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/"nombre": "personas"/).length).toBeGreaterThan(0);
-  expect(screen.getByText("SQL técnico equivalente sobre la tabla cruda")).toBeInTheDocument();
-  expect(screen.getByText(/FROM individual WHERE CH04 = 1/)).toBeInTheDocument();
+  expect(
+    screen.getByText("SQL completo para copiar y ejecutar en la base cruda"),
+  ).toBeInTheDocument();
+  expect(screen.getByText(/WITH personas AS/)).toHaveTextContent("FROM individual");
 });
 
 it("restaura el modo debugging y la traza desde el historial", () => {

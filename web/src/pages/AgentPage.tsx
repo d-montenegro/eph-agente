@@ -74,37 +74,40 @@ function columnsUsed(sql: string | null, trace: Array<Record<string, unknown>> |
   );
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function describedViews(trace: Array<Record<string, unknown>> | null | undefined) {
+  if (!trace) return new Map<string, string>();
+  const definitions = new Map<string, string>();
+  for (const turn of trace) {
+    if (!Array.isArray(turn.tool_results)) continue;
+    for (const item of turn.tool_results as Array<Record<string, unknown>>) {
+      const result = item.result;
+      if (!result || typeof result !== "object") continue;
+      const view = (result as { view?: unknown }).view;
+      const viewSql = (result as { view_sql?: unknown }).view_sql;
+      if (typeof view === "string" && typeof viewSql === "string") definitions.set(view, viewSql);
+    }
+  }
+  return definitions;
 }
 
-function rawSqlEquivalent(
+function removeSafetyWrapper(sql: string) {
+  const match = sql.match(/^SELECT \* FROM \(\s*([\s\S]+)\s*\) AS _guard LIMIT \d+\s*;?$/i);
+  return match?.[1]?.trim() ?? sql.trim().replace(/;$/, "");
+}
+
+function executableRawSql(
   sql: string | null,
   trace: Array<Record<string, unknown>> | null | undefined,
 ) {
   if (!sql) return null;
-  let rawSql = sql;
-  for (const [view, lineage] of viewsUsed(sql)) {
-    rawSql = rawSql.replace(new RegExp(`\\b${view}\\b`, "gi"), lineage.source);
-  }
-  for (const column of columnsUsed(sql, trace)) {
-    if (!column.column || !column.source_column) continue;
-    for (const [label, rawValue] of Object.entries(column.raw_values ?? {})) {
-      const renderedValue = typeof rawValue === "number" ? String(rawValue) : `'${rawValue}'`;
-      const equality = new RegExp(
-        `\\b${escapeRegExp(column.column)}\\b\\s*=\\s*(['"])${escapeRegExp(label)}\\1`,
-        "gi",
-      );
-      rawSql = rawSql.replace(equality, `${column.source_column} = ${renderedValue}`);
-    }
-    if (column.sql_expression) {
-      rawSql = rawSql.replace(
-        new RegExp(`\\b${escapeRegExp(column.column)}\\b`, "gi"),
-        `(${column.sql_expression})`,
-      );
-    }
-  }
-  return rawSql === sql ? null : rawSql;
+  const query = removeSafetyWrapper(sql);
+  const definitions = describedViews(trace);
+  const ctes = viewsUsed(query).flatMap(([view]) => {
+    const definition = definitions.get(view);
+    return definition ? [`${view} AS (\n${definition}\n)`] : [];
+  });
+  if (!ctes.length) return null;
+  return `WITH ${ctes.join(",\n")}\n${query};`;
 }
 
 function loadHistory(): HistoryEntry[] {
@@ -355,15 +358,16 @@ export default function AgentPage() {
                     </ul>
                   </div>
                 )}
-                {rawSqlEquivalent(answer.sql, answer.trace) && (
+                {executableRawSql(answer.sql, answer.trace) && (
                   <div className="raw-sql">
-                    <h4>SQL técnico equivalente sobre la tabla cruda</h4>
-                    <pre>
-                      <code>{rawSqlEquivalent(answer.sql, answer.trace)}</code>
-                    </pre>
+                    <SqlPanel
+                      sql={executableRawSql(answer.sql, answer.trace)}
+                      title="SQL completo para copiar y ejecutar en la base cruda"
+                    />
                     <p>
-                      Se muestra para auditoría. El agente no lo ejecuta: consulta solamente las
-                      vistas semánticas protegidas.
+                      Incluye la definición de la vista y elimina el límite interno de seguridad.
+                      Se muestra para auditoría; el agente no consulta directamente las tablas
+                      crudas.
                     </p>
                   </div>
                 )}

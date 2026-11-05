@@ -58,6 +58,19 @@ def _read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def view_definition(view_name: str, path: Path | None = None) -> str:
+    """Devuelve el SELECT versionado que define una vista semántica."""
+    if view_name not in load_dictionary()["views"]:
+        raise SemanticLayerError(f"No existe la vista semántica {view_name!r}")
+    sql = _read(Path(path) if path is not None else VIEWS_SQL)
+    marker = f"CREATE VIEW {view_name} AS"
+    try:
+        definition = sql.split(marker, 1)[1].split(";", 1)[0].strip()
+    except IndexError as error:
+        raise SemanticLayerError(f"No se encontró la definición SQL de {view_name!r}") from error
+    return definition
+
+
 def install_semantic_layer(
     connection: sqlite3.Connection,
     dictionary: dict[str, Any] | None = None,

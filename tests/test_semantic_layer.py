@@ -10,6 +10,7 @@ from eph_agent.semantic import (
     list_views,
     load_dictionary,
     validate_dictionary,
+    view_definition,
 )
 
 
@@ -197,6 +198,14 @@ def test_describir_tabla_expone_la_traduccion_sql_cruda(semantic_connection) -> 
     assert sexo["source_column"] == "CH04"
     assert sexo["sql_expression"] == "CASE CH04 WHEN 1 THEN 'Varón' WHEN 2 THEN 'Mujer' END"
     assert sexo["raw_values"] == {"Varón": 1, "Mujer": 2}
+
+
+def test_definicion_de_vista_es_un_select_ejecutable() -> None:
+    sql = view_definition("personas")
+
+    assert sql.startswith("SELECT")
+    assert "CASE CH04" in sql
+    assert sql.endswith("FROM individual")
 
 
 def test_grupo_edad_es_null_si_la_edad_es_null(semantic_connection) -> None:

@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/semantic.py": {
-    "mtime": 1793918183.953689,
-    "seen": 1793918232.860353,
-    "ast_hash": "c9941dac1fd0feed1824dceec56eaa84",
+    "mtime": 1793918854.2303457,
+    "seen": 1793918908.923959,
+    "ast_hash": "a0eb9c4d259e39f82dac7e57a71777eb",
     "semantic_hash": ""
   },
   "src/eph_agent/sql_guard.py": {
@@ -198,9 +198,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/tools.py": {
-    "mtime": 1793295320.2308095,
-    "seen": 1793303657.852117,
-    "ast_hash": "fdb1938f15f5b1e5bdda571d1515bc73",
+    "mtime": 1793918854.2583034,
+    "seen": 1793918908.9239879,
+    "ast_hash": "9a50ff88018f2f13e9230cf20489a65e",
     "semantic_hash": ""
   },
   "tests/conftest.py": {
@@ -222,9 +222,9 @@
     "semantic_hash": ""
   },
   "tests/test_semantic_layer.py": {
-    "mtime": 1793918183.9836302,
-    "seen": 1793918232.860828,
-    "ast_hash": "3ea7dd146ad43628cc36922d4ba7ecd2",
+    "mtime": 1793918854.3119621,
+    "seen": 1793918908.9243221,
+    "ast_hash": "1077098258d7d10e9058de87dc405de6",
     "semantic_hash": ""
   },
   "tests/test_sql_guard.py": {
@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/agent.py": {
-    "mtime": 1793384508.8362184,
-    "seen": 1793385832.6496809,
-    "ast_hash": "2b09c27087503053206e1ec56cec1891",
+    "mtime": 1793918854.284839,
+    "seen": 1793918908.923317,
+    "ast_hash": "a27237e8736c0caba6bc350c6d78221c",
     "semantic_hash": ""
   },
   "src/eph_agent/answer.py": {
@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "web/src/components/SqlPanel.tsx": {
-    "mtime": 1793308585.6168764,
-    "seen": 1793309219.857822,
-    "ast_hash": "89dbbdf37ff82d003e69a6bb030ebc67",
+    "mtime": 1793918854.339657,
+    "seen": 1793918908.924612,
+    "ast_hash": "63cbe317a8e42acd76bb3b21ed0b5cb6",
     "semantic_hash": ""
   },
   "web/src/lib/markdown.test.ts": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793918203.3193038,
-    "seen": 1793918232.861212,
-    "ast_hash": "0a004fca6b42f678ffdb82b0da51825a",
+    "mtime": 1793918877.4170566,
+    "seen": 1793918908.924711,
+    "ast_hash": "dcac3975a3a5eeb0f0e173f4c6b50dfe",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793918203.2776155,
-    "seen": 1793918232.861213,
-    "ast_hash": "e4083307069e83f2d03778ca62f9835f",
+    "mtime": 1793918869.2658165,
+    "seen": 1793918908.924712,
+    "ast_hash": "8b3473106ff415a0046a4d7d8f81e846",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {

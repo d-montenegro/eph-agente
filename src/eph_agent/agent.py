@@ -244,7 +244,9 @@ class AgentService:
                 columns = self.adapter.describe_table(name)
             except (DatabaseError, ValueError) as error:
                 return {"error": str(error)}, None
-            return {"view": name, "columns": columns}, None
+            from eph_agent.semantic import view_definition
+
+            return {"view": name, "view_sql": view_definition(name), "columns": columns}, None
 
         if call.name == "ejecutar_sql":
             query = call.arguments.get("query")
