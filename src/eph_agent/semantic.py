@@ -290,6 +290,7 @@ def list_views(connection: sqlite3.Connection) -> list[dict[str, Any]]:
 
 def describe_table(connection: sqlite3.Connection, view_name: str) -> list[dict[str, Any]]:
     """Devuelve la ficha completa de columnas de una vista semántica."""
+    dictionary_columns = load_dictionary()["views"].get(view_name, {}).get("columns", {})
     rows = connection.execute(
         """
         SELECT column_name, source_column, description, data_type, possible_values,
@@ -317,6 +318,8 @@ def describe_table(connection: sqlite3.Connection, view_name: str) -> list[dict[
             "weight": row[7],
             "synonyms": _from_json(row[8]) or [],
             "notes": row[9],
+            "sql_expression": dictionary_columns.get(row[0], {}).get("sql_expression"),
+            "raw_values": dictionary_columns.get(row[0], {}).get("raw_values"),
         }
         for row in rows
     ]

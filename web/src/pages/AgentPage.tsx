@@ -48,6 +48,8 @@ type SemanticColumn = {
   description?: string;
   possible_values?: unknown[] | null;
   notes?: string | null;
+  sql_expression?: string | null;
+  raw_values?: Record<string, string | number> | null;
 };
 
 function describedColumns(trace: Array<Record<string, unknown>> | null | undefined) {
@@ -70,6 +72,39 @@ function columnsUsed(sql: string | null, trace: Array<Record<string, unknown>> |
   return describedColumns(trace).filter(
     (column) => column.column && new RegExp(`\\b${column.column}\\b`, "i").test(sql),
   );
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function rawSqlEquivalent(
+  sql: string | null,
+  trace: Array<Record<string, unknown>> | null | undefined,
+) {
+  if (!sql) return null;
+  let rawSql = sql;
+  for (const [view, lineage] of viewsUsed(sql)) {
+    rawSql = rawSql.replace(new RegExp(`\\b${view}\\b`, "gi"), lineage.source);
+  }
+  for (const column of columnsUsed(sql, trace)) {
+    if (!column.column || !column.source_column) continue;
+    for (const [label, rawValue] of Object.entries(column.raw_values ?? {})) {
+      const renderedValue = typeof rawValue === "number" ? String(rawValue) : `'${rawValue}'`;
+      const equality = new RegExp(
+        `\\b${escapeRegExp(column.column)}\\b\\s*=\\s*(['"])${escapeRegExp(label)}\\1`,
+        "gi",
+      );
+      rawSql = rawSql.replace(equality, `${column.source_column} = ${renderedValue}`);
+    }
+    if (column.sql_expression) {
+      rawSql = rawSql.replace(
+        new RegExp(`\\b${escapeRegExp(column.column)}\\b`, "gi"),
+        `(${column.sql_expression})`,
+      );
+    }
+  }
+  return rawSql === sql ? null : rawSql;
 }
 
 function loadHistory(): HistoryEntry[] {
@@ -318,6 +353,18 @@ export default function AgentPage() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                )}
+                {rawSqlEquivalent(answer.sql, answer.trace) && (
+                  <div className="raw-sql">
+                    <h4>SQL técnico equivalente sobre la tabla cruda</h4>
+                    <pre>
+                      <code>{rawSqlEquivalent(answer.sql, answer.trace)}</code>
+                    </pre>
+                    <p>
+                      Se muestra para auditoría. El agente no lo ejecuta: consulta solamente las
+                      vistas semánticas protegidas.
+                    </p>
                   </div>
                 )}
                 <div className="tool-details">

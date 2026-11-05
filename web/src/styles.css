@@ -720,13 +720,27 @@ button.danger {
 }
 
 .semantic-translations,
+.raw-sql,
 .tool-details {
   margin-top: 1rem;
 }
 
 .semantic-translations h4,
+.raw-sql h4,
 .tool-details h4 {
   margin: 0 0 0.4rem;
+}
+
+.raw-sql pre {
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: var(--code-bg);
+  white-space: pre-wrap;
+}
+
+.raw-sql p {
+  color: var(--muted);
 }
 
 .semantic-translations ul {

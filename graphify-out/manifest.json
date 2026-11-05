@@ -186,9 +186,9 @@
     "semantic_hash": ""
   },
   "src/eph_agent/semantic.py": {
-    "mtime": 1793312431.4939249,
-    "seen": 1793314841.465594,
-    "ast_hash": "e6e055c771d965635c3ded96a2e96efa",
+    "mtime": 1793918183.953689,
+    "seen": 1793918232.860353,
+    "ast_hash": "c9941dac1fd0feed1824dceec56eaa84",
     "semantic_hash": ""
   },
   "src/eph_agent/sql_guard.py": {
@@ -222,9 +222,9 @@
     "semantic_hash": ""
   },
   "tests/test_semantic_layer.py": {
-    "mtime": 1793312423.1295793,
-    "seen": 1793314841.46585,
-    "ast_hash": "937f28162d7454ea04f0eb11ec289801",
+    "mtime": 1793918183.9836302,
+    "seen": 1793918232.860828,
+    "ast_hash": "3ea7dd146ad43628cc36922d4ba7ecd2",
     "semantic_hash": ""
   },
   "tests/test_sql_guard.py": {
@@ -234,9 +234,9 @@
     "semantic_hash": ""
   },
   "semantic/columns.yml": {
-    "mtime": 1793912067.3249304,
-    "seen": 1793917831.1821709,
-    "ast_hash": "af8603829df94daf5778184dffba6d1b",
+    "mtime": 1793918177.2602563,
+    "seen": 1793918232.8620312,
+    "ast_hash": "24136bb3d6bf177ce85bfb76e3b8e49f",
     "semantic_hash": ""
   },
   "src/eph_agent/agent.py": {
@@ -408,15 +408,15 @@
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.test.tsx": {
-    "mtime": 1793917820.492289,
-    "seen": 1793917831.1813052,
-    "ast_hash": "e04acb360c5348f1657918072a6439bb",
+    "mtime": 1793918203.3193038,
+    "seen": 1793918232.861212,
+    "ast_hash": "0a004fca6b42f678ffdb82b0da51825a",
     "semantic_hash": ""
   },
   "web/src/pages/AgentPage.tsx": {
-    "mtime": 1793912067.3564675,
-    "seen": 1793917831.1813061,
-    "ast_hash": "7bbdf672397aa2b82c3fb72617d6e94c",
+    "mtime": 1793918203.2776155,
+    "seen": 1793918232.861213,
+    "ast_hash": "e4083307069e83f2d03778ca62f9835f",
     "semantic_hash": ""
   },
   "web/src/pages/ProjectPage.test.tsx": {

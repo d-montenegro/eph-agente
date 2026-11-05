@@ -176,6 +176,8 @@ views:
         description: Sexo de la persona.
         type: categorica
         possible_values: [Varón, Mujer]
+        sql_expression: "CASE CH04 WHEN 1 THEN 'Varón' WHEN 2 THEN 'Mujer' END"
+        raw_values: {Varón: 1, Mujer: 2}
         null_meaning: No se documenta un NULL.
         universe: Todas las personas.
         synonyms: [género, varón, mujer]
@@ -287,6 +289,8 @@ views:
         description: Carácter formal o informal del empleo.
         type: categorica
         possible_values: [Formal, Informal]
+        sql_expression: "CASE EMPLEO WHEN 1 THEN 'Formal' WHEN 2 THEN 'Informal' END"
+        raw_values: {Formal: 1, Informal: 2}
         null_meaning: NULL fuera del universo o cuando la respuesta es Ns/Nr.
         universe: Ocupados.
         synonyms: [formalidad, empleo formal, empleo informal]

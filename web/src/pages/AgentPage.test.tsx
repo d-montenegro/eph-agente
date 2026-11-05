@@ -119,6 +119,8 @@ it("envía debug y muestra la traza del loop", async () => {
                 description: "Sexo de la persona",
                 possible_values: ["Varón", "Mujer"],
                 notes: "CH04 = 1 → Varón; CH04 = 2 → Mujer.",
+                sql_expression: "CASE CH04 WHEN 1 THEN 'Varón' WHEN 2 THEN 'Mujer' END",
+                raw_values: { Varón: 1, Mujer: 2 },
               },
             ],
           },
@@ -170,6 +172,8 @@ it("envía debug y muestra la traza del loop", async () => {
   expect(screen.getByText(/Debug · 2 llamadas/)).toBeInTheDocument();
   expect(screen.getAllByText(/CH04 = 1 → Varón/).length).toBeGreaterThan(0);
   expect(screen.getAllByText(/"nombre": "personas"/).length).toBeGreaterThan(0);
+  expect(screen.getByText("SQL técnico equivalente sobre la tabla cruda")).toBeInTheDocument();
+  expect(screen.getByText(/FROM individual WHERE CH04 = 1/)).toBeInTheDocument();
 });
 
 it("restaura el modo debugging y la traza desde el historial", () => {

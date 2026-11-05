@@ -1,17 +1,17 @@
 # Graph Report - Trabajo Final Diplomatura  (2026-11-05)
 
 ## Corpus Check
-- 87 files · ~43,118 words
+- 87 files · ~43,400 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 11 file(s) not represented in the graph (top: (none) 5, .zip 2, .example 1)
 
 ## Summary
-- 901 nodes · 1989 edges · 41 communities (33 shown, 8 thin omitted)
+- 904 nodes · 1998 edges · 42 communities (34 shown, 8 thin omitted)
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 213 edges (avg confidence: 0.91)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `180522b1`
+- Built from commit: `9e2236e7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -28,21 +28,22 @@
 - bash
 - Dependencia pandas 3.1.0
 - api.py
-- agent.py
+- AgentService
 - test_api.py
 - providers/__init__.py
 - pytest
 - evaluation.py
 - permission
 - package.json
-- pytest
+- agent.py
 - client.ts
 - validate_query
 - compilerOptions
 - PostgresAdapter
-- .connect
+- DatabaseAdapter
 - test_api_agent.py
 - Evaluación
+- schema_index.py
 - dev.sh
 - Despliegue
 - Demo rápida
@@ -50,7 +51,7 @@
 - Sesgo por cobertura y no respuesta
 - Diseño de registros EPH 1T 2026
 - Herramienta ejecutar_sql
-- Agente de consultas en lenguaje natural sobre la EPH
+- describir_tabla
 - auth.py
 - DailyRequestLimiter
 
@@ -67,15 +68,15 @@
 10. `PostgresAdapter` - 16 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `La solución` --references--> `ejecutar_sql()`  [INFERRED]
+  docs/proyecto.md → src/eph_agent/tools.py
 - `Golden set de preguntas EPH` --conceptually_related_to--> `No comparabilidad estricta antes y después de 1T 2019`  [INFERRED]
   README.md → datos_indec/EPH_nota_metodologica_1_trim_2019.pdf
 - `La solución` --references--> `describir_tabla()`  [INFERRED]
   docs/proyecto.md → src/eph_agent/tools.py
-- `La solución` --references--> `ejecutar_sql()`  [INFERRED]
-  docs/proyecto.md → src/eph_agent/tools.py
+- `Herramientas` --references--> `ejecutar_sql()`  [INFERRED]
+  src/eph_agent/prompts/system.md → src/eph_agent/tools.py
 - `Diccionario de metadatos de columnas` --references--> `Ponderadores de ingresos PONDII PONDIIO PONDIH`  [INFERRED]
-  README.md → datos_indec/EPH_registro_1T2026.pdf
-- `Vistas legibles personas y hogares` --references--> `Códigos especiales y no respuesta`  [INFERRED]
   README.md → datos_indec/EPH_registro_1T2026.pdf
 
 ## Import Cycles
@@ -88,15 +89,15 @@
 - **Acceso semántico seguro a la EPH** — readme_readable_views, readme_metadata_dictionary, readme_describir_tabla, readme_ejecutar_sql, readme_safe_sql_execution [EXTRACTED 1.00]
 - **Ponderación y calidad de estimaciones EPH** — datos_indec_eph_registro_1t2026_general_weight, datos_indec_eph_registro_1t2026_income_weights, datos_indec_eph_consideraciones_metodologicas_2t20_propensity_score, datos_indec_eph_consideraciones_metodologicas_2t20_calibration, datos_indec_eph_consideraciones_metodologicas_2t20_quality_thresholds [INFERRED 0.85]
 
-## Communities (41 total, 8 thin omitted)
+## Communities (42 total, 8 thin omitted)
 
 ### Community 0 - "Evaluación y reproducibilidad"
-Cohesion: 0.09
-Nodes (21): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+13 more)
+Cohesion: 0.13
+Nodes (17): buscar_zip(), construir_base(), convertir_tipos(), extraer_tablas(), leer_txt(), main(), tipo_sql(), validar_periodo() (+9 more)
 
 ### Community 1 - "Capa semántica EPH"
-Cohesion: 0.09
-Nodes (11): get_settings(), DatabaseBackend, DatabaseSettings, ColabNotebookTest, test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string(), test_default_sqlite_path_is_relative_to_project(), test_defaults_to_local_sqlite() (+3 more)
+Cohesion: 0.08
+Nodes (13): get_adapter(), get_settings(), DatabaseBackend, DatabaseSettings, create_database_adapter(), ColabNotebookTest, test_accepts_cloudflare_d1_identifier(), test_accepts_postgresql_connection_string() (+5 more)
 
 ### Community 2 - "opencode.json"
 Cohesion: 0.22
@@ -111,24 +112,24 @@ Cohesion: 0.25
 Nodes (5): Umbrales de calidad para publicar resultados, Agente de consultas en lenguaje natural sobre la EPH, Golden set de preguntas EPH, Perfiles local dev y eval, Despliegue reproducible en contenedor
 
 ### Community 5 - "DatabaseError"
-Cohesion: 0.16
+Cohesion: 0.18
 Nodes (4): DatabaseError, QueryExecutionError, QueryTimeoutError, D1Adapter
 
 ### Community 6 - "semantic.py"
-Cohesion: 0.10
-Nodes (31): _check_column_values(), _check_dictionary_structure(), describe_table(), _from_json(), install_semantic_layer(), list_views(), load_dictionary(), main() (+23 more)
+Cohesion: 0.08
+Nodes (36): main(), profile_view(), _check_column_values(), _check_dictionary_structure(), describe_table(), _from_json(), install_semantic_layer(), list_views() (+28 more)
 
 ### Community 12 - "bash"
 Cohesion: 0.05
 Nodes (39): cat*, curl *, docker *, find*, git add*, git commit*, git diff*, git log* (+31 more)
 
 ### Community 14 - "api.py"
-Cohesion: 0.06
-Nodes (45): La solución, add_custom_provider(), ask_agent(), cancel_agent(), describe_table(), execute_sql(), get_adapter(), health() (+37 more)
-
-### Community 15 - "agent.py"
 Cohesion: 0.08
-Nodes (33): AgentError, AgentService, _dedupe(), detect_period_conflict(), quality_warnings(), _to_payload(), AgentAnswer, AnswerValidationError (+25 more)
+Nodes (36): add_custom_provider(), ask_agent(), cancel_agent(), describe_table(), execute_sql(), health(), list_providers(), login() (+28 more)
+
+### Community 15 - "AgentService"
+Cohesion: 0.17
+Nodes (18): AgentError, AgentService, detect_period_conflict(), FakeProvider, final(), sql_call(), test_agota_los_turnos_sin_inventar(), test_debug_incluye_la_traza_del_loop() (+10 more)
 
 ### Community 16 - "test_api.py"
 Cohesion: 0.09
@@ -136,14 +137,14 @@ Nodes (7): client(), client(), test_hosted_no_permite_perfiles_personalizados(),
 
 ### Community 17 - "providers/__init__.py"
 Cohesion: 0.09
-Nodes (16): _json_arguments(), LLMProvider, Message, ModelInfo, ModelNotFound, ModelTurn, ProviderAuthError, ProviderError (+8 more)
+Nodes (15): _json_arguments(), LLMProvider, Message, ModelInfo, ModelNotFound, ModelTurn, ProviderAuthError, ProviderError (+7 more)
 
 ### Community 18 - "pytest"
-Cohesion: 0.13
-Nodes (21): get_registry(), _default_path(), fake_create(), models_handler(), provider(), test_error_de_conexion_es_seguro(), test_health_credencial_invalida(), test_health_modelo_inexistente() (+13 more)
+Cohesion: 0.07
+Nodes (34): get_registry(), _authorizer(), SQLiteAdapter, _default_path(), adapter(), adapter(), test_acota_las_filas_devueltas(), test_base_inexistente_falla_con_mensaje_seguro() (+26 more)
 
 ### Community 19 - "evaluation.py"
-Cohesion: 0.09
+Cohesion: 0.08
 Nodes (37): _as_dict(), compare_result(), compare_runs(), _current_commit(), EvaluationError, extract_scalar(), inspect_sql(), load_cases() (+29 more)
 
 ### Community 20 - "permission"
@@ -154,33 +155,37 @@ Nodes (10): permission, external_directory, glob, grep, list, read, task, todowr
 Cohesion: 0.06
 Nodes (31): jsdom, @types/node, @types/react, @types/react-dom, typescript, vite, @vitejs/plugin-react, dependencies (+23 more)
 
-### Community 23 - "pytest"
-Cohesion: 0.17
-Nodes (12): SQLiteAdapter, adapter(), test_validacion_rechaza_datos_sin_sql(), test_validacion_rechaza_texto_vacio(), adapter(), test_acota_las_filas_devueltas(), test_base_inexistente_falla_con_mensaje_seguro(), test_cierra_consultas_que_superan_el_timeout() (+4 more)
+### Community 23 - "agent.py"
+Cohesion: 0.14
+Nodes (13): _dedupe(), quality_warnings(), _to_payload(), AgentAnswer, AnswerValidationError, _as_list(), normalize_structured(), parse_structured_answer() (+5 more)
 
 ### Community 24 - "client.ts"
 Cohesion: 0.05
-Nodes (50): react, react-dom, @testing-library/jest-dom, @testing-library/react, vitest, AgentAnswer, api, ApiError (+42 more)
+Nodes (52): react, react-dom, @testing-library/jest-dom, @testing-library/react, vitest, AgentAnswer, api, ApiError (+44 more)
 
 ### Community 25 - "validate_query"
-Cohesion: 0.19
+Cohesion: 0.22
 Nodes (8): SQLGuardError, validate_query(), test_acepta_cte_y_join_entre_vistas(), test_acepta_lectura_sobre_vistas(), test_acepta_select_sin_tablas(), test_aplica_el_limite_configurado(), test_rechaza_consultas_peligrosas(), test_rechaza_dml_escondido_en_cte()
 
 ### Community 26 - "compilerOptions"
 Cohesion: 0.15
 Nodes (12): compilerOptions, isolatedModules, jsx, lib, module, moduleResolution, noEmit, skipLibCheck (+4 more)
 
-### Community 28 - ".connect"
-Cohesion: 0.24
-Nodes (3): _authorizer(), test_el_authorizer_bloquea_load_extension(), test_expone_metadatos_y_vistas()
+### Community 28 - "DatabaseAdapter"
+Cohesion: 0.23
+Nodes (3): DatabaseAdapter, QueryResult, ejecutar_sql()
 
 ### Community 29 - "test_api_agent.py"
-Cohesion: 0.16
-Nodes (12): AlwaysToolsProvider, client(), FakeProvider, patch_provider(), test_agent_ask_acota_periodo(), test_agent_ask_con_debug_devuelve_traza(), test_agent_ask_devuelve_salida_auditable(), test_agent_ask_devuelve_ultimo_resultado_si_no_cierra() (+4 more)
+Cohesion: 0.15
+Nodes (13): AlwaysToolsProvider, client(), FakeProvider, patch_provider(), fake_create(), test_agent_ask_acota_periodo(), test_agent_ask_con_debug_devuelve_traza(), test_agent_ask_devuelve_salida_auditable() (+5 more)
 
 ### Community 30 - "Evaluación"
 Cohesion: 0.33
 Nodes (5): Archivos, Comandos, Estructura de un caso, Evaluación, Umbral de aprobación (definido antes de mirar los resultados finales)
+
+### Community 31 - "schema_index.py"
+Cohesion: 0.48
+Nodes (3): build_schema_index(), _describe_column(), _render_value()
 
 ### Community 32 - "dev.sh"
 Cohesion: 0.73
@@ -210,13 +215,13 @@ Nodes (6): Condición de actividad ESTADO, Variables demográficas CH03-CH16, Ca
 Cohesion: 0.32
 Nodes (7): Códigos especiales y no respuesta, Identificadores CODUSU NRO_HOGAR COMPONENTE, Herramienta describir_tabla, Herramienta ejecutar_sql, Integración MCP con asistentes LLM, Vistas legibles personas y hogares, Loop de agente con tool use
 
-### Community 39 - "Agente de consultas en lenguaje natural sobre la EPH"
-Cohesion: 0.29
-Nodes (6): Agente de consultas en lenguaje natural sobre la EPH, Arquitectura, El problema, Evaluación, Lo que devuelve cada respuesta, Ponderadores
+### Community 39 - "describir_tabla"
+Cohesion: 0.11
+Nodes (13): Agente de consultas en lenguaje natural sobre la EPH, Arquitectura, El problema, Evaluación, La solución, Lo que devuelve cada respuesta, Ponderadores, Dialecto SQLite (+5 more)
 
 ### Community 40 - "auth.py"
 Cohesion: 0.07
-Nodes (21): main(), auth_guard(), login(), AuthConfigError, _b64decode(), _b64encode(), blocked_ips(), hash_password() (+13 more)
+Nodes (20): main(), auth_guard(), AuthConfigError, _b64decode(), _b64encode(), blocked_ips(), hash_password(), LoginThrottle (+12 more)
 
 ### Community 44 - "DailyRequestLimiter"
 Cohesion: 0.22
@@ -237,10 +242,10 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `eph-agente`, `@types/react`, `@types/react-dom` to the rest of the system?**
   _31 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Evaluación y reproducibilidad` be split into smaller, more focused modules?**
-  _Cohesion score 0.09468599033816426 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13015873015873017 - nodes in this community are weakly interconnected._
 - **Why does `Despliegue` connect `Despliegue` to `Demo rápida`?**
-  _High betweenness centrality (0.079) - this node is a cross-community bridge._
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `ProviderRegistry` (e.g. with `ProviderError` and `OpenAICompatibleProvider`) actually correct?**
   _`ProviderRegistry` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Capa semántica EPH` be split into smaller, more focused modules?**
-  _Cohesion score 0.09206349206349207 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._

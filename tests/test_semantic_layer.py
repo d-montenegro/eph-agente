@@ -190,6 +190,15 @@ def test_el_ponderador_declarado_es_una_columna_de_la_vista(semantic_connection)
     assert ingreso["weight"] in names
 
 
+def test_describir_tabla_expone_la_traduccion_sql_cruda(semantic_connection) -> None:
+    columns = describe_table(semantic_connection, "personas")
+    sexo = next(column for column in columns if column["column"] == "sexo")
+
+    assert sexo["source_column"] == "CH04"
+    assert sexo["sql_expression"] == "CASE CH04 WHEN 1 THEN 'Varón' WHEN 2 THEN 'Mujer' END"
+    assert sexo["raw_values"] == {"Varón": 1, "Mujer": 2}
+
+
 def test_grupo_edad_es_null_si_la_edad_es_null(semantic_connection) -> None:
     semantic_connection.execute(
         "UPDATE individual SET CH06 = NULL WHERE rowid = (SELECT MIN(rowid) FROM individual)"
